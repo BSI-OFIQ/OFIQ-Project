@@ -1,0 +1,38 @@
+//----------------------------
+// Example Configuration File
+// using: https://github.com/taocpp/json
+// formatted as: https://github.com/stand-art/jaxn
+// license: MIT
+//----------------------------
+{
+    "generateDebugImages": false,
+    "limit_to_measures" : [
+        "TotalFacesPresent",
+        "DynamicRange",
+        "MouthOpen"
+    ],
+    "faceLandmarks": {
+		"provider": "adnet",
+        "model_path": "models/adnet/ADNet.onnx"
+    },
+    "faceDetection": {
+        "provider": "ssd_facedetect",
+        "model_path": "models/ssd_facedetect/ssd_facedetect.caffemodel",
+        "prototxt_path": "models/ssd_facedetect/ssd_facedetect.prototxt.txt"
+    },
+    "parameters": {
+        // WARNING: Any changes in these parameters will make your results deviate from the specification!
+        /* Example for modifying a measure:
+        "<Measure>": {
+            "Sigmoid": { // qa(x) =  h * (a + s*(1+exp((x0-x)/w))^(-1))
+                "h": 100,
+                "a": 0,
+                "s": 1,
+                "x0": 4,
+                "w": 0.7,
+                "round": true
+            }
+        }
+        */
+    }
+}
