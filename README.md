@@ -18,4 +18,4 @@ See: [https://www.iso.org/standard/81005.html](https://www.iso.org/standard/8100
 
 # Preview for OFIQ
 
-A preview for OFIQ is available from the [https://github.com/BSI-OFIQ/OFIQ-Project/tree/develop](develop branch) of this repository.
+A preview for OFIQ is available from the [develop branch](https://github.com/BSI-OFIQ/OFIQ-Project/tree/develop) of this repository.
