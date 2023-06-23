@@ -1,7 +1,7 @@
 
 config_dir=../data
-input_image=../data/images/Emilia03.jpg
-config=Release
+input_image=../data/images/c-07-twofaces.png
+config=../install_x86_64_linux/Release
 
 export LD_LIBRARY_PATH=$PWD/$config/lib
 
