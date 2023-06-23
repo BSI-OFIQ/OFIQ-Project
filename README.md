@@ -15,3 +15,7 @@ Measuring these quality components can provide actionable feedback in the captur
 The outcome of the Open Source Face Image Quality (OFIQ) project is an open-source framework and reference implementation of face image quality assessment algorithms as standardised in **ISO/IEC 29794-5**, which can be deployed in commercial and government applications. 
 
 See: [https://www.iso.org/standard/81005.html](https://www.iso.org/standard/81005.html)
+
+## Getting started
+
+First steps on getting started with OFIQlib are described [here](doc/GETTINGSTARTED.md).

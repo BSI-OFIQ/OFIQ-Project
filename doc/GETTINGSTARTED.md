@@ -1,3 +1,17 @@
+# DISCLAIMER
+
+Currently, the scope of OFIQlib is onlay a preview featuring a subset of 
+implementations of preprocessing steps and quality measures. It is very 
+likely that the provided implementation will change. Do not expect backwards 
+compatibility.
+
+As of now, the preview for OFIQ features the following.
+* ADNet landmark estimator
+* SSD face detector
+* Dynamic Range measure
+* Total number of faces measure
+* Mouth open measure
+
 # Compilation of OFIQlib
 
 ## Download CNN models
