@@ -23,17 +23,17 @@ and [SSD - Readme](../data/models/ssd_facedetect/README.md).
 
 In order to build the project using Conan and CMake several batch scripts have been set up to guide through the build.
 
-To build the project you need to install cmake and conan
+To build the project you need to install cmake and conan.
 
 [Download and install cmake](https://cmake.org/)
 
-[Download and install conan](https://conan.io/)
-
-Currently, the project requires conan in the verions of 1.59 (other versions may not work). Install a working version of conan via **pip install conan==1.59**.
+The recommended way to install [Conan](https://conan.io/) is using python pip, so you need Python>=3.6 distribution installed on your machine. Currently, the project requires conan in the verion 1.59 (other versions may not work). Install a working version of conan via **pip install conan==1.59**.
 
 Install required libraries/packages: go to **\<OFIQ-PROJECT\>\scripts\\** directory and run **01_conan-install-FaceQAlib.cmd**
 
-Create and build the project: go to **\<OFIQ-PROJECT\>\scripts\\** directory and run **02_build_FaceQAlib.cmd**
+Create and build the project: go to **\<OFIQ-PROJECT\>\scripts\\** directory and run **02_configure_and_build_FaceQAlib.cmd**. If you later changed the source code and want to rebuild the library, you can run the **03_build_FaceQAlib.cmd** file, the project will be built without rectreating and overwriting your existing project files.
+
+Do not forget to download required model files for face detector and landmark estimator. The instructions are given in [ADNet - Readme](../data/models/adnet/README.md) and [SSD - Readme](../data/models/ssd_facedetect/README.md).
 
 Run the sample program: go to **\<OFIQ-PROJECT\>\scripts\\** directory and run **run_sample.cmd**
 
