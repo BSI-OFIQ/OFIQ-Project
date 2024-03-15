@@ -7,7 +7,7 @@ It includes dependencies that may
 be licensed otherwise. A documentation on the license situation of 
 dependencies can be found in the table below.
 
-##OFIQ License
+## OFIQ License
 
 Copyright (c) 2024  Federal Office for Information Security, Germany
 
@@ -29,7 +29,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-##License of dependencies
+## License of dependencies
 
 In the table the license situation of the files shipped with the OFIQ source
 is documented.
