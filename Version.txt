@@ -1,0 +1,7 @@
+# This file is used to set the version numbers for the cmake project and conan.
+# DO NOT change the "VERSION_*" keywords, as this file gets parsed by the conanfile.py and CMakeLists.txt
+# keep SUFFIX empty for release builds
+VERSION_MAJOR 1
+VERSION_MINOR 0
+VERSION_PATCH 0
+VERSION_SUFFIX RC

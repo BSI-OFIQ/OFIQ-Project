@@ -1,21 +1,15 @@
 # Open Source Face Image Quality (OFIQ)
 
-When dealing with operational face recognition systems, the quality of biometric samples plays an important role to ensure the usability of the collected data in reference databases.
-Accuracy is highly dependent on the sample quality achieved during the capture process. For face image samples the quality can be expressed as a **unified quality score** and in various quality components such as:
-- illumination uniformity
-- focus
-- eyes open
-- mouth open
-- face occlusion
-- frontal pose
-- and many more. 
+The __OFIQ__ (Open Source Face Image Quality) is a software library for computing quality 
+aspects of a facial image. OFIQ is written in the C/C++ programming language.
+OFIQ is the reference implementation for the ISO/IEC 29794-5 international
+standard; see [https://bsi.bund.de/dok/OFIQ-e](https://bsi.bund.de/dok/OFIQ-e).
 
-Measuring these quality components can provide actionable feedback in the capture process to the data subject or to the biometric attendant. Improving these quality components can lead to improved quality which in turn leads to better biometric performance.
-
-The outcome of the Open Source Face Image Quality (OFIQ) project is an open-source framework and reference implementation of face image quality assessment algorithms as standardised in **ISO/IEC 29794-5**, which can be deployed in commercial and government applications. 
-
-See: [https://www.iso.org/standard/81005.html](https://www.iso.org/standard/81005.html)
-
-# Preview for OFIQ
-
-A preview for OFIQ is available from the [develop branch](https://github.com/BSI-OFIQ/OFIQ-Project/tree/develop) of this repository.
+## License
+Before using __OFIQ__ or distributing parts of __OFIQ__ one should have a look
+on OFIQ's license and the license of its dependencies: [LICENSE.md](LICENSE.md)
+  
+## Reference manual
+The best way to get started, is to read OFIQ's reference manual: 
+see [doc/refman.pdf](doc/refman.pdf). The manual contains a documentation on
+how to compile and run __OFIQ__.
