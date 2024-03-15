@@ -231,7 +231,8 @@ TEST_P(ConformanceTest, ValidateScores)
 	QualityMeasureResult measureResult = iter->second;
 	
 	//EXPECT_NEAR(measureResult.rawScore, rawScore, 1e-3);
-	ASSERT_NEAR(measureResult.scalar, scalarScore, 1.0);
+	ASSERT_NEAR(measureResult.scalar, scalarScore, 1.0) << "scalar scores deviate by more than 1" << std::endl;
+	ASSERT_EQ(measureResult.scalar, round(measureResult.scalar)) << "scalar scores have to be integer" << std::endl;
 }
 
 std::string generateTestname(const testing::TestParamInfo<ConformanceTest::ParamType>& info) {

@@ -53,7 +53,7 @@ namespace OFIQ_LIB::modules::measures
         auto luminanceImage = GetLuminanceImageFromBGR(faceSegmentation);
 
         auto rawScore = ComputeEntropy(luminanceImage, cvMask);
-        auto scalarScore = 12.5 * rawScore;
+        auto scalarScore = round(12.5 * rawScore);
         if (scalarScore < 0.0)
         {
             scalarScore = 0.0;
