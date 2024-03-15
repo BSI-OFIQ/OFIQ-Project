@@ -1,0 +1,220 @@
+//----------------------------
+// Example Configuration File
+// using: https://github.com/taocpp/json
+// formatted as: https://github.com/stand-art/jaxn
+// license: MIT
+//----------------------------
+{
+
+// python config start
+  "config": {
+    "detector": "ssd",
+    "landmarks": "ADNet",
+    "measures": [
+      "HeadPose",
+      "InterEyeDistance",
+      "NoHeadCoverings",
+      "BackgroundUniformity",
+      "DynamicRange",
+      "ExpressionNeutrality",
+      "EyesVisible",
+      "EyesOpen",
+      "FaceOcclusionPrevention",
+      "CropOfTheFaceImage",
+      "IlluminationUniformity",
+      "MouthOcclusionPrevention",
+      "MouthClosed",
+      "OverExposurePrevention",
+      "Sharpness",
+      "SingleFacePresent",
+      "UnderExposurePrevention",
+      "UnifiedQualityScore",
+      "NaturalColour",
+      "NoHeadCoverings",
+      "CompressionArtifacts",
+      "Luminance",
+      "HeadSize"
+    ],
+    "params": {
+      "detector": {
+        "ssd": {
+          "model_path": "models/face_detection/ssd_facedetect.caffemodel",
+          "prototxt_path": "models/face_detection/ssd_facedetect.prototxt.txt",
+          "confidence_thr": 0.4,
+          "min_rel_face_size": 0.05,
+          "padding": 0.2
+        }
+      },
+      "landmarks": {
+        "ADNet": {
+          "model_path": "models/face_landmark_estimation/ADNet.onnx"
+        }
+      },
+      "measures": {
+        "BackgroundUniformity": {
+          "Sigmoid" : {
+            // deviates from C++ default settings
+            "h": 190,
+            "a": 1,
+            "s": -1,
+            "x0": 10,
+            "w" : 100
+          }
+        },
+        "UnderExposurePrevention": {
+          "Sigmoid" : {
+            "h": 120,
+            "a": 0.832,
+            "s": -1,
+            "x0": 0.92,
+            "w": 0.05,
+            "round": true
+          }
+        },
+        "Sharpness": {
+          "face_region_alpha": 0.0,
+          "use_aligned_landmarks": false,
+          "model_path": "models/sharpness/face_sharpness_rtree.xml.gz",
+          "Sigmoid" : {
+            // deviates from C++ default settings
+            "h": 1,
+            "a": -14.0,
+            "s": 115.0,
+            "x0": -20.0,
+            "w": 15.0,
+            "round": true
+          }
+        },
+        "NaturalColor": {
+          "Sigmoid" : {
+            "h": 200,
+            "a": 1,
+            "s": -1,
+            "x0": 0.0,
+            "w": 10.0,
+            "round": true
+          }
+        },
+        "EyesOpen": {
+          "Sigmoid" : {
+            "h": 100,
+            "x0": 0.02,
+            "w": 0.01,
+            "round": true
+          }
+        },
+        "MouthClosed": {
+          "Sigmoid" : {
+            "h": 100,
+            "a": 1,
+            "s": -1,
+            "x0": 0.2,
+            "w": 0.06,
+            "round": true
+          }
+        },
+        "InterEyeDistance": {
+          "Sigmoid" : {
+            "h": 100,
+            "x0": 70.0,
+            "w": 20.0,
+            "round": true
+          }
+        },
+        "HeadSize": {
+          "Sigmoid" : {
+            // input argument is |raw_score-0.45|, not raw_score
+            "h": 200,
+            "a": 1,
+            "s": -1,
+            "x0": 0.0,
+            "w": 0.05,
+            "round": true
+          }
+        },
+        "CropOfTheFaceImage": {
+          "LeftwardCropOfTheFaceImage": {
+            "Sigmoid" : {
+              "h": 100,
+              "x0": 0.9,
+              "w": 0.1,
+              "round": true
+            }
+          },
+          "RightwardCropOfTheFaceImage": {
+            "Sigmoid" : {
+              "h": 100,
+              "x0": 0.9,
+              "w": 0.1,
+              "round": true
+            }
+          },
+          "UpwardCropOfTheFaceImage": {
+            "Sigmoid" : {
+              "h": 100,
+              "x0": 1.8,
+              "w": 0.1,
+              "round": true
+            }
+          },
+          "DownwardCropOfTheFaceImage": {
+            "Sigmoid" : {
+              "h": 100,
+              "x0": 1.4,
+              "w": 0.1,
+              "round": true
+            }
+          }
+        },
+        "NoHeadCoverings": {
+          "threshold": 0.02
+        },
+        "HeadPose": {
+          "model_path": "models/head_pose_estimation/mb1_120x120.onnx"
+        },
+        "FaceOcclusionSegmentation": {
+          "model_path": "models/face_occlusion_segmentation/face_occlusion_segmentation_ort.onnx"
+        },
+        "FaceParsing": {
+          "model_path": "models/face_parsing/bisenet_400.onnx"
+        },
+        "FaceRegion": {
+          "alpha": 0.0
+        },
+        "UnifiedQualityScore": {
+          "model_path": "models/unified_quality_score/magface_iresnet50_norm.onnx",
+          "Sigmoid" : {
+            "h": 100,
+            "x0": 23.0,
+            "w": 2.6,
+            "round": true
+          }
+        },
+        "ExpressionNeutrality": {
+          "cnn1_model_path": "models/expression_neutrality/hsemotion/enet_b0_8_best_vgaf_embed_zeroed.onnx",
+          "cnn2_model_path": "models/expression_neutrality/hsemotion/enet_b2_8_embed_zeroed.onnx",
+          "adaboost_model_path": "models/expression_neutrality/grimmer/hse_1_2_C_adaboost.yml.gz",
+          "Sigmoid" : {
+            "h": 100,
+            "x0": -5000.0,
+            "w": 5000.0,
+            "round": true
+          }
+        },
+        "CompressionArtifacts": {
+          "crop": 184,
+          "dim": 248,
+          "model_path": "models/no_compression_artifacts/ssim_248_model.onnx",
+          "Sigmoid" : {
+            "h": 1,
+            "a": -0.0278,
+            "s": 103.0,
+            "x0": 0.3308,
+            "w": 0.092,
+            "round": true
+          }
+        }
+      }
+    }
+  }
+}
