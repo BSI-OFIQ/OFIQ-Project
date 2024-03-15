@@ -13,4 +13,3 @@ on OFIQ's license and the license of its dependencies: [LICENSE.md](LICENSE.md)
 The best way to get started, is to read OFIQ's reference manual: 
 see [doc/refman.pdf](doc/refman.pdf). The manual contains a documentation on
 how to compile and run __OFIQ__.
-
