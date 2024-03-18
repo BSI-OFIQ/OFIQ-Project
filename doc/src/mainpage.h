@@ -145,14 +145,14 @@
  * </table>
  * 
  * @subsection sec_download_models Download model files
- * To run OFIQ, the model files from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-2/en/OFIQ-MODELS.zip) 
+ * To run OFIQ, the model files from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-MODELS.zip) 
  * need to be downloaded and be placed in the <code>./data/models/</code> directory. 
  * This step is integrated in the cmake building process.
  * 
  * @subsection sec_download_conformance_test_images Download conformance test images
  * To run conformance tests, the conformance test
  * images need to be downloaded from 
- * [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-2/en/OFIQ-IMAGES.zip) 
+ * [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-IMAGES.zip) 
  * and be placed in the <code>./data/tests/images/</code> directory.
  * This step is integrated in the cmake building process.
  *
