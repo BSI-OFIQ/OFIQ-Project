@@ -25,7 +25,7 @@
  * for OFIQ.
  * @author OFIQ development team
  *
- * @mainpage Open Face Image Quality (OFIQ) Library
+ * @mainpage Open Source Face Image Quality (OFIQ) Library
  * @section sec_intro Introduction
  * OFIQ (Open Source Face Image Quality) is a software library for computing quality 
  * aspects of a facial image. OFIQ is written in the C/C++ programming language.
