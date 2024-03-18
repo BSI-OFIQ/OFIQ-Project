@@ -1,6 +1,6 @@
 This folder contains model files needed to run OFIQ.
 The files need to be downloaded from the 
-[ISO-portal](https://standards.iso.org/iso-iec/29794/-5/ed-2/en/OFIQ-MODELS.zip).
+[ISO-portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-MODELS.zip).
 This is done automatically by the building scripts shipped with OFIQ.
 The following folder structure shoulde placed directly here in this folder (not in
 a sub-folder).
