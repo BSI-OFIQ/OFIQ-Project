@@ -1,6 +1,6 @@
 This folder contains image files for reproducing conformance tests.
 The files need to be downloaded from the 
-[ISO-portal](https://standards.iso.org/iso-iec/29794/-5/ed-2/en/OFIQ-IMAGES.zip).
+[ISO-portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-IMAGES.zip).
 This is done automatically by the building scripts shipped with OFIQ.
 The following image files should be placed directly here in this folder (not in
 a sub-folder).
