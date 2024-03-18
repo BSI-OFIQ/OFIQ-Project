@@ -29,12 +29,6 @@ find_package(spdlog REQUIRED)
 find_package(taocpp-json REQUIRED)
 find_package(magic_enum REQUIRED)
 
-# MacOS Specific
-#find_library(FoundationLib CoreFoundation)
-#message("LIB: ${FoundationLib}")
-#find_library(AppLib ApplicationServices)
-#message("APP: ${AppLib}")
-
 # Find all source files
 
 add_definitions(-DOFIQ_EXPORTS)
