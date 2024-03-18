@@ -1,0 +1,21 @@
+install*
+extern/*
+build
+data/models/*/
+data/tests/images/*
+
+
+# Ignore Mac system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes

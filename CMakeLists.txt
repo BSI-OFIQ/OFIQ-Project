@@ -23,7 +23,7 @@ option(DOWNLOAD_IMAGES "Whether images must be downloaded" OFF)
 
 include(cmake/DownloadDependencies.cmake)
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
     project(OFIQLib VERSION ${ver_major}.${ver_minor}.${ver_patch} LANGUAGES CXX)
 
     if(DOWNLOAD_ONNX)
@@ -32,9 +32,21 @@ if (UNIX)
         message("Downloading ONNX from ${ONNX_URL}")
         download_file(${ONNX_URL}  ${ONNX_FILE})
     endif(DOWNLOAD_ONNX)
-
     include(OFIQlib/CMakeLists.ubuntu.conan.cmake)
-else(UNIX)
+elseif(APPLE)
+    project(OFIQLibMac VERSION ${ver_major}.${ver_minor}.${ver_patch} LANGUAGES CXX)
+    
+    if(DOWNLOAD_ONNX)
+        set(ONNX_FILE onnxruntime-osx-universal2-1.14.1.tgz)
+        set(ONNX_URL https://github.com/microsoft/onnxruntime/releases/download/v1.14.1/onnxruntime-osx-universal2-1.14.1.tgz)
+        message("Downloading ONNX from ${ONNX_URL}")
+        download_file(${ONNX_URL}  ${ONNX_FILE})
+    endif(DOWNLOAD_ONNX)
+    find_package(Threads)
+    find_package(BLAS)
+    find_package(LAPACK)
+    include(OFIQlib/CMakeLists.macos.conan.cmake)
+else(APPLE)
     project(OFIQLibWin VERSION ${ver_major}.${ver_minor}.${ver_patch} LANGUAGES CXX)
 
     if(DOWNLOAD_ONNX)
@@ -45,7 +57,7 @@ else(UNIX)
     endif(DOWNLOAD_ONNX)
 
     include(OFIQlib/CMakeLists.windows.cmake)
-endif (UNIX)
+endif (UNIX AND NOT APPLE)
 
 if(DOWNLOAD_MODELS)
     set(MODEL_FILE OFIQ-MODELS.zip)
