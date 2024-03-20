@@ -58,6 +58,6 @@ namespace OFIQ_LIB::modules::measures
         {
             scalarScore = 100;
         }
-        SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);
+        session.assessment().qAssessments[qualityMeasure] = { rawScore, scalarScore, OFIQ::QualityMeasureReturnCode::Success };
     }
 }
