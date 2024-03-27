@@ -8,6 +8,8 @@ magic_enum/0.8.1
 opencv*:with_tiff=False
 opencv*:with_webp=False
 opencv*:with_ffmpeg=False
+opencv*:with_gtk=False
+opencv*:with_qt=False
 [generators]
 CMakeDeps
 CMakeToolchain
