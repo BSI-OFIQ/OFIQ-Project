@@ -23,7 +23,6 @@ include_directories (
 )
 
 # Add packages from conan
-find_package(LAPACK REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core calib3d imgcodecs imgproc highgui dnn ml)
 find_package(spdlog REQUIRED)
 find_package(taocpp-json REQUIRED)
@@ -98,7 +97,6 @@ list(APPEND OFIQ_LINK_LIB_LIST
 	spdlog::spdlog
 	taocpp::json
 	magic_enum::magic_enum
-	LAPACK::LAPACK
 	onnxruntime
 )
 
