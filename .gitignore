@@ -5,7 +5,6 @@
 # Downloaded files during build
 /data/models/
 /data/tests/images/
-!/data/tests/images/README.md
 
 # Application
 /install_x86_64_linux/
