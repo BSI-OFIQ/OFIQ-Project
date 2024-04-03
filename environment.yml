@@ -4,7 +4,6 @@ channels:
 dependencies:
   - python=3.10.*
   - cmake=3.26.4
-  - lapack=3.9.0 # Would be nicer to put lapack into conanfile.txt, but it is currently not available via conan
   - pip>=23
   - pip:
       - conan==2.0.17
