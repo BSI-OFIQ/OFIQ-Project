@@ -13,3 +13,9 @@ on OFIQ's license and the license of its dependencies: [LICENSE.md](LICENSE.md)
 The best way to get started, is to read OFIQ's reference manual: 
 see [doc/refman.pdf](doc/refman.pdf). The manual contains a documentation on
 how to compile and run __OFIQ__.
+
+
+## Run sample app
+```bash
+./install_x86_64_linux/Release/bin/OFIQSampleApp -c data/ofiq_config.jaxn -i data/tests/images -o results/out.csv
+```
