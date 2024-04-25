@@ -16,17 +16,17 @@ conan install ${OFIQLIB_CONAN_DIR}/${CONAN_FILE} \
         -g CMakeToolchain
 
 
-build_dir=build/build_linux
-install_dir=install_x86_64_linux
+# build_dir=build/build_linux
+# install_dir=install_x86_64_linux
 
-echo "Attempting to build the real implementation"
+# echo "Attempting to build the real implementation"
 
-cd ../
-echo "Removing $build_dir"
-rm -r $build_dir
+# cd ../
+# echo "Removing $build_dir"
+# rm -r $build_dir
 
-echo "Generating build files"
-cmake -S ./ -B $build_dir -DCMAKE_INSTALL_PREFIX=$install_dir -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DDOWNLOAD_MODELS=ON -DDOWNLOAD_IMAGES=ON
-cmake --build $build_dir --target install -j 8
+# echo "Generating build files"
+# cmake -S ./ -B $build_dir -DCMAKE_INSTALL_PREFIX=$install_dir -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DDOWNLOAD_MODELS=ON -DDOWNLOAD_IMAGES=ON
+# cmake --build $build_dir --target install -j 8
 
-echo "Building finished"
+# echo "Building finished"

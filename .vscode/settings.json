@@ -3,9 +3,19 @@
     "cmake.buildDirectory": "${workspaceFolder}/build/build_linux",
     "cmake.configureArgs": [
         "-DCMAKE_INSTALL_PREFIX=${workspaceFolder}/install_x86_64_linux",
-        "-DCMAKE_BUILD_TYPE=Release",
+        // "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
         "-DDOWNLOAD_MODELS=OFF",
         "-DDOWNLOAD_IMAGES=OFF"
     ],
+    "cmake.debugConfig": {
+        "args": [
+            "-c",
+            "${workspaceFolder}/data/ofiq_config.jaxn",
+            "-i",
+            "${workspaceFolder}/data/tests/images",
+            "-o",
+            "${workspaceFolder}/results/out.csv",
+        ]
+    }
 }
