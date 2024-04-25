@@ -389,7 +389,7 @@ namespace OFIQ_LIB::modules::landmarks
                 detectedFace.height); // (x, y, width, height)
 
             // Crop the image using the ROI
-            cv::Mat croppedImage = cvImage(roi);
+            cv::Mat croppedImage = cvImage(roi).clone();
 
             std::vector<float> landmarks_from_net = landmarkExtractor->extractLandMarks(croppedImage);
             float scalingFactor = detectedFace.height / 256.0f;
