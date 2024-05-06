@@ -14,6 +14,52 @@ The best way to get started, is to read OFIQ's reference manual:
 see [doc/refman.pdf](doc/refman.pdf). The manual contains a documentation on
 how to compile and run __OFIQ__.
 
+## Set up project
+
+1. Install miniconda
+2. Create conda environment with
+
+```bash
+conda env create -n ofiq -f environment.yml
+```
+
+3. Build dependencies
+
+```bash
+conda activate ofiq
+cd scripts
+sh build_debug.sh
+```
+
+4. Build project with VSCode CMake Tools
+
+When building the project for the first time, make sure you download images and models. \
+Configure `.vscode/settings.json` as follows:
+
+```json
+{
+    "cmake.cmakePath": "${userHome}/miniconda3/envs/ofiq/bin/cmake",
+    "cmake.buildDirectory": "${workspaceFolder}/build/build_linux",
+    "cmake.configureArgs": [
+        "-DCMAKE_INSTALL_PREFIX=${workspaceFolder}/install_x86_64_linux",
+        // "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
+        "-DDOWNLOAD_MODELS=ON",
+        "-DDOWNLOAD_IMAGES=ON"
+    ],
+}
+```
+
+5. CMake Configure Project
+
+In VSCode, press `Ctrl + Shift + P` and select `CMake: Configure`
+
+6. Debug project
+
+Make sure your CMake configuration looks as in the following image and select "Debug":
+![CMake Config](assets/cmake_config.png)
+
+
 
 ## Run sample app
 ```bash
