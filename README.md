@@ -42,7 +42,6 @@ Configure `.vscode/settings.json` as follows:
     "cmake.buildDirectory": "${workspaceFolder}/build/build_linux",
     "cmake.configureArgs": [
         "-DCMAKE_INSTALL_PREFIX=${workspaceFolder}/install_x86_64_linux",
-        // "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
         "-DDOWNLOAD_MODELS=ON",
         "-DDOWNLOAD_IMAGES=ON"
