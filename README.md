@@ -62,5 +62,5 @@ Make sure your CMake configuration looks as in the following image and select "D
 
 ## Run sample app
 ```bash
-./install_x86_64_linux/Release/bin/OFIQSampleApp -c data/ofiq_config.jaxn -i data/tests/images -o results/out.csv
+./install_x86_64_linux/Debug/bin/OFIQSampleApp -c data/ofiq_config.jaxn -i data/tests/images -o results/out.csv
 ```
