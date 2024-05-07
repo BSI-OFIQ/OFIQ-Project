@@ -7,3 +7,4 @@ dependencies:
   - pip>=23
   - pip:
       - conan==2.0.17
+      - pre-commit==3.7.0

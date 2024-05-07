@@ -1,0 +1,19 @@
+# Further information at https://github.com/pre-commit/action
+
+name: Code Quality
+
+on:
+  pull_request:
+    branches: [main, "release/*", "dev"]
+  push:
+    branches: [main]
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - uses: pre-commit/action@v3.0.0

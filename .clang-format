@@ -1,0 +1,8 @@
+# Use Google style
+# Infos at https://dev.to/dhanu0510/how-to-configure-c-code-formatting-in-visual-studio-code-4d5m
+
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 80
