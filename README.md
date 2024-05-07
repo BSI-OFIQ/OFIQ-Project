@@ -56,7 +56,7 @@ In VSCode, press `Ctrl + Shift + P` and select `CMake: Configure`
 6. Debug project
 
 Make sure your CMake configuration looks as in the following image and select "Debug":
-![CMake Config](assets/cmake_config.png)
+<img src="assets/cmake_config.png" alt="CMake Config" width="300">
 
 
 
