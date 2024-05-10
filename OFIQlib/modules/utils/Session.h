@@ -44,7 +44,7 @@ namespace OFIQ_LIB
 
     /**
      * @brief The session class is the data container used to distribute the image and additional data, 
- * including the data computed during the pre-processing.
+     * including the data computed during the pre-processing.
      * @details One instance of this class contains the relevant face information used for the computation of the activated measures.
      * Most information is acquired during the pre-processing where the detection of the facial landmarks, the aligned image, etc. is computed.
      */

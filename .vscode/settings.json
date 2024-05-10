@@ -1,5 +1,5 @@
 {
-    "cmake.cmakePath": "${userHome}/miniconda3/envs/ofiq/bin/cmake",
+    //"cmake.cmakePath": "${userHome}/miniconda3/envs/ofiq/bin/cmake",
     "cmake.buildDirectory": "${workspaceFolder}/build/build_linux",
     "cmake.configureArgs": [
         "-DCMAKE_INSTALL_PREFIX=${workspaceFolder}/install_x86_64_linux",
@@ -17,5 +17,6 @@
             "-o",
             "${workspaceFolder}/results/out.csv",
         ]
-    }
+    },
+    "cmake.configureOnOpen": true
 }

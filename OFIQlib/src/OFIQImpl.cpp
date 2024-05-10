@@ -92,6 +92,7 @@ ReturnStatus OFIQImpl::scalarQuality(const OFIQ::Image& face, double& quality)
 void OFIQImpl::performPreprocessing(Session& session)
 {
     log("\t1. detectFaces ");
+    //find Bounding Boxes
     std::vector<OFIQ::BoundingBox> faces = networks->faceDetector->detectFaces(session);
     if (faces.empty())
     {

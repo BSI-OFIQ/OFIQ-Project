@@ -70,6 +70,7 @@ namespace OFIQ_LIB::modules::detectors
         }
     }
 
+    //method returns a vector of all found faces inside the current Session.image image 
     std::vector<BoundingBox> SSDFaceDetector::UpdateFaces(Session& session)
     {
         if (!this->dnnNet)
@@ -106,6 +107,9 @@ namespace OFIQ_LIB::modules::detectors
             doCrop = false;
 
         // Create a 4D blob from the image.
+
+        //resize image into 300*300 and feed it into neuronal network to find faces
+        //Question: what is a blob?
         Mat blob = dnn::blobFromImage(cvImage, 1.0, Size(300, 300), meanBGR, doSwapRB, doCrop);
 
         // Run a model.
@@ -157,6 +161,12 @@ namespace OFIQ_LIB::modules::detectors
             }
         }
 
+        //before returning the vector we want to show one image with bounding box via cv::imshow();
+
+        cv::InputArray tmp(cvImage);
+        
+        cv::imshow("Window", tmp);
+        cv::waitKey(0);
         return faceRects;
     }
 
