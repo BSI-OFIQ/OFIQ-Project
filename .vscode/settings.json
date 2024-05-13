@@ -18,5 +18,6 @@
             "${workspaceFolder}/results/out.csv",
         ]
     },
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "C_Cpp.errorSquiggles": "enabled"
 }

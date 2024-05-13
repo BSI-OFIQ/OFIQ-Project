@@ -27,6 +27,8 @@
 #include "opencv_ssd_face_detector.h"
 #include "OFIQError.h"
 #include "utils.h"
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/dnn.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -162,11 +164,13 @@ namespace OFIQ_LIB::modules::detectors
         }
 
         //before returning the vector we want to show one image with bounding box via cv::imshow();
-
-        cv::InputArray tmp(cvImage);
         
-        cv::imshow("Window", tmp);
-        cv::waitKey(0);
+            cv::InputArray tmp(cvImage);
+        
+            cv::imshow("Window", tmp);
+            cv::waitKey(0);
+        
+        
         return faceRects;
     }
 
