@@ -89,11 +89,61 @@ ReturnStatus OFIQImpl::scalarQuality(const OFIQ::Image& face, double& quality)
     return ReturnStatus(ReturnCode::Success);
 }
 
+/**
+ * method draws a vertical line, starting at (x,y) with length of length. if horizontal == true then the line gets drawn horizontally
+ * else vertically.
+*/
+void drawBoundingBox(cv::Mat& image, OFIQ::BoundingBox& bb, cv::Scalar& color)
+{
+    //Corner points of bounding box
+    cv::Point2i top_left = cv::Point2i(bb.xleft, bb.ytop);
+    cv::Point2i top_right = cv::Point2i(bb.xleft + bb.width, bb.ytop);
+
+    cv::Point2i bottom_left = cv::Point2i(bb.xleft, bb.ytop + bb.height);
+    cv::Point2i bottom_right = cv::Point2i(bb.xleft + bb.width, bb.ytop + bb.height);
+    //top
+    cv::line(image, top_left, top_right, color, cv::LINE_AA);
+
+    //left
+    cv::line(image, top_left, bottom_left, color, cv::LINE_AA);
+
+    //bottom
+    cv::line(image, bottom_left, bottom_right, color, cv::LINE_AA);
+
+    //right
+    cv::line(image, top_right, bottom_right, color, cv::LINE_AA);
+}
+
+/**
+ * method draws a all found bounding boxes onto the image.
+*/
+void visualizeBoundingBoxes(Session& session, std::vector<OFIQ::BoundingBox>& faces)
+{
+    cv::Mat image = copyToCvImage(session.image());
+    
+    //NOTE: color values are in BGR!
+    cv::Scalar purple = cv::Scalar(191, 0, 207);
+
+    //draw all bounding boxes onto the image
+    for(BoundingBox bb : faces)
+    {
+        drawBoundingBox(image, bb, purple);
+    }
+
+    //open window
+    cv::namedWindow("Bounding Boxes Preview", cv::WINDOW_NORMAL);
+    cv::imshow("Bounding Boxes Preview", image);
+    cv::waitKey(0);
+}
+
 void OFIQImpl::performPreprocessing(Session& session)
 {
     log("\t1. detectFaces ");
     //find Bounding Boxes
     std::vector<OFIQ::BoundingBox> faces = networks->faceDetector->detectFaces(session);
+
+    visualizeBoundingBoxes(session, faces);
+
     if (faces.empty())
     {
         log("\n\tNo faces were detected, abort preprocessing\n");

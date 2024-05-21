@@ -120,13 +120,13 @@ namespace OFIQ_LIB::modules::detectors
         dnnNet->forward(netOuts);
 
         // Network produces output blob with a shape 1x1xNx7 where N is a number of
-        // detections and an every detection is a vector of values
+        // detections and every detection is a vector of values
         // [batchId, classId, confidence, left, top, right, bottom]
 
         std::vector<BoundingBox> faceRects;
-
         std::vector<int> classIds;
         std::vector<float> confidences;
+
         //std::vector<Rect> boxes;
         for (size_t k = 0; k < netOuts.size(); k++)
         {
@@ -139,7 +139,7 @@ namespace OFIQ_LIB::modules::detectors
                     r = data[i + 5],
                     b = data[i + 6];
 
-                // printf("face %d: conf = %.2f\n", n, confidence);
+                
                 if ((double)confidence >= confidenceThreshold &&
                     l > 0 &&
                     t > 0 &&
@@ -162,16 +162,6 @@ namespace OFIQ_LIB::modules::detectors
                 }
             }
         }
-
-        //before returning the vector we want to show one image with bounding box via cv::imshow();
-        
-            cv::InputArray tmp(cvImage);
-        
-            cv::imshow("Window", tmp);
-            cv::waitKey(0);
-        
-        
         return faceRects;
     }
-
 }
