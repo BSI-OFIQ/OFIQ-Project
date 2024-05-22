@@ -90,34 +90,54 @@ ReturnStatus OFIQImpl::scalarQuality(const OFIQ::Image& face, double& quality)
 }
 
 /**
- * method draws a vertical line, starting at (x,y) with length of length. if horizontal == true then the line gets drawn horizontally
- * else vertically.
+ * method opens up a window displaying the given image. window has given title.
+*/
+void previewWindow(std::string title, cv::Mat& image)
+{
+    cv::namedWindow(title, cv::WINDOW_NORMAL);
+    cv::imshow(title, image);
+    cv::waitKey(0);
+}
+
+
+/**
+ * method draws the given bounding box onto the image. the bounding box will have the given color. 
 */
 void drawBoundingBox(cv::Mat& image, OFIQ::BoundingBox& bb, cv::Scalar& color)
 {
     //Corner points of bounding box
-    cv::Point2i top_left = cv::Point2i(bb.xleft, bb.ytop);
-    cv::Point2i top_right = cv::Point2i(bb.xleft + bb.width, bb.ytop);
+    cv::Point2f top_left = cv::Point2f(bb.xleft, bb.ytop);
+    cv::Point2f top_right = cv::Point2f(bb.xleft + bb.width, bb.ytop);
 
-    cv::Point2i bottom_left = cv::Point2i(bb.xleft, bb.ytop + bb.height);
-    cv::Point2i bottom_right = cv::Point2i(bb.xleft + bb.width, bb.ytop + bb.height);
-    //top
+    cv::Point2f bottom_left = cv::Point2f(bb.xleft, bb.ytop + bb.height);
+    cv::Point2f bottom_right = cv::Point2f(bb.xleft + bb.width, bb.ytop + bb.height);
+
+    //draw top line
     cv::line(image, top_left, top_right, color, cv::LINE_AA);
 
-    //left
+    //draw left line
     cv::line(image, top_left, bottom_left, color, cv::LINE_AA);
 
-    //bottom
+    //draw bottom line
     cv::line(image, bottom_left, bottom_right, color, cv::LINE_AA);
 
-    //right
+    //draw right line
     cv::line(image, top_right, bottom_right, color, cv::LINE_AA);
 }
 
+void drawLandmarkPoint(cv::Mat& image, OFIQ::LandmarkPoint& fp, cv::Scalar& color)
+{
+    //create center point (just for readability)
+    cv::Point2i center = cv::Point2i(fp.x, fp.y);
+
+    //draw landmark point 
+    cv::circle(image, center, 9, color, cv::FILLED);
+}
+
 /**
- * method draws a all found bounding boxes onto the image.
+ * method draws all found bounding boxes onto the image.
 */
-void visualizeBoundingBoxes(Session& session, std::vector<OFIQ::BoundingBox>& faces)
+void visualizeBoundingBoxes(Session& session, std::vector<OFIQ::BoundingBox>& boxes)
 {
     cv::Mat image = copyToCvImage(session.image());
     
@@ -125,16 +145,36 @@ void visualizeBoundingBoxes(Session& session, std::vector<OFIQ::BoundingBox>& fa
     cv::Scalar purple = cv::Scalar(191, 0, 207);
 
     //draw all bounding boxes onto the image
-    for(BoundingBox bb : faces)
+    for(BoundingBox bb : boxes)
     {
         drawBoundingBox(image, bb, purple);
     }
 
     //open window
-    cv::namedWindow("Bounding Boxes Preview", cv::WINDOW_NORMAL);
-    cv::imshow("Bounding Boxes Preview", image);
-    cv::waitKey(0);
+    previewWindow("Bounding Boxes Preview", image);
 }
+
+void visualizeLandmarks(Session& session, const std::vector<OFIQ::FaceLandmarks>& landmarks)
+{
+    cv::Mat image = copyToCvImage(session.image());
+
+    //NOTE: color values are in BGR!
+    cv::Scalar orange = cv::Scalar(224, 110, 0);
+    
+    //go through all detected facelandmarks for each face on the image
+    for(FaceLandmarks fl : landmarks)
+    {
+        //go through eacht specific landmark point and draw it onto the image
+        for(LandmarkPoint fp : fl.landmarks)
+        {
+            drawLandmarkPoint(image, fp, orange);
+        }
+    }
+
+    //open window
+    previewWindow("Landmark Preview", image);
+}
+
 
 void OFIQImpl::performPreprocessing(Session& session)
 {
@@ -142,14 +182,15 @@ void OFIQImpl::performPreprocessing(Session& session)
     //find Bounding Boxes
     std::vector<OFIQ::BoundingBox> faces = networks->faceDetector->detectFaces(session);
 
-    visualizeBoundingBoxes(session, faces);
-
     if (faces.empty())
     {
         log("\n\tNo faces were detected, abort preprocessing\n");
         throw OFIQError(ReturnCode::FaceDetectionError, "No faces were detected");
     }
     session.setDetectedFaces(faces);
+
+    visualizeBoundingBoxes(session, faces);
+
     log("2. estimatePose ");
     session.setPose(networks->poseEstimator->estimatePose(session));
 
@@ -167,6 +208,9 @@ void OFIQImpl::performPreprocessing(Session& session)
 #else
     session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
 #endif
+    
+
+    visualizeLandmarks(session, session.getLandmarksAllFaces());
 
     log("4. alignFaceImage ");
     // aligned face requires the landmarks of the face thus it must come after the landmark extraction.
