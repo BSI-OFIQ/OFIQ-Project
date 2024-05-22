@@ -125,19 +125,20 @@ void drawBoundingBox(cv::Mat& image, OFIQ::BoundingBox& bb, cv::Scalar& color)
     cv::line(image, top_right, bottom_right, color, cv::LINE_AA);
 }
 
-void drawLandmarkPoint(cv::Mat& image, OFIQ::LandmarkPoint& fp, cv::Scalar& color)
+void drawLandmarkPoint(cv::Mat& image, OFIQ::LandmarkPoint& fp, cv::Scalar& color, int index)
 {
     //create center point (just for readability)
     cv::Point2i center = cv::Point2i(fp.x, fp.y);
-
+    cv::Point2i text_origin = cv::Point2i(fp.x + 15, fp.y + 15);
     //draw landmark point 
     cv::circle(image, center, 9, color, cv::FILLED);
+    cv::putText(image, std::to_string(index) , text_origin, cv::FONT_HERSHEY_PLAIN, 3, cv::Scalar(0,0,0), 3);
 }
 
 /**
  * method draws all found bounding boxes onto the image.
 */
-void visualizeBoundingBoxes(Session& session, std::vector<OFIQ::BoundingBox>& boxes)
+void visualizeBoundingBoxes(Session& session, const std::vector<OFIQ::BoundingBox>& boxes)
 {
     cv::Mat image = copyToCvImage(session.image());
     
@@ -162,19 +163,19 @@ void visualizeLandmarks(Session& session, const std::vector<OFIQ::FaceLandmarks>
     cv::Scalar orange = cv::Scalar(224, 110, 0);
     
     //go through all detected facelandmarks for each face on the image
+    int index = 0;
     for(FaceLandmarks fl : landmarks)
-    {
+    {   
         //go through eacht specific landmark point and draw it onto the image
         for(LandmarkPoint fp : fl.landmarks)
         {
-            drawLandmarkPoint(image, fp, orange);
+            drawLandmarkPoint(image, fp, orange, index);
+            index++;
         }
     }
-
     //open window
     previewWindow("Landmark Preview", image);
 }
-
 
 void OFIQImpl::performPreprocessing(Session& session)
 {
