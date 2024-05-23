@@ -45,6 +45,7 @@ namespace OFIQ_LIB
 
         try
         {
+            //convert images into Matrix of n*m
             cv::Mat cvImage = cv::imread(filename, cv::IMREAD_COLOR);
             if(cvImage.empty())
             {
@@ -52,8 +53,10 @@ namespace OFIQ_LIB
                 retStatusInfo = std::string("failed to read image or image is empty: ") + filename;
                 return ReturnStatus(retCode, retStatusInfo);
             }
-
+            //revert color form BGR into RGB
             cv::cvtColor(cvImage, cvImage, cv::COLOR_BGR2RGB);
+
+            //copy output from cv::imread into seperate location
             image.width = static_cast<uint16_t>(cvImage.cols);
             image.height = static_cast<uint16_t>(cvImage.rows);
             image.depth = 24;

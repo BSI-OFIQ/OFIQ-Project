@@ -89,16 +89,109 @@ ReturnStatus OFIQImpl::scalarQuality(const OFIQ::Image& face, double& quality)
     return ReturnStatus(ReturnCode::Success);
 }
 
+/**
+ * method opens up a window displaying the given image. window has given title.
+*/
+void previewWindow(std::string title, cv::Mat& image)
+{
+    cv::namedWindow(title, cv::WINDOW_NORMAL);
+    cv::imshow(title, image);
+    cv::waitKey(0);
+}
+
+
+/**
+ * method draws the given bounding box onto the image. the bounding box will have the given color. 
+*/
+void drawBoundingBox(cv::Mat& image, OFIQ::BoundingBox& bb, cv::Scalar& color)
+{
+    //Corner points of bounding box
+    cv::Point2f top_left = cv::Point2f(bb.xleft, bb.ytop);
+    cv::Point2f top_right = cv::Point2f(bb.xleft + bb.width, bb.ytop);
+
+    cv::Point2f bottom_left = cv::Point2f(bb.xleft, bb.ytop + bb.height);
+    cv::Point2f bottom_right = cv::Point2f(bb.xleft + bb.width, bb.ytop + bb.height);
+
+    //draw top line
+    cv::line(image, top_left, top_right, color, cv::LINE_AA);
+
+    //draw left line
+    cv::line(image, top_left, bottom_left, color, cv::LINE_AA);
+
+    //draw bottom line
+    cv::line(image, bottom_left, bottom_right, color, cv::LINE_AA);
+
+    //draw right line
+    cv::line(image, top_right, bottom_right, color, cv::LINE_AA);
+}
+
+void drawLandmarkPoint(cv::Mat& image, OFIQ::LandmarkPoint& fp, cv::Scalar& color, int index)
+{
+    //create center point (just for readability)
+    cv::Point2i center = cv::Point2i(fp.x, fp.y);
+    cv::Point2i text_origin = cv::Point2i(fp.x + 15, fp.y + 15);
+    //draw landmark point 
+    cv::circle(image, center, 9, color, cv::FILLED);
+    cv::putText(image, std::to_string(index) , text_origin, cv::FONT_HERSHEY_PLAIN, 3, cv::Scalar(0,0,0), 3);
+}
+
+/**
+ * method draws all found bounding boxes onto the image.
+*/
+void visualizeBoundingBoxes(Session& session, const std::vector<OFIQ::BoundingBox>& boxes)
+{
+    cv::Mat image = copyToCvImage(session.image());
+    
+    //NOTE: color values are in BGR!
+    cv::Scalar purple = cv::Scalar(191, 0, 207);
+
+    //draw all bounding boxes onto the image
+    for(BoundingBox bb : boxes)
+    {
+        drawBoundingBox(image, bb, purple);
+    }
+
+    //open window
+    previewWindow("Bounding Boxes Preview", image);
+}
+
+void visualizeLandmarks(Session& session, const std::vector<OFIQ::FaceLandmarks>& landmarks)
+{
+    cv::Mat image = copyToCvImage(session.image());
+
+    //NOTE: color values are in BGR!
+    cv::Scalar orange = cv::Scalar(224, 110, 0);
+    
+    //go through all detected facelandmarks for each face on the image
+    int index = 0;
+    for(FaceLandmarks fl : landmarks)
+    {   
+        //go through eacht specific landmark point and draw it onto the image
+        for(LandmarkPoint fp : fl.landmarks)
+        {
+            drawLandmarkPoint(image, fp, orange, index);
+            index++;
+        }
+    }
+    //open window
+    previewWindow("Landmark Preview", image);
+}
+
 void OFIQImpl::performPreprocessing(Session& session)
 {
     log("\t1. detectFaces ");
+    //find Bounding Boxes
     std::vector<OFIQ::BoundingBox> faces = networks->faceDetector->detectFaces(session);
+
     if (faces.empty())
     {
         log("\n\tNo faces were detected, abort preprocessing\n");
         throw OFIQError(ReturnCode::FaceDetectionError, "No faces were detected");
     }
     session.setDetectedFaces(faces);
+
+    visualizeBoundingBoxes(session, faces);
+
     log("2. estimatePose ");
     session.setPose(networks->poseEstimator->estimatePose(session));
 
@@ -116,6 +209,9 @@ void OFIQImpl::performPreprocessing(Session& session)
 #else
     session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
 #endif
+    
+
+    visualizeLandmarks(session, session.getLandmarksAllFaces());
 
     log("4. alignFaceImage ");
     // aligned face requires the landmarks of the face thus it must come after the landmark extraction.

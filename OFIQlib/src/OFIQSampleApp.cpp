@@ -234,6 +234,7 @@ int getQualityAssessmentResults(
     FaceImageQualityAssessment& assessments)
 {
     Image image;
+    //loading images 
     ReturnStatus retStatus = readImage(inputFile, image);
 
     if (retStatus.code != ReturnCode::Success)

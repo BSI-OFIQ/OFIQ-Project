@@ -27,6 +27,8 @@
 #include "opencv_ssd_face_detector.h"
 #include "OFIQError.h"
 #include "utils.h"
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/dnn.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -70,6 +72,7 @@ namespace OFIQ_LIB::modules::detectors
         }
     }
 
+    //method returns a vector of all found faces inside the current Session.image image 
     std::vector<BoundingBox> SSDFaceDetector::UpdateFaces(Session& session)
     {
         if (!this->dnnNet)
@@ -106,6 +109,9 @@ namespace OFIQ_LIB::modules::detectors
             doCrop = false;
 
         // Create a 4D blob from the image.
+
+        //resize image into 300*300 and feed it into neuronal network to find faces
+        //Question: what is a blob?
         Mat blob = dnn::blobFromImage(cvImage, 1.0, Size(300, 300), meanBGR, doSwapRB, doCrop);
 
         // Run a model.
@@ -114,13 +120,13 @@ namespace OFIQ_LIB::modules::detectors
         dnnNet->forward(netOuts);
 
         // Network produces output blob with a shape 1x1xNx7 where N is a number of
-        // detections and an every detection is a vector of values
+        // detections and every detection is a vector of values
         // [batchId, classId, confidence, left, top, right, bottom]
 
         std::vector<BoundingBox> faceRects;
-
         std::vector<int> classIds;
         std::vector<float> confidences;
+
         //std::vector<Rect> boxes;
         for (size_t k = 0; k < netOuts.size(); k++)
         {
@@ -133,7 +139,7 @@ namespace OFIQ_LIB::modules::detectors
                     r = data[i + 5],
                     b = data[i + 6];
 
-                // printf("face %d: conf = %.2f\n", n, confidence);
+                
                 if ((double)confidence >= confidenceThreshold &&
                     l > 0 &&
                     t > 0 &&
@@ -156,8 +162,6 @@ namespace OFIQ_LIB::modules::detectors
                 }
             }
         }
-
         return faceRects;
     }
-
 }

@@ -1,0 +1,18 @@
+# Infos on clang-format styles can be found here:
+# https://dev.to/dhanu0510/how-to-configure-c-code-formatting-in-visual-studio-code-4d5m
+
+# Visual Studio style
+BasedOnStyle: LLVM
+UseTab: Never
+IndentWidth: 4
+TabWidth: 4
+BreakBeforeBraces: Allman
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: false
+ColumnLimit: 0
+AccessModifierOffset: -4
+NamespaceIndentation: All
+FixNamespaceComments: false
+
+# Custom pointer alignment
+PointerAlignment: Left

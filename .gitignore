@@ -11,3 +11,6 @@
 
 # Results
 /results/
+
+# Ignore Properties
+/.vscode/c_cpp_properties.json
