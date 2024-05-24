@@ -31,7 +31,7 @@ namespace OFIQ_LIB::modules::measures
 
     void log(const std::string_view& msg)
     {
-        if (execLogActive)
+        if (ExecutorLogActive)
             std::cout << msg;
     }
 
@@ -39,7 +39,7 @@ namespace OFIQ_LIB::modules::measures
     {
         int i = 1;
         log("\t");
-        for (const auto& measure : measures)
+        for (const auto& measure : m_measures)
         {
             log(std::to_string(i++) + ". " + measure->GetName() + " ");
             try {

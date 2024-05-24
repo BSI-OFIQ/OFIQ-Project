@@ -93,6 +93,6 @@ namespace OFIQ_LIB::modules::landmarks
         /**
          * @brief Encapsulated implementation class. 
          */
-        std::unique_ptr<ADNetFaceLandmarkExtractorImpl> landmarkExtractor;
+        std::unique_ptr<ADNetFaceLandmarkExtractorImpl> landmarkExtractor_;
     };
 }

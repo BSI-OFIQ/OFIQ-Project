@@ -247,7 +247,7 @@ namespace OFIQ_LIB::modules::landmarks
         try
         {
 
-            landmarkExtractor = std::make_unique<ADNetFaceLandmarkExtractorImpl>();
+            landmarkExtractor_ = std::make_unique<ADNetFaceLandmarkExtractorImpl>();
             const auto modelPath =
                 config.getDataDir() + "/" + config.GetString("params.landmarks.ADNet.model_path");
 
@@ -256,7 +256,7 @@ namespace OFIQ_LIB::modules::landmarks
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
 
-            landmarkExtractor->init_session(modelData);
+            landmarkExtractor_->init_session(modelData);
         }
         catch (const std::exception&)
         {
@@ -321,7 +321,7 @@ namespace OFIQ_LIB::modules::landmarks
         // Crop the image using the ROI
         cv::Mat croppedImage = cvImage(roi);
 
-        std::vector<float> landmarks_from_net = landmarkExtractor->extractLandMarks(croppedImage);
+        std::vector<float> landmarks_from_net = landmarkExtractor_->extractLandMarks(croppedImage);
         float scalingFactor = detectedFace.height / 256.0f;
 
         int offset_x = detectedFace.xleft - translationVector.x;
@@ -389,9 +389,11 @@ namespace OFIQ_LIB::modules::landmarks
                 detectedFace.height); // (x, y, width, height)
 
             // Crop the image using the ROI
-            cv::Mat croppedImage = cvImage(roi).clone();
+            cv::Mat croppedImage = cvImage(roi);
+            if (!croppedImage.isContinuous())
+                croppedImage = croppedImage.clone();
 
-            std::vector<float> landmarks_from_net = landmarkExtractor->extractLandMarks(croppedImage);
+            std::vector<float> landmarks_from_net = landmarkExtractor_->extractLandMarks(croppedImage);
             float scalingFactor = detectedFace.height / 256.0f;
 
             int offset_x = detectedFace.xleft - translationVector.x;

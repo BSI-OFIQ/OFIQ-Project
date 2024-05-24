@@ -46,13 +46,9 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Constructor
          * @param configuration Configuration object from which the measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing()
-         * OFIQImpl::performPreprocessing()\endlink method
          */
-        DynamicRange(
-            const Configuration& configuration,
-            Session& session);
+        explicit DynamicRange(
+            const Configuration& configuration);
 
         /**
          * @brief Assesses dynamic range.

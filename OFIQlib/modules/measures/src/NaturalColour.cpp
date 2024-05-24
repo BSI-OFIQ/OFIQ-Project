@@ -41,9 +41,8 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityMeasure = OFIQ::QualityMeasure::NaturalColour;
 
     NaturalColour::NaturalColour(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
         SigmoidParameters defaultValues;
         defaultValues.h = 200.0;
@@ -63,8 +62,10 @@ namespace OFIQ_LIB::modules::measures
         cv::bitwise_and(alignedFace, alignedFace, faceSegmentation, cvMask);
 
         cv::Mat maskedImage = CreateMaskedImage(landmarks, faceSegmentation);
-        OFIQ::LandmarkPoint leftEyeCenter, rightEyeCenter;
-        double interEyeDistance, eyeMouthDistance;
+        OFIQ::LandmarkPoint leftEyeCenter;
+        OFIQ::LandmarkPoint rightEyeCenter;
+        double interEyeDistance;
+        double eyeMouthDistance;
         CalculateReferencePoints(landmarks, leftEyeCenter, rightEyeCenter, interEyeDistance, eyeMouthDistance);
         cv::Rect leftRegionOfInterest;
         cv::Rect rightRegionOfInterest;
@@ -85,7 +86,10 @@ namespace OFIQ_LIB::modules::measures
         return maskedImage;
     }
 
-    cv::Mat NaturalColour::ReduceImageToRegionOfInterest(const cv::Mat maskedImage, const cv::Rect& leftRegionOfInterest, const cv::Rect& rightRegionOfInterest)
+    cv::Mat NaturalColour::ReduceImageToRegionOfInterest(
+        const cv::Mat& maskedImage,
+        const cv::Rect& leftRegionOfInterest,
+        const cv::Rect& rightRegionOfInterest)
     {
         auto leftRegion = maskedImage(leftRegionOfInterest);
         auto rightRegion = maskedImage(rightRegionOfInterest);

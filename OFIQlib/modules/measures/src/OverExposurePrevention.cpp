@@ -40,9 +40,8 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityMeasure = OFIQ::QualityMeasure::OverExposurePrevention;
 
     OverExposurePrevention::OverExposurePrevention(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
     }
 
@@ -58,6 +57,7 @@ namespace OFIQ_LIB::modules::measures
         {
             scalarScore = 100;
         }
-        session.assessment().qAssessments[qualityMeasure] = { rawScore, scalarScore, OFIQ::QualityMeasureReturnCode::Success };
+        session.assessment().qAssessments[qualityMeasure] = 
+            { rawScore, scalarScore, OFIQ::QualityMeasureReturnCode::Success };
     }
 }

@@ -36,12 +36,11 @@ namespace OFIQ_LIB::modules::measures
     static const std::string paramThreshold = "params.measures.NoHeadCoverings.threshold";
 
     NoHeadCoverings::NoHeadCoverings(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
-        if (!configuration.GetNumber(paramThreshold, this->threshold))
-            this->threshold = 0.02;
+        if (!configuration.GetNumber(paramThreshold, this->m_threshold))
+            this->m_threshold = 0.02;
     }
 
     void NoHeadCoverings::Execute(OFIQ_LIB::Session & session)
@@ -71,7 +70,7 @@ namespace OFIQ_LIB::modules::measures
         double rawScore = nonZeroPixels / (double)totalPixels;
 
         double scalarScore;
-        if (rawScore > this->threshold)
+        if (rawScore > this->m_threshold)
         {
             scalarScore = 0;
         }

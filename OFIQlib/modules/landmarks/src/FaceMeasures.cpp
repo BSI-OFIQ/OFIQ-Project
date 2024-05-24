@@ -86,9 +86,8 @@ namespace OFIQ_LIB::modules::landmarks
     cv::Mat FaceMeasures::GetFaceMask(
         const OFIQ::FaceLandmarks& faceLandmarks, const int height, const int width, const float alpha)
     {
-        auto landmarks = faceLandmarks.landmarks;    
         std::vector<cv::Point2i> landmarkPoints;
-        for (const auto& landmark : landmarks)
+        for (const auto& landmark : faceLandmarks.landmarks)
         {
             landmarkPoints.emplace_back(landmark.x, landmark.y);
         }
@@ -96,7 +95,8 @@ namespace OFIQ_LIB::modules::landmarks
         if (alpha > 0)
         {
             std::vector<cv::Point2i> contour;
-            cv::Point2f eyesMidpoint, chin;
+            cv::Point2f eyesMidpoint;
+            cv::Point2f chin;
             OFIQ::Landmarks eyeCorners = PartExtractor::getFacePart(faceLandmarks, FaceParts::LEFT_EYE_CORNERS);
             OFIQ::Landmarks rightEyeCorners = PartExtractor::getFacePart(faceLandmarks, FaceParts::RIGHT_EYE_CORNERS);
             eyeCorners.insert(eyeCorners.end(), rightEyeCorners.begin(), rightEyeCorners.end());
@@ -105,9 +105,8 @@ namespace OFIQ_LIB::modules::landmarks
                 eyesMidpoint += cv::Point2f(eyeCorners[i].x, eyeCorners[i].y);
             }
             eyesMidpoint /= (int)eyeCorners.size();
-            switch (faceLandmarks.type)
-            {
-            case OFIQ::LandmarkType::LM_98:
+
+            if (faceLandmarks.type == OFIQ::LandmarkType::LM_98)
             {
                 int chinIndex = 16;
                 chin = landmarkPoints[chinIndex];
@@ -116,11 +115,10 @@ namespace OFIQ_LIB::modules::landmarks
                 {
                     contour.push_back(landmarkPoints[contourIndices[i]]);
                 }
-                break;
             }
-            default:
+            else
                 throw std::invalid_argument("Unknown LandmarkType");
-            }
+
             cv::Point2f chinMidpointVector = eyesMidpoint - chin;
             cv::Point2i topOfForehead{ (int)(eyesMidpoint.x + alpha * chinMidpointVector.x), (int)(eyesMidpoint.y + alpha * chinMidpointVector.y) };
             std::vector <cv::Point2i> ellipsePoints = contour;
@@ -144,10 +142,10 @@ namespace OFIQ_LIB::modules::landmarks
         std::vector<cv::Point2i> hullPoints;
         cv::convexHull(landmarkPoints, hullPoints);
         cv::Rect rect = cv::boundingRect(hullPoints);
-        int b = (int)(rect.y - rect.height * 0.05);
-        int d = (int)(rect.y + rect.height * 1.05);
-        int a = (int)(rect.x + rect.width / 2.0 - (d - b) / 2.0);
-        int c = (int)(rect.x + rect.width / 2.0 + (d - b) / 2.0);
+        auto b = (int)(rect.y - rect.height * 0.05);
+        auto d = (int)(rect.y + rect.height * 1.05);
+        auto a = (int)(rect.x + rect.width / 2.0 - (d - b) / 2.0);
+        auto c = (int)(rect.x + rect.width / 2.0 + (d - b) / 2.0);
         // relative landmarks on cropped image
         int imgSize = 224;
         for (auto& p : hullPoints)
@@ -159,13 +157,19 @@ namespace OFIQ_LIB::modules::landmarks
         }
         // generate mask of convex hull
         cv::Mat mask = cv::Mat::zeros(cv::Size(imgSize, imgSize), CV_8UC1);
-        cv::Scalar maskColor = 1;
+
         cv::fillConvexPoly(mask, hullPoints, cv::Scalar(1));
         cv::Mat faceRegion = cv::Mat::zeros(cv::Size(width, height), CV_8UC1);
         cv::Mat maskRescaled;
         cv::resize(mask, maskRescaled, cv::Size(c - a, d - b), 0, 0, cv::INTER_NEAREST);
-        int left = 0, top = 0, right = maskRescaled.cols, bottom = maskRescaled.rows;
-        int an = a, bn = b, cn = c, dn = d;
+        int left = 0;
+        int top = 0;
+        int right = maskRescaled.cols;
+        int bottom = maskRescaled.rows;
+        int an = a;
+        int bn = b;
+        int cn = c;
+        int dn = d;
         if (a < 0)
         {
             left -= a;

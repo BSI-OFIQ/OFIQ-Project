@@ -48,8 +48,6 @@ using FaceParts = OFIQ_LIB::modules::landmarks::FaceParts;
 
 namespace OFIQ_LIB
 {
-
-
     OFIQ_EXPORT void makeSquareBoundingBoxWithPadding(
         const OFIQ::BoundingBox& i_bb,
         const cv::Mat& i_input_image,
@@ -119,7 +117,10 @@ namespace OFIQ_LIB
         int16_t x_bottom_right_orig = i_bb.xleft + i_bb.width;
         int16_t y_bottom_right_orig = i_bb.ytop + i_bb.height;
 
-        int16_t x_top_left_trans, y_top_left_trans, x_bottom_right_trans, y_bottom_right_trans = 0;
+        int16_t x_top_left_trans;
+        int16_t y_top_left_trans;
+        int16_t x_bottom_right_trans;
+        int16_t y_bottom_right_trans;
 
         // extend bounding box to square
         if (i_bb.width < i_bb.height)
@@ -212,12 +213,14 @@ namespace OFIQ_LIB
         OFIQ::FaceLandmarks& alignedFaceLandmarks,
         cv::Mat& transformationMatrix)
     {
-        cv::Mat cvImage = copyToCvImage(faceImage);
-        int nose, leftMouth, rightMouth;
-        std::vector<cv::Point2f> landmarks, alignedLandmarks;
-        switch (faceLandmarks.type)
-        {
-        case OFIQ::LandmarkType::LM_98:
+        cv::Mat bgrCvImage = copyToCvImage(faceImage);
+        int nose;
+        int leftMouth;
+        int rightMouth;
+        std::vector<cv::Point2f> landmarks;
+        std::vector<cv::Point2f> alignedLandmarks;
+
+        if (faceLandmarks.type == OFIQ::LandmarkType::LM_98)
         {
             nose = 54;
             leftMouth = 82;
@@ -225,50 +228,51 @@ namespace OFIQ_LIB
             int num_landmarks = 98;
             landmarks.reserve(num_landmarks);
             alignedLandmarks.reserve(num_landmarks);
-            break;
         }
-        default:
+        else
             throw std::invalid_argument("Unknown LandmarkType");
-        }
-        Point2f leftEyeCenter, rightEyeCenter;
+
+        Point2f leftEyeCenter;
+        Point2f rightEyeCenter;
         calculateEyeCenter(faceLandmarks, leftEyeCenter, rightEyeCenter);
         cv::Mat srcPoints = cv::Mat::zeros(5, 2, CV_32F);
         srcPoints.at<float>(0, 0) = leftEyeCenter.x;
         srcPoints.at<float>(0, 1) = leftEyeCenter.y;
         srcPoints.at<float>(1, 0) = rightEyeCenter.x;
         srcPoints.at<float>(1, 1) = rightEyeCenter.y;
-        OFIQ::LandmarkPoint point = faceLandmarks.landmarks[nose];
-        srcPoints.at<float>(2, 0) = point.x;
-        srcPoints.at<float>(2, 1) = point.y;
-        point = faceLandmarks.landmarks[rightMouth];
-        srcPoints.at<float>(3, 0) = point.x;
-        srcPoints.at<float>(3, 1) = point.y;
-        point = faceLandmarks.landmarks[leftMouth];
-        srcPoints.at<float>(4, 0) = point.x;
-        srcPoints.at<float>(4, 1) = point.y;
+
+        OFIQ::LandmarkPoint lmPoint = faceLandmarks.landmarks[nose];
+        srcPoints.at<float>(2, 0) = lmPoint.x;
+        srcPoints.at<float>(2, 1) = lmPoint.y;
+        lmPoint = faceLandmarks.landmarks[rightMouth];
+        srcPoints.at<float>(3, 0) = lmPoint.x;
+        srcPoints.at<float>(3, 1) = lmPoint.y;
+        lmPoint = faceLandmarks.landmarks[leftMouth];
+        srcPoints.at<float>(4, 0) = lmPoint.x;
+        srcPoints.at<float>(4, 1) = lmPoint.y;
         // define reference points
         float refData[10] = {251, 272, 364, 272, 308, 336, 262, 402, 355, 402};
-        cv::Mat refPoints = cv::Mat(5, 2, CV_32F, refData);
+        auto refPoints = cv::Mat(5, 2, CV_32F, refData);
         // calculate transformation matrix and warp image
         transformationMatrix = cv::estimateAffinePartial2D(srcPoints, refPoints, {}, cv::LMEDS);
-        cv::Mat alignedImage;
+        cv::Mat bgrAlignedImage;
         // cv::Mat alignedLandmarks = cv::Mat::zeros(landmarks.size(), CV_16UC1);;
-        cv::warpAffine(cvImage, alignedImage, transformationMatrix, cv::Size(616, 616));
+        cv::warpAffine(bgrCvImage, bgrAlignedImage, transformationMatrix, cv::Size(616, 616));
         for (int i = 0; i < faceLandmarks.landmarks.size(); i++)
         {
             OFIQ::LandmarkPoint landmark = faceLandmarks.landmarks[i];
-            cv::Point point{landmark.x, landmark.y};
-            landmarks.push_back(point);
+            //cv::Point point{landmark.x, landmark.y};
+            landmarks.push_back({ static_cast<float>(landmark.x), static_cast<float>(landmark.y) });
         }
         cv::transform(landmarks, alignedLandmarks, transformationMatrix);
-        for (auto& p : alignedLandmarks)
+        for (const auto& p : alignedLandmarks)
         {
             OFIQ::LandmarkPoint landmark;
             landmark.x = round(p.x);
             landmark.y = round(p.y);
             alignedFaceLandmarks.landmarks.push_back(landmark);
         }
-        return alignedImage;
+        return bgrAlignedImage;
     }
 
     OFIQ_EXPORT void calculateEyeCenter(
@@ -286,7 +290,8 @@ namespace OFIQ_LIB
 
     OFIQ_EXPORT float tmetric(const OFIQ::FaceLandmarks& faceLandmarks)
     {
-        Point2f leftEyeCenter, rightEyeCenter;
+        Point2f leftEyeCenter;
+        Point2f rightEyeCenter;
         calculateEyeCenter(faceLandmarks, leftEyeCenter, rightEyeCenter);
         OFIQ::Landmarks chinLandmarks = PartExtractor::getFacePart(faceLandmarks, FaceParts::CHIN);
         cv::Point2f eyeMidpoint((leftEyeCenter.x + rightEyeCenter.x) / 2.0, (leftEyeCenter.y + rightEyeCenter.y) / 2.0);
@@ -322,5 +327,57 @@ namespace OFIQ_LIB
         x = (x * 180) / M_PI;
         y = (y * 180) / M_PI;
         z = (z * 180) / M_PI;
+    }
+
+    static const std::string base64Chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz"
+            "0123456789+/";
+
+    static inline bool isBase64(unsigned char c) {
+        return (isalnum(c) || (c == '+') || (c == '/'));
+    }
+
+    // source: https://gist.github.com/taxilian/b5991396932855cea6dd
+    OFIQ_EXPORT std::string base64Decode(std::string const& encodedString)
+    {
+        int in_len = encodedString.size();
+        int i = 0;
+        int j = 0;
+        int in_ = 0;
+        unsigned char charArray4[4], charArray3[3];
+        std::string ret;
+
+        while (in_len-- && (encodedString[in_] != '=') && isBase64(encodedString[in_])) {
+            charArray4[i++] = encodedString[in_]; in_++;
+            if (i == 4) {
+                for (i = 0; i < 4; i++)
+                    charArray4[i] = base64Chars.find(charArray4[i]);
+
+                charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
+                charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
+                charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+
+                for (i = 0; (i < 3); i++)
+                    ret += charArray3[i];
+                i = 0;
+            }
+        }
+
+        if (i) {
+            for (j = i; j < 4; j++)
+                charArray4[j] = 0;
+
+            for (j = 0; j < 4; j++)
+                charArray4[j] = base64Chars.find(charArray4[j]);
+
+            charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
+            charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
+            charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+
+            for (j = 0; (j < i - 1); j++) ret += charArray3[j];
+        }
+
+        return ret;
     }
 }

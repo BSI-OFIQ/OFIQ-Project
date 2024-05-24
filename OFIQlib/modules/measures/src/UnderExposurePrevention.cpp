@@ -39,16 +39,15 @@ namespace OFIQ_LIB::modules::measures
     
     static const auto qualityMeasure = OFIQ::QualityMeasure::UnderExposurePrevention;
 
-    static double ComputeBrightnessAspect(
-        const cv::Mat& luminanceImage,
-        const cv::Mat& maskImage,
-        const ExposureRange& exposureRange);
-    static double CalculateScore(const cv::Mat1f& histogram, const ExposureRange& exposureRange);
+    //static double ComputeBrightnessAspect(
+    //    const cv::Mat& luminanceImage,
+    //    const cv::Mat& maskImage,
+    //    const ExposureRange& exposureRange);
+    //static double CalculateScore(const cv::Mat1f& histogram, const ExposureRange& exposureRange);
     
     UnderExposurePrevention::UnderExposurePrevention(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
         SigmoidParameters defaultValues;
         defaultValues.h = 120;

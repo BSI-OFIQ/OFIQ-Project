@@ -36,7 +36,7 @@ namespace OFIQ_LIB::modules::measures
     /**
      * @brief This variable enables logging to std::cout for debug purposes. By default the logging is switched off.
      */
-    const static bool execLogActive = false;
+    const static bool ExecutorLogActive = false;
 
     /**
      * @brief Logging function for writing debug messages to std::cout.
@@ -57,7 +57,7 @@ namespace OFIQ_LIB::modules::measures
          * @param measures Provide access to the activated measures.
          */
         explicit Executor(std::vector<std::unique_ptr<Measure>> measures)
-            : measures{std::move(measures)}
+            : m_measures{std::move(measures)}
         {
         }
 
@@ -72,13 +72,13 @@ namespace OFIQ_LIB::modules::measures
          * @brief Return the list of the activated measures.
          *
          */
-        const std::vector<std::unique_ptr<Measure>>& GetMeasures() const { return measures; }
+        const std::vector<std::unique_ptr<Measure>>& GetMeasures() const { return m_measures; }
 
     private:
         /**
          * @brief Container for access to the measures to be computed.
          * 
          */
-        std::vector<std::unique_ptr<Measure>> measures;
+        std::vector<std::unique_ptr<Measure>> m_measures;
     };
 }

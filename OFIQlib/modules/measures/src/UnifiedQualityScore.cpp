@@ -43,10 +43,9 @@ namespace OFIQ_LIB::modules::measures
     static const int scaledWidth = 192;
     static const int scaledHeight = 192;
 
-    UnifiedQualityScore::UnifiedQualityScore(const Configuration& configuration, Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+    UnifiedQualityScore::UnifiedQualityScore(const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
-
         try
         {
             SigmoidParameters defaultValues;
@@ -65,7 +64,7 @@ namespace OFIQ_LIB::modules::measures
                 std::istreambuf_iterator<char>());
             m_onnxRuntimeEnv.initialize(modelData, imageSize,imageSize); 
         }
-        catch (std::exception e)
+        catch (std::exception& e)
         {
             throw OFIQError(
                 OFIQ::ReturnCode::UnknownError,
@@ -73,25 +72,25 @@ namespace OFIQ_LIB::modules::measures
         }
     }
 
-    static cv::Mat CreateBlob(cv::Mat image)
+    static cv::Mat CreateBlob(const cv::Mat& image)
     {
         cv::Mat converted;
         image.convertTo(converted, CV_32FC3);
         converted /= 255.0;
         cv::Size size(imageSize, imageSize);
-        auto blob = cv::dnn::blobFromImage({ converted }, 1, size, 0, true);
-        return blob;
+        bool swapRB = false;
+        return cv::dnn::blobFromImage({ converted }, 1.0, size, 0, swapRB);
     }
 
     void UnifiedQualityScore::Execute(OFIQ_LIB::Session & session)
     {
-        cv::Mat rgb_aligned = session.getAlignedFace();
+        cv::Mat alignedFaceBGR = session.getAlignedFace();
 
-        cv::resize(rgb_aligned, rgb_aligned, cv::Size(scaledWidth, scaledHeight));
-        cv::Mat rgb_alignedCrop = rgb_aligned(cv::Range(cropTop, scaledHeight - cropBottom), cv::Range(cropLeft, scaledWidth - cropRight));
-        cv::Mat bgr_alignedCrop;
-        cv::cvtColor(rgb_alignedCrop, bgr_alignedCrop, cv::COLOR_RGB2BGR);
-        auto blob = CreateBlob(bgr_alignedCrop);
+        cv::resize(alignedFaceBGR, alignedFaceBGR, cv::Size(scaledWidth, scaledHeight));
+        cv::Mat alignedFaceCropBGR = alignedFaceBGR(
+            cv::Range(cropTop, scaledHeight - cropBottom),
+            cv::Range(cropLeft, scaledWidth - cropRight));
+        auto blob = CreateBlob(alignedFaceCropBGR);
         
         std::vector<float> net_input;
         net_input.assign(blob.begin<float>(), blob.end<float>());

@@ -44,13 +44,8 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Constructor a new Under Exposure Prevention object
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results 
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing() 
-         * OFIQImpl::performPreprocessing()\endlink method 
          */
-        UnderExposurePrevention(
-            const Configuration& configuration,
-            Session& session);
+        explicit UnderExposurePrevention(const Configuration& configuration);
 
         /**
          * @brief Run the computation of the under-exposure prevention measure.

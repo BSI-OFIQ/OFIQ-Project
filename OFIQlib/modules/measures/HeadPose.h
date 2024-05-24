@@ -43,13 +43,9 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Constructor for HeadPose.
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results 
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing() 
-         * OFIQImpl::performPreprocessing()\endlink method 
          */
-        HeadPose(
-            const Configuration& configuration,
-            Session& session);
+        explicit HeadPose(
+            const Configuration& configuration);
 
         /**
          * @brief Assesses head pose measure.

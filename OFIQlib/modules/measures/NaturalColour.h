@@ -46,13 +46,8 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Constructor
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing()
-         * OFIQImpl::performPreprocessing()\endlink method
          */
-        NaturalColour(
-            const Configuration& configuration,
-            Session& session);
+        explicit NaturalColour(const Configuration& configuration);
 
         /**
          * @brief Assesses natural colourness
@@ -83,10 +78,10 @@ namespace OFIQ_LIB::modules::measures
          * <code>leftRegionOfInterest</code>.
          * @attention An error occurs if the height of the two requested regions differ.
          */
-        cv::Mat ReduceImageToRegionOfInterest
-        (const cv::Mat maskedImage, 
-         const cv::Rect& leftRegionOfInterest, 
-         const cv::Rect& rightRegionOfInterest);
+        cv::Mat ReduceImageToRegionOfInterest(
+            const cv::Mat& maskedImage, 
+            const cv::Rect& leftRegionOfInterest, 
+            const cv::Rect& rightRegionOfInterest);
         
         /**
          * @brief Combines two CIELAB values a* and b* to computed

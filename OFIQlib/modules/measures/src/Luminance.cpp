@@ -34,9 +34,8 @@
 namespace OFIQ_LIB::modules::measures
 {
     Luminance::Luminance(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, OFIQ::QualityMeasure::Luminance }
+        const Configuration& configuration)
+        : Measure{ configuration, OFIQ::QualityMeasure::Luminance }
     {
     }
 
@@ -64,7 +63,8 @@ namespace OFIQ_LIB::modules::measures
         }
 
         double scalarScoreMean = round(100 * Sigmoid(mean, 0.2, 0.05) * (1 - Sigmoid(mean, 0.8, 0.05)));
-        session.assessment().qAssessments[OFIQ::QualityMeasure::LuminanceMean] = { mean, scalarScoreMean, OFIQ::QualityMeasureReturnCode::Success };
+        session.assessment().qAssessments[OFIQ::QualityMeasure::LuminanceMean] = 
+            { mean, scalarScoreMean, OFIQ::QualityMeasureReturnCode::Success };
 
         // Compute the variance of the luminance histogram
         double variance = 0;
@@ -74,6 +74,7 @@ namespace OFIQ_LIB::modules::measures
         }
 
         double scalarScoreVariance = round(100 * sin((60 * variance) / (60 * variance + 1) * M_PI));
-        session.assessment().qAssessments[OFIQ::QualityMeasure::LuminanceVariance] = { variance, scalarScoreVariance, OFIQ::QualityMeasureReturnCode::Success };
+        session.assessment().qAssessments[OFIQ::QualityMeasure::LuminanceVariance] = 
+            { variance, scalarScoreVariance, OFIQ::QualityMeasureReturnCode::Success };
     }
 }

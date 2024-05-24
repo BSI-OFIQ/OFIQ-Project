@@ -63,12 +63,9 @@ namespace OFIQ_LIB::modules::measures
          *  being scaled to the target dimension input of the CNN.</li>
          * </ul>
          * @param configuration Configuration object from which measure-related configuration is read. 
-         * @param session Session object containing the original facial image and pre-processing results
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing()
-         * OFIQImpl::performPreprocessing()\endlink method
          * @throws OFIQ_LIB::OFIQError if no valid model path is configured.
          */
-        CompressionArtifacts(const Configuration& configuration, Session& session);
+        explicit CompressionArtifacts(const Configuration& configuration);
 
         /**
          * @brief Assesses abscence of compression artifacts.
@@ -87,7 +84,7 @@ namespace OFIQ_LIB::modules::measures
          * @warning The value should be 184 such that an aligned input image of dimension 616 x 616 is cropped
          * to an image of dimension 248 x 248.
          */
-        uint16_t m_crop;
+        int m_crop;
 
         /**
          * @brief Target dimension of cropped image being scaled before input to the CNN .
@@ -96,7 +93,7 @@ namespace OFIQ_LIB::modules::measures
          * @warning The value should be 248; if configured differently, do not expect that the cropped image
          * can be successfully be passed to the CNN.
          */
-        uint16_t m_dim;
+        int m_dim;
 
         /**
          * @brief Manages CNN estimations. 

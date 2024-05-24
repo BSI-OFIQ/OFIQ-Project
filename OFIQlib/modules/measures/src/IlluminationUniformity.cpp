@@ -39,9 +39,8 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityMeasure = OFIQ::QualityMeasure::IlluminationUniformity;
 
     IlluminationUniformity::IlluminationUniformity(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
     }
 
@@ -59,8 +58,10 @@ namespace OFIQ_LIB::modules::measures
         auto luminanceImage = GetLuminanceImageFromBGR(faceSegmentation);
 
         // Compute the RMZ and LMZ of the face
-        OFIQ::LandmarkPoint leftEyeCenter, rightEyeCenter;
-        double interEyeDistance, eyeMouthDistance;
+        OFIQ::LandmarkPoint leftEyeCenter;
+        OFIQ::LandmarkPoint rightEyeCenter;
+        double interEyeDistance;
+        double eyeMouthDistance;
         CalculateReferencePoints(landmarks, leftEyeCenter, rightEyeCenter, interEyeDistance, eyeMouthDistance);
         cv::Rect leftRegionOfInterest;
         cv::Rect rightRegionOfInterest;
@@ -69,7 +70,8 @@ namespace OFIQ_LIB::modules::measures
         auto rightRegion = luminanceImage(rightRegionOfInterest);
 
         // Compute the normalized luminance histograms for RMZ and LMZ
-        cv::Mat1f leftHistogram, rightHistogram;
+        cv::Mat1f leftHistogram;
+        cv::Mat1f rightHistogram;
         GetNormalizedHistogram(leftRegion, cv::Mat(), leftHistogram);
         GetNormalizedHistogram(rightRegion, cv::Mat(), rightHistogram);
 
@@ -80,6 +82,7 @@ namespace OFIQ_LIB::modules::measures
         double rawScore = cv::sum(minHistogram).val[0];
 
         double scalarScore = round(100 * (std::pow(rawScore, 0.3)));
-        session.assessment().qAssessments[qualityMeasure] = { rawScore, scalarScore, OFIQ::QualityMeasureReturnCode::Success };
+        session.assessment().qAssessments[qualityMeasure] = 
+            { rawScore, scalarScore, OFIQ::QualityMeasureReturnCode::Success };
     }
 }

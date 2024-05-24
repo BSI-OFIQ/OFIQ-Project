@@ -51,10 +51,6 @@ namespace OFIQ_LIB::modules::measures
           * @param measure Enum value encoding the requested measure.
           * @param configuration Configuration from which measure parameters
           * are read.
-          * @param session Session object containing the original facial image
-          * and pre-processing results
-          * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing()
-          * OFIQImpl::performPreprocessing()\endlink method.
           * @attention The function returns <code>nullptr</code> if
           * the request of a measure is not implemented by the function.
           * @attention If any constructor of a requested measures throws something,
@@ -62,7 +58,6 @@ namespace OFIQ_LIB::modules::measures
           */
          static std::unique_ptr<Measure> CreateMeasure(
             const OFIQ::QualityMeasure measure,
-            const Configuration& configuration,
-            OFIQ_LIB::Session& session);
+            const Configuration& configuration);
     };
 }

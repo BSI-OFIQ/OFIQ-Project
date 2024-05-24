@@ -38,7 +38,7 @@ namespace OFIQ_LIB::modules::segmentations
 
     FaceOcclusionSegmentation::FaceOcclusionSegmentation(const Configuration& config)
     {
-        std::string modelPath = config.getDataDir() + "/" + config.GetString(modelConfigItem);
+        std::string modelPath = config.getDataDir() + "/" + config.GetString(m_modelConfigItem);
 
         try
         {
@@ -46,7 +46,7 @@ namespace OFIQ_LIB::modules::segmentations
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
-            m_onnxRuntimeEnv.initialize(modelData, scaledWidth, scaledHeight);
+            m_onnxRuntimeEnv.initialize(modelData, m_scaledWidth, m_scaledHeight);
         }
         catch (const std::exception& e)
         {
@@ -60,11 +60,11 @@ namespace OFIQ_LIB::modules::segmentations
     cv::Mat FaceOcclusionSegmentation::GetFaceOcclusionSegmentation(const cv::Mat& alignedImage)
     {
         cv::Mat alignedCrop = alignedImage(
-            cv::Range(cropTop, alignedImage.rows - cropBottom),
-            cv::Range(cropLeft, alignedImage.cols - cropRight));
+            cv::Range(m_cropTop, alignedImage.rows - m_cropBottom),
+            cv::Range(m_cropLeft, alignedImage.cols - m_cropRight));
         int croppedWidth = alignedCrop.cols;
         int croppedHeight = alignedCrop.rows;
-        cv::Size size(scaledWidth, scaledHeight);
+        cv::Size size(m_scaledWidth, m_scaledHeight);
         cv::Mat resized;
         cv::resize(alignedCrop, resized, size);
         float scaleFactor = 1/255.0f;
@@ -107,8 +107,8 @@ namespace OFIQ_LIB::modules::segmentations
             cv::INTER_NEAREST);
         cv::Mat maskAligned = cv::Mat::zeros(alignedImage.size(), CV_64F);
         maskRescaled.copyTo(maskAligned(
-            cv::Range(cropTop, croppedHeight + cropTop),
-            cv::Range(cropLeft, croppedWidth + cropLeft)));
+            cv::Range(m_cropTop, croppedHeight + m_cropTop),
+            cv::Range(m_cropLeft, croppedWidth + m_cropLeft)));
         maskAligned.convertTo(maskAligned, CV_8U);
 
         return maskAligned;
@@ -117,10 +117,10 @@ namespace OFIQ_LIB::modules::segmentations
     OFIQ::Image FaceOcclusionSegmentation::UpdateMask(
         OFIQ_LIB::Session& session, SegmentClassLabels faceSegment)
     {
-        if (segmentationImage == nullptr || session.Id() != GetLastSessionId())
+        if (m_segmentationImage == nullptr || session.Id() != GetLastSessionId())
             try
             {
-                segmentationImage =
+                m_segmentationImage =
                     std::make_shared<cv::Mat>(GetFaceOcclusionSegmentation(session.getAlignedFace()));
             }
             catch (const std::exception& e)
@@ -131,12 +131,12 @@ namespace OFIQ_LIB::modules::segmentations
             }
 
         OFIQ::Image maskImage =
-            OFIQ_LIB::MakeGreyImage(segmentationImage->cols, segmentationImage->rows);
+            OFIQ_LIB::MakeGreyImage(m_segmentationImage->cols, m_segmentationImage->rows);
 
 
         if (OFIQ_LIB::modules::segmentations::SegmentClassLabels::face == faceSegment)
         {
-            memcpy(maskImage.data.get(), segmentationImage->data, maskImage.size());
+            memcpy(maskImage.data.get(), m_segmentationImage->data, maskImage.size());
         }
         else
         {

@@ -45,11 +45,8 @@ namespace OFIQ_LIB::modules::measures
          /**
          * @brief Constructor
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results 
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing() 
-         * OFIQImpl::performPreprocessing()\endlink method 
          */
-        CropOfTheFaceImage(const Configuration& configuration, Session& session);
+        explicit CropOfTheFaceImage(const Configuration& configuration);
 
         /**
          * @brief Implementation of the crop of the face image measure.

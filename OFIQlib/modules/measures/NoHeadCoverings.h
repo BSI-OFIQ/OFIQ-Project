@@ -58,14 +58,8 @@ namespace OFIQ_LIB::modules::measures
          * is 0.02 by default. 
          * @param configuration Configuration object from which measure-related
          * configuration is read.
-         * @param session Session object containing the original facial image
-         * and pre-processing results
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing()
-         * OFIQImpl::performPreprocessing()\endlink method
          */
-        NoHeadCoverings(
-            const Configuration& configuration,
-            Session& session);
+        NoHeadCoverings(const Configuration& configuration);
 
         /**
          * @brief Assesses no head covering.
@@ -93,6 +87,6 @@ namespace OFIQ_LIB::modules::measures
          * is below (or equals) this threshold, then a quality of 100 (best) is used; 
          * otherwise, a quality of 0 is used.
          */
-        double threshold;
+        double m_threshold;
     };
 }

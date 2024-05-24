@@ -34,7 +34,7 @@ if exist %build_dir% (
 )
 
 echo Generating build files
-cmake -S ./ -G %vs_gen% -A %platform_name% -B %build_dir% -DCMAKE_INSTALL_PREFIX=%install_dir% -DDOWNLOAD_MODELS=ON -DDOWNLOAD_IMAGES=ON || goto end
+cmake -S ./ -G %vs_gen% -A %platform_name% -B %build_dir% -DCMAKE_INSTALL_PREFIX=%install_dir% -DDOWNLOAD_MODELS=OFF -DDOWNLOAD_IMAGES=OFF -DDOWNLOAD_ONNX=OFF || goto end
 
 echo Building Release
 cmake --build %build_dir% --config Release --target install -j 8|| goto end

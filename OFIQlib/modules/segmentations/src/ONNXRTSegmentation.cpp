@@ -35,7 +35,7 @@ void ONNXRuntimeSegmentation::initialize(
     {
         init_session(i_modelData, i_imageWidth, i_imageHeight);
     }
-    catch (std::exception e)
+    catch (const std::exception&)
     {
         throw OFIQ_LIB::OFIQError(
             OFIQ::ReturnCode::MissingConfigParamError,
@@ -46,40 +46,38 @@ void ONNXRuntimeSegmentation::initialize(
 
 size_t ONNXRuntimeSegmentation::getNumberOfOutputNodes()
 {
-    return m_ort_session->GetOutputCount();
+    return m_ortSession->GetOutputCount();
 }
 
 std::vector<Ort::Value> ONNXRuntimeSegmentation::run( std::vector<float>& i_netInput) {
 
     std::vector<Ort::Value> results;
-            // define names
+
     Ort::AllocatorWithDefaultOptions ort_alloc;
-    Ort::AllocatedStringPtr inputName = m_ort_session->GetInputNameAllocated(0, ort_alloc);
+    Ort::AllocatedStringPtr inputName = m_ortSession->GetInputNameAllocated(0, ort_alloc);
     std::array<const char*, 1> inputNames = {inputName.get()};
     std::vector<const char*> outputNames;
-    const size_t num_output_nodes = m_ort_session->GetOutputCount();
+    const size_t num_output_nodes = m_ortSession->GetOutputCount();
     for (int i = 0; i < num_output_nodes; i++)
     {
-        Ort::AllocatedStringPtr outputName = m_ort_session->GetOutputNameAllocated(i, ort_alloc);
+        Ort::AllocatedStringPtr outputName = m_ortSession->GetOutputNameAllocated(i, ort_alloc);
         outputNames.push_back(outputName.get());
         outputName.release();
     }
 
     inputName.release();
 
-
     // define Tensor
     auto inputTensor = Ort::Value::CreateTensor<float>(
-        m_memory_info,
+        m_memoryInfo,
         i_netInput.data(),
         i_netInput.size(),
         m_inputShape.data(),
         m_inputShape.size());
 
-
     // run inference
     Ort::RunOptions runOptions;
-    results = m_ort_session->Run(
+    results = m_ortSession->Run(
         runOptions,
         inputNames.data(),
         &inputTensor,
@@ -96,23 +94,20 @@ void ONNXRuntimeSegmentation::init_session(
     int64_t i_imageHeight)
 {
     m_ortenv = Ort::Env(ORT_LOGGING_LEVEL_ERROR);
-    m_ort_session = std::make_unique<Ort::Session>(
+    m_ortSession = std::make_unique<Ort::Session>(
         m_ortenv,
         i_model_data.data(),
         i_model_data.size(),
         Ort::SessionOptions{nullptr});
 
 
-    auto type_info = m_ort_session->GetInputTypeInfo(0);
+    auto type_info = m_ortSession->GetInputTypeInfo(0);
     auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
     auto input_node_shape = tensor_info.GetShape();
 
     int64_t expected_image_number_of_channels = input_node_shape[1] > 0 ? input_node_shape[1] : 3;
     int64_t expected_image_width = i_imageWidth;
     int64_t expected_image_height = i_imageHeight;
-
-    int64_t number_of_input_elements =
-        expected_image_number_of_channels * expected_image_width * expected_image_height;
 
     // define shape
     std::array<int64_t, 4> inputShape2 =

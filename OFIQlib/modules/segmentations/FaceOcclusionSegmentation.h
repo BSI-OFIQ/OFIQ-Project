@@ -114,47 +114,47 @@ namespace OFIQ_LIB::modules::segmentations
          * \link OFIQ_LIB::modules::segmentations::FaceOcclusionSegmentation::UpdateMask()
          * UpdateMask()\endlink. 
          */
-        std::shared_ptr<cv::Mat> segmentationImage;
+        std::shared_ptr<cv::Mat> m_segmentationImage;
 
         /**
          * @brief JSON/JAXN key to access path to FaceExtraction's model file from 
          * \link OFIQ_LIB::Configuration Configuration\endlink object. 
          */
-        const std::string modelConfigItem = "params.measures.FaceOcclusionSegmentation.model_path";
+        const std::string m_modelConfigItem = "params.measures.FaceOcclusionSegmentation.model_path";
 
         /**
          * @brief Cropping parameter 
          */
-        const int cropLeft = 96;
+        const int m_cropLeft = 96;
 
         /**
          * @brief Cropping parameter
          */
-        const int cropRight = 96;
+        const int m_cropRight = 96;
         
         /**
          * @brief Cropping parameter
          */
-        const int cropTop = 96;
+        const int m_cropTop = 96;
         
         /**
          * @brief Cropping parameter
          */
-        const int cropBottom = 96;
+        const int m_cropBottom = 96;
 
         /**
          * @brief After cropping the aligned image, the result will be 
          * scaled to a dimension of that width for being input to the 
          * CNN-based segmentation.
          */
-        const int scaledWidth = 224;
+        const int m_scaledWidth = 224;
 
         /**
          * @brief After cropping the aligned image, the result will be 
          * scaled to a dimension of that height for being input to the
          * CNN-based segmentation.
          */
-        const int scaledHeight = 224;
+        const int m_scaledHeight = 224;
 
     };
 }

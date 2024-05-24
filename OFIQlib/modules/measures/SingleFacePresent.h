@@ -44,12 +44,8 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Construct a new Single Face Present object
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results 
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing() 
-         * OFIQImpl::performPreprocessing()\endlink method 
          */
-        SingleFacePresent(
-            const Configuration& configuration, Session& session);
+        explicit SingleFacePresent(const Configuration& configuration);
 
         /**
          * @brief Run computation of the single face present analysis.

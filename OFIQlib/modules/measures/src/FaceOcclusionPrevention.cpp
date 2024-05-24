@@ -35,9 +35,8 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityMeasure = OFIQ::QualityMeasure::FaceOcclusionPrevention;
     
     FaceOcclusionPrevention::FaceOcclusionPrevention(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
     }
 

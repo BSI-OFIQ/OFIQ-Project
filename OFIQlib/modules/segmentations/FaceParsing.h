@@ -138,39 +138,39 @@ namespace OFIQ_LIB::modules::segmentations
          * \link OFIQ_LIB::modules::segmentations::FaceParsing::UpdateMask()
          * UpdateMask()\endlink.
          */
-        std::shared_ptr<cv::Mat> segmentationImage;
+        std::shared_ptr<cv::Mat> m_segmentationImage;
 
         /**
          * @brief JSON/JAXN key to access path to [BiSeNet](https://github.com/zllrunning/face-parsing.PyTorch)
          * model in ONNX format from
          * \link OFIQ_LIB::Configuration Configuration\endlink object.
          */
-        const std::string modelConfigItem = "params.measures.FaceParsing.model_path";
+        const std::string m_modelConfigItem = "params.measures.FaceParsing.model_path";
 
         /**
          * @brief Face parsing target dimension. 
          */
-        const int imageSize = 400;
+        const int m_imageSize = 400;
 
         /**
          * @brief Cropping parameter. 
          */
-        const int cropLeft = 30;
+        const int m_cropLeft = 30;
 
         /**
          * @brief Cropping parameter.
          */
-        const int cropRight = 30;
+        const int m_cropRight = 30;
 
         /**
          * @brief Cropping parameter.
          */
-        const int cropTop = 0;
+        const int m_cropTop = 0;
 
         /**
          * @brief Cropping parameter.
          */
-        const int cropBottom = 60;
+        const int m_cropBottom = 60;
         
         /**
          * @brief Creates the blob being input to the face parsing CNN.
