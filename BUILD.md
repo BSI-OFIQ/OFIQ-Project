@@ -163,7 +163,8 @@ This will create the following output.
 </table>
 
 ## MacOS
-The following has been tested on <code>macOS Sonoma Version 14.4.1</code>.
+### MacOS (ARM64)
+The following has been tested on <code>macOS Sonoma Version 14.4.1</code> with ARM64 processor.
 <br/><br/>
 Install Homebrew
 <pre>
@@ -203,6 +204,19 @@ Finally, to build OFIQ run the following.
  $ sh build.sh --os macos
 </pre>
 
+### MacOS (x86_64)
+To compile OFIQ on MacOS x86_64 one needs to 
+edit <code>/path/to/OFIQ_Project/conan/conan_profile_release_macos.txt</code> 
+and <code>/path/to/OFIQ_Project/conan/conan_profile_debug_macos.txt</code> first. In both files replace the line
+<pre>
+arch=armv8
+</pre>
+by
+<pre>
+arch=x86_64
+</pre>
+Then apply the same actions as for MacOS compilation on ARM64.
+
 ## Download model files
 To run OFIQ, the model files from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-MODELS.zip) 
 need to be downloaded and be placed in the <code>./data/models/</code> directory. 
@@ -217,8 +231,10 @@ This step is integrated in the cmake building process.
 
 # Running conformance tests
 The conformance tests are executed by going to <code>/path/to/OFIQ_Project/scripts/</code> 
-and run <code>conformance_tests.cmd</code> (Windows) or 
-<code>conformance_tests.sh</code> (Linux, MacOS).
+and run 
+ * <code>conformance_tests.cmd</code> (Windows).
+ * <code>conformance_tests.sh</code> (Linux).
+ * <code>conformance_tests.sh --os</code> (MacOS).
  
 # Running the sample executable
 In this section, we describe how to run the sample application of OFIQ after

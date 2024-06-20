@@ -11,8 +11,6 @@ if [ "$1" = "--os" ]; then
     fi
 fi
 
-pushd $PWD
 cd ../${build_dir}/testing
 ./test_conformance_table --gtest_output=xml:"../reports/$t.xml"
 
-popd
