@@ -48,6 +48,13 @@ namespace OFIQ_LIB::modules::measures
     void OverExposurePrevention::Execute(OFIQ_LIB::Session & session)
     {
         double rawScore = CalculateExposure(session, lightRange);
+
+        if (std::isnan(rawScore))
+        {
+            session.assessment().qAssessments[qualityMeasure] = { rawScore,-1,OFIQ::QualityMeasureReturnCode::FailureToAssess };
+            return;
+        }
+
         double scalarScore = round(1.0 / (rawScore + 0.01));
         if (scalarScore < 0)
         {

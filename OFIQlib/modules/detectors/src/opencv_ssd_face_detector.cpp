@@ -89,15 +89,13 @@ namespace OFIQ_LIB::modules::detectors
 
         if (!isRGB)
             cv::cvtColor(cvImage, cvImage, cv::COLOR_GRAY2RGB);
-        // else
-        //     cv::cvtColor(cvImage, cvImage, cv::COLOR_RGB2BGR);
 
         int paddingHorizontal = 0;
         int paddingVertical = 0;
         if (m_padding > 0)
         {
-            paddingHorizontal = faceImage.width * m_padding;
-            paddingVertical = faceImage.height * m_padding;
+            paddingHorizontal = static_cast<int>(faceImage.width * m_padding);
+            paddingVertical = static_cast<int>(faceImage.height * m_padding);
             cv::copyMakeBorder(cvImage, cvImage, paddingVertical, paddingVertical, paddingHorizontal, paddingHorizontal, BORDER_CONSTANT);
         }
 
@@ -132,7 +130,6 @@ namespace OFIQ_LIB::modules::detectors
                 float r = data[i + 5];
                 float b = data[i + 6];
 
-                // printf("face %d: conf = %.2f\n", n, confidence);
                 if ((double)confidence >= m_confidenceThreshold &&
                     l > 0 &&
                     t > 0 &&
@@ -140,17 +137,18 @@ namespace OFIQ_LIB::modules::detectors
                     b < 1 &&
                     r - l > m_minimalRelativeFaceSize)
                 {
-                    auto left = (int)round(l * cvImage.cols) - paddingHorizontal;
-                    auto top = (int)round(t * cvImage.rows) - paddingVertical;
-                    auto width = (int)round((r - l) * cvImage.cols);
-                    auto height = (int)round((b - t) * cvImage.rows);
+                    auto left = static_cast<int>(round(l * static_cast<float>(cvImage.cols))) - paddingHorizontal;
+                    auto top = static_cast<int>(round(t * static_cast<float>(cvImage.rows))) - paddingVertical;
+                    auto width = static_cast<int>(round((r - l) * static_cast<float>(cvImage.cols)));
+                    auto height = static_cast<int>(round((b - t) * static_cast<float>(cvImage.rows)));
                     
                     classIds.push_back((int)(data[i + 1]) - 1); // Skip 0th background class id.
                     confidences.push_back(confidence);
 
-                    faceRects.push_back(BoundingBox(left, top, width, height, FaceDetectorType::OPENCVSSD));
-                    // printf("face %d (%.2f): x,y,w,h = %d %d %d %d\n", n, confidence, left, top,
-                    // width, height);
+                    faceRects.push_back
+                        (BoundingBox(static_cast<int16_t>(left), static_cast<int16_t>(top), 
+                                     static_cast<int16_t>(width), static_cast<int16_t>(height),
+                                     FaceDetectorType::OPENCVSSD));
                 }
             }
         }

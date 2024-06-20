@@ -103,7 +103,7 @@ namespace OFIQ_LIB::modules::measures
             cv::Mat& faceCrop,
             cv::Mat& maskCrop,
             bool useAligned,
-            float faceRegionAlpha);
+            float faceRegionAlpha) const;
         
         /**
          * @brief Computation of the input features using different edge detectors.
@@ -113,6 +113,6 @@ namespace OFIQ_LIB::modules::measures
          * @param applyBlur Wheter or not rub a GaussianBlur before the edge detection.
          * @return cv::Mat Container storing the results of the different edge detectors.
          */
-        cv::Mat GetClassifierFocusFeatures(const cv::Mat& image, const cv::Mat& mask, bool applyBlur);
+        cv::Mat GetClassifierFocusFeatures(const cv::Mat& image, const cv::Mat& mask, bool applyBlur) const;
     };
 }

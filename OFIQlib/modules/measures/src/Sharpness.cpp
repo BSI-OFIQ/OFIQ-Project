@@ -85,9 +85,9 @@ namespace OFIQ_LIB::modules::measures
         features.convertTo(features, CV_32F);
 
         cv::Mat predResults;
-        float svmPrediction = m_rtree->predict(features, predResults, cv::ml::StatModel::RAW_OUTPUT);
+        m_rtree->predict(features, predResults, cv::ml::StatModel::RAW_OUTPUT);
 
-        double prediction = m_numTrees - predResults.at<float>(0, 0);
+        double prediction = static_cast<float>(m_numTrees) - predResults.at<float>(0, 0);
         SetQualityMeasure(session, qualityMeasure, prediction, OFIQ::QualityMeasureReturnCode::Success);
     }
 
@@ -96,7 +96,7 @@ namespace OFIQ_LIB::modules::measures
         cv::Mat& faceCrop,
         cv::Mat& maskCrop,
         bool useAligned,
-        float faceRegionAlpha)
+        float faceRegionAlpha) const
     {
         cv::Mat img;
         cv::Mat faceMask;
@@ -118,7 +118,7 @@ namespace OFIQ_LIB::modules::measures
         maskCrop = faceMask(rect);
     }
 
-    cv::Mat Sharpness::GetClassifierFocusFeatures(const cv::Mat& image, const cv::Mat& mask, bool applyBlur)
+    cv::Mat Sharpness::GetClassifierFocusFeatures(const cv::Mat& image, const cv::Mat& mask, bool applyBlur) const
     {
         cv::Mat features;
         cv::Mat grayImage = image.clone();

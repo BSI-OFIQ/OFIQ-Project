@@ -164,7 +164,7 @@ namespace OFIQ_LIB
 
         cv::Mat maskedImage;
         cv::bitwise_and(faceMask, faceOcclusionMask, maskedImage);
-        
+
         auto luminanceImage = GetLuminanceImageFromBGR(alignedImage);
 
         quality = ComputeBrightnessAspect(
@@ -185,6 +185,8 @@ namespace OFIQ_LIB
         cv::calcHist(std::vector{luminanceImage}, {0}, maskImage, histogram, {histSize}, range);
 
         auto pixelsInHistogram = cv::sum(histogram).val[0];
+        if (pixelsInHistogram == 0)
+            return std::nan("");
         double rawScore = 0;
         for (int i = exposureRange[0]; i <= exposureRange[1]; i++)
         {

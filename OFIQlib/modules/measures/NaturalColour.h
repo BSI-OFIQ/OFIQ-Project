@@ -66,7 +66,7 @@ namespace OFIQ_LIB::modules::measures
          * @param cvImage The mask image returned has the same dimension as <code>cvImage</code>.
          * @return Mask image
          */
-        cv::Mat CreateMaskedImage(const OFIQ::FaceLandmarks& landmarks, const cv::Mat& cvImage);
+        cv::Mat CreateMaskedImage(const OFIQ::FaceLandmarks& landmarks, const cv::Mat& cvImage) const;
 
         /**
          * @brief Extracts two rectangular regions from an image and returns its concatenation.
@@ -81,7 +81,7 @@ namespace OFIQ_LIB::modules::measures
         cv::Mat ReduceImageToRegionOfInterest(
             const cv::Mat& maskedImage, 
             const cv::Rect& leftRegionOfInterest, 
-            const cv::Rect& rightRegionOfInterest);
+            const cv::Rect& rightRegionOfInterest) const;
         
         /**
          * @brief Combines two CIELAB values a* and b* to computed
@@ -96,6 +96,6 @@ namespace OFIQ_LIB::modules::measures
          * @param meanChannelB The CIELAB value \f$b^*\f$ input value.
          * @return Native quality score
          */
-        double CalculateScore(double meanChannelA, double meanChannelB);
+        double CalculateScore(double meanChannelA, double meanChannelB) const;
     };
 }

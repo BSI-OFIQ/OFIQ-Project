@@ -51,8 +51,8 @@ namespace OFIQ_LIB::modules::landmarks
         OFIQ::LandmarkPoint point;
         if (count > 0)
         {
-            point.x = round(sumX / (float)count);
-            point.y = round(sumY / (float)count);
+            point.x = static_cast<int32_t>(round(static_cast<float>(sumX) / static_cast<float>(count)));
+            point.y = static_cast<int32_t>(round(static_cast<float>(sumY) / static_cast<float>(count)));
         }
 
         return point;
@@ -70,6 +70,7 @@ namespace OFIQ_LIB::modules::landmarks
 
     double FaceMeasures::InterEyeDistance(const OFIQ::FaceLandmarks& faceLandmarks, double yaw)
     {
+        const static double EPS = 1e-6;
         auto leftEyePoints = PartExtractor::getFacePart(faceLandmarks, FaceParts::LEFT_EYE_CORNERS);
         auto rightEyePoints =
             PartExtractor::getFacePart(faceLandmarks, FaceParts::RIGHT_EYE_CORNERS);
@@ -77,8 +78,18 @@ namespace OFIQ_LIB::modules::landmarks
         auto leftCenter = GetMiddle(leftEyePoints);
         auto rightCenter = GetMiddle(rightEyePoints);
 
-        double distance = GetDistance(leftCenter, rightCenter);
-        distance *= 1 / (cos(yaw * M_PI / 180.0));
+        double distance;
+
+        double cos_of_yaw = cos(yaw * M_PI / 180.0);
+        if (std::abs(cos_of_yaw) < EPS)
+        {
+            distance = std::nan("");
+        }
+        else
+        {
+            distance = GetDistance(leftCenter, rightCenter);
+            distance *= 1 / cos_of_yaw;
+        }
         return distance;
     }
 
@@ -151,9 +162,9 @@ namespace OFIQ_LIB::modules::landmarks
         for (auto& p : hullPoints)
         {
             cv::Point2f cropped = p;
-            cropped = (cropped - cv::Point2f(a, b)) / (d - b) * imgSize;
-            p.x = (int)cropped.x;
-            p.y = (int)cropped.y;
+            cropped = (cropped - cv::Point2f(static_cast<float>(a), static_cast<float>(b))) / static_cast<float>(d - b) * static_cast<float>(imgSize);
+            p.x = static_cast<int>(cropped.x);
+            p.y = static_cast<int>(cropped.y);
         }
         // generate mask of convex hull
         cv::Mat mask = cv::Mat::zeros(cv::Size(imgSize, imgSize), CV_8UC1);

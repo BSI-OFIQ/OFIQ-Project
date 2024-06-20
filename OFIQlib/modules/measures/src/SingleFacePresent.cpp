@@ -89,7 +89,7 @@ namespace OFIQ_LIB::modules::measures
             { static_cast<double>(f), static_cast<double>(qc), OFIQ::QualityMeasureReturnCode::Success };
 #else
         float f = 1.0f;
-        auto& m_detectedFaces = session.getDetectedFaces();
+        const auto& m_detectedFaces = session.getDetectedFaces();
         if (m_detectedFaces.size() == 1)
         {
             f = 0.0f;
@@ -116,7 +116,7 @@ namespace OFIQ_LIB::modules::measures
 
             // Update face unicity: the more it approaches zero, the more
             // dominant is the largest face.
-            f = sqrtf(a2 / a1);
+            f = a2 / a1;
         }
 
         float qc = round(100.0f * (1.0f - f));

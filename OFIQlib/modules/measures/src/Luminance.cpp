@@ -59,7 +59,7 @@ namespace OFIQ_LIB::modules::measures
         std::vector<int> range = { 0, 256 };
         for (int i = range[0]; i < range[1]; i++)
         {
-            mean += histogram.at<float>(i) * i / 255.0;
+            mean += static_cast<double>(histogram.at<float>(i)) * static_cast<double>(i) / 255.0;
         }
 
         double scalarScoreMean = round(100 * Sigmoid(mean, 0.2, 0.05) * (1 - Sigmoid(mean, 0.8, 0.05)));

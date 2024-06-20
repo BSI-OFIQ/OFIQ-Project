@@ -78,7 +78,7 @@ namespace OFIQ_LIB::modules::measures
         SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);
     }
 
-    cv::Mat NaturalColour::CreateMaskedImage(const OFIQ::FaceLandmarks& landmarks, const cv::Mat& cvImage)
+    cv::Mat NaturalColour::CreateMaskedImage(const OFIQ::FaceLandmarks& landmarks, const cv::Mat& cvImage) const
     {
         auto cvMask = FaceMeasures::GetFaceMask(landmarks, cvImage.rows, cvImage.cols);
         cv::Mat maskedImage;
@@ -89,7 +89,7 @@ namespace OFIQ_LIB::modules::measures
     cv::Mat NaturalColour::ReduceImageToRegionOfInterest(
         const cv::Mat& maskedImage,
         const cv::Rect& leftRegionOfInterest,
-        const cv::Rect& rightRegionOfInterest)
+        const cv::Rect& rightRegionOfInterest) const
     {
         auto leftRegion = maskedImage(leftRegionOfInterest);
         auto rightRegion = maskedImage(rightRegionOfInterest);
@@ -98,7 +98,7 @@ namespace OFIQ_LIB::modules::measures
         return reducedImage;
     }
 
-    double NaturalColour::CalculateScore(double meanChannelA, double meanChannelB)
+    double NaturalColour::CalculateScore(double meanChannelA, double meanChannelB) const
     {
         auto rawScore = (meanChannelA >= 0 && meanChannelB >= 0)
                           ? sqrt(

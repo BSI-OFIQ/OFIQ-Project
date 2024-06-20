@@ -132,7 +132,7 @@ void OFIQImpl::performPreprocessing(Session& session)
         session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
     }
 #else
-    session.setLandmarks(networks->landmarkExtractor_->extractLandmarks(session));
+    session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
 #endif
     log(std::to_string(
         std::chrono::duration_cast<std::chrono::milliseconds>(
