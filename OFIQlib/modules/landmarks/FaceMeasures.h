@@ -144,8 +144,8 @@ namespace OFIQ_LIB::modules::landmarks
          * @param facePart Face part
          * @return Maxim of face pairs
          */
-        static double GetMaxPairDistance
-        (const OFIQ::FaceLandmarks& landmarks, 
-         landmarks::FaceParts facePart);
+        static double GetMaxPairDistance(
+            const OFIQ::FaceLandmarks& landmarks,
+            landmarks::FaceParts facePart);
     };
 }

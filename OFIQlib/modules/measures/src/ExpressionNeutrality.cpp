@@ -42,9 +42,8 @@ namespace OFIQ_LIB::modules::measures
     static const uint16_t dimCNN2 = 260;
 
     ExpressionNeutrality::ExpressionNeutrality(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
         auto modelPathCNN1 = configuration.getDataDir() + "/" + configuration.GetString(modelConfigItemCNN1);
         auto modelPathCNN2 = configuration.getDataDir() + "/" + configuration.GetString(modelConfigItemCNN2);
@@ -59,7 +58,7 @@ namespace OFIQ_LIB::modules::measures
                 std::istreambuf_iterator<char>());
             m_onnxRuntimeEnvCNN1.initialize(modelData, dimCNN1, dimCNN1);
         }
-        catch (std::exception e)
+        catch (std::exception & e)
         {
             throw OFIQError(
                 OFIQ::ReturnCode::UnknownError,
@@ -75,7 +74,7 @@ namespace OFIQ_LIB::modules::measures
                 std::istreambuf_iterator<char>());
             m_onnxRuntimeEnvCNN2.initialize(modelData, dimCNN2, dimCNN2);
         }
-        catch (std::exception e)
+        catch (const std::exception&)
         {
             throw OFIQError(
                 OFIQ::ReturnCode::UnknownError,
@@ -84,7 +83,7 @@ namespace OFIQ_LIB::modules::measures
 
         try
         {
-            classifier = cv::ml::Boost::load(modelPathAdaboost);
+            m_classifier = cv::ml::Boost::load(modelPathAdaboost);
         }
         catch (const std::exception&)
         {
@@ -123,7 +122,7 @@ namespace OFIQ_LIB::modules::measures
         std::vector<float> net_input;
         net_input.assign(blob.begin<float>(), blob.end<float>());
         auto outCNN1 = m_onnxRuntimeEnvCNN1.run(net_input);
-        cv::Mat features1 = cv::Mat(1, 1280, CV_32F, outCNN1[0].GetTensorMutableData<float>());
+        auto features1 = cv::Mat(1, 1280, CV_32F, outCNN1[0].GetTensorMutableData<float>());
 
         cv::Mat resized2;
         cv::resize(transformed, resized2, cv::Size(dimCNN2, dimCNN2), 0, 0, cv::INTER_LINEAR);
@@ -132,13 +131,13 @@ namespace OFIQ_LIB::modules::measures
         net_input.clear();
         net_input.assign(blob.begin<float>(), blob.end<float>());
         auto outCNN2 = m_onnxRuntimeEnvCNN2.run(net_input);
-        cv::Mat features2 = cv::Mat(1, 1408, CV_32F, outCNN2[0].GetTensorMutableData<float>());
+        auto features2 = cv::Mat(1, 1408, CV_32F, outCNN2[0].GetTensorMutableData<float>());
 
         cv::Mat features;
         cv::hconcat(features1, features2, features);
         
         cv::Mat predResults;
-        this->classifier->predict(features, predResults, cv::ml::DTrees::PREDICT_SUM);
+        this->m_classifier->predict(features, predResults, cv::ml::DTrees::PREDICT_SUM);
         double rawScore = predResults.at<float>(0, 0);
         SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);
     }

@@ -34,9 +34,8 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityMeasure = OFIQ::QualityMeasure::EyesOpen;
 
     EyesOpen::EyesOpen(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
         SigmoidParameters defaultValues;
         defaultValues.h = 100;

@@ -33,7 +33,7 @@
 
 namespace OFIQ_LIB::modules::poseEstimators
 {
-    const std::string HeadPose3DDFAV2::paramPoseEstimatorModel = "params.measures.HeadPose.model_path";
+    const std::string HeadPose3DDFAV2::m_paramPoseEstimatorModel = "params.measures.HeadPose.model_path";
     const cv::Mat paramMean = (cv::Mat_<float>(1, 7) <<
         3.4926363e-04, 2.5279013e-07, -6.8751979e-07, 6.0167957e+01,
         -6.2955132e-07, 5.7572004e-04, -5.0853912e-05);
@@ -44,7 +44,7 @@ namespace OFIQ_LIB::modules::poseEstimators
     HeadPose3DDFAV2::HeadPose3DDFAV2(const Configuration& config)
     {
         const auto modelPath =
-            config.getDataDir() + "/" + config.GetString(paramPoseEstimatorModel);
+            config.getDataDir() + "/" + config.GetString(m_paramPoseEstimatorModel);
         try
         {
             std::ifstream instream(modelPath, std::ios::in | std::ios::binary);
@@ -52,20 +52,20 @@ namespace OFIQ_LIB::modules::poseEstimators
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
 
-            m_ort_session = std::make_unique<Ort::Session>(m_ortenv, modelData.data(), modelData.size(), Ort::SessionOptions{ nullptr });
+            m_ortSession = std::make_unique<Ort::Session>(m_ortenv, modelData.data(), modelData.size(), Ort::SessionOptions{ nullptr });
 
-            auto type_info = m_ort_session->GetInputTypeInfo(0);
+            auto type_info = m_ortSession->GetInputTypeInfo(0);
             auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
             auto input_node_shape = tensor_info.GetShape();
 
-            m_expected_image_number_of_channels = input_node_shape[1];
-            m_expected_image_width = input_node_shape[2];
-            m_expected_image_height = input_node_shape[3];
-            m_number_of_input_elements = m_expected_image_number_of_channels * m_expected_image_width * m_expected_image_height;
+            m_expectedImageNumberOfChannels = input_node_shape[1];
+            m_expectedImageWidth = input_node_shape[2];
+            m_expectedImageHeight = input_node_shape[3];
+            m_numberOfInputElements = m_expectedImageNumberOfChannels * m_expectedImageWidth * m_expectedImageHeight;
             // define shape
-            inputShape = { 1, m_expected_image_number_of_channels, m_expected_image_height, m_expected_image_width };
+            m_inputShape = { 1, m_expectedImageNumberOfChannels, m_expectedImageHeight, m_expectedImageWidth };
         }
-        catch (std::exception e)
+        catch (const std::exception&)
         {
             throw OFIQError(
                 OFIQ::ReturnCode::UnknownError,
@@ -81,7 +81,7 @@ namespace OFIQ_LIB::modules::poseEstimators
         cv::Mat croppedImageBGR = CropImage(cvImageBGR, biggestFace);
 
         cv::Mat resizedImage;
-        cv::resize(croppedImageBGR, resizedImage, cv::Size(m_expected_image_width, m_expected_image_height), 0, 0, cv::INTER_LINEAR);
+        cv::resize(croppedImageBGR, resizedImage, cv::Size(m_expectedImageWidth, m_expectedImageHeight), 0, 0, cv::INTER_LINEAR);
         resizedImage.convertTo(resizedImage, CV_32FC3);
         cv::Mat normalizedImageBGR;
         normalizedImageBGR = resizedImage - cv::Scalar(127.5, 127.5, 127.5);
@@ -103,9 +103,9 @@ namespace OFIQ_LIB::modules::poseEstimators
         auto inputTensor = Ort::Value::CreateTensor<float>(
             memory_info,
             &tensor[0],
-            m_number_of_input_elements,
-            inputShape.data(),
-            inputShape.size());
+            m_numberOfInputElements,
+            m_inputShape.data(),
+            m_inputShape.size());
         const std::array<const char*, 1> inputNames = { "input" };
         const std::array<const char*, 1> outputNames = { "output" };
 
@@ -114,7 +114,7 @@ namespace OFIQ_LIB::modules::poseEstimators
         try
         {
             Ort::RunOptions runOptions;
-            results = m_ort_session->Run(runOptions, inputNames.data(), &inputTensor, 1, outputNames.data(), 1);
+            results = m_ortSession->Run(runOptions, inputNames.data(), &inputTensor, 1, outputNames.data(), 1);
         }
         catch (Ort::Exception& e)
         {
@@ -150,12 +150,12 @@ namespace OFIQ_LIB::modules::poseEstimators
 
     cv::Mat HeadPose3DDFAV2::CropImage(const cv::Mat& image, const OFIQ::BoundingBox& detectedFace)
     {
-        float centerX = detectedFace.xleft + detectedFace.width / 2.0;
-        float centerY = detectedFace.ytop + detectedFace.height / 2.0;
-        int b = (int)(centerY - 0.44 * detectedFace.height);
-        int d = (int)(centerY + 0.51 * detectedFace.height);
-        int a = (int)(centerX - (d - b) / 2.0);
-        int c = a + (d - b);
+        double centerX = detectedFace.xleft + detectedFace.width / 2.0;
+        double centerY = detectedFace.ytop + detectedFace.height / 2.0;
+        auto b = (int16_t)(centerY - 0.44 * detectedFace.height);
+        auto d = (int16_t)(centerY + 0.51 * detectedFace.height);
+        auto a = (int16_t)(centerX - (d - b) / 2.0);
+        int16_t c = a + (d - b);
         OFIQ::BoundingBox box;
         box.xleft = a;
         box.ytop = b;

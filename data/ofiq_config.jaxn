@@ -167,7 +167,14 @@
           }
         },
         "NoHeadCoverings": {
-          "threshold": 0.02
+		  // Proportion of pixels classified as head covering <= T0 will lead to a quality component value of 100 (best)
+          "T0": 0.0,
+		  // Proportion of pixels classified as head covering >= T1 will lead to a quality component value of 0 (worst)
+		  "T1": 0.95,
+		  // Proportion of pixels classified as head covering in (T0,T1) will be interpolated using a sigmoid function with w as standard deviation 
+		  "w" : 0.1,
+		  // Proportion of pixels classified as head covering in (T0,T1) will be interpolated using a sigmoid function with x0 as development point 
+		  "x0" : 0.02
         },
         "HeadPose": {
           "model_path": "models/head_pose_estimation/mb1_120x120.onnx"

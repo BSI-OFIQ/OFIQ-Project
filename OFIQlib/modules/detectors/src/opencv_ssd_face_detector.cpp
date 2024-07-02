@@ -50,16 +50,16 @@ namespace OFIQ_LIB::modules::detectors
         const std::string paramMinimalRelativeFaceSize = pathPrefix + "min_rel_face_size";
 
 
-        confidenceThreshold = config.GetNumber(paramConfidenceThreshold);
-        padding = config.GetNumber(paramPadding);
-        minimalRelativeFaceSize = config.GetNumber(paramMinimalRelativeFaceSize);
+        m_confidenceThreshold = config.GetNumber(paramConfidenceThreshold);
+        m_padding = config.GetNumber(paramPadding);
+        m_minimalRelativeFaceSize = config.GetNumber(paramMinimalRelativeFaceSize);
         const auto fileNameProtoTxt = config.getDataDir() + "/" + config.GetString(paramPrototxt);
         const auto fileNameCaffeModel =
             config.getDataDir() + "/" + config.GetString(paramCaffemodel);
 
         try
         {
-            dnnNet =
+            m_dnnNet =
                 make_shared<dnn::Net>(dnn::readNetFromCaffe(fileNameProtoTxt, fileNameCaffeModel));
         }
         catch (const std::exception&)
@@ -72,7 +72,7 @@ namespace OFIQ_LIB::modules::detectors
 
     std::vector<BoundingBox> SSDFaceDetector::UpdateFaces(Session& session)
     {
-        if (!this->dnnNet)
+        if (!this->m_dnnNet)
             throw OFIQError(
                 ReturnCode::FaceDetectionError,
                 "Opencv SDD face detector isn't initialized");
@@ -89,29 +89,27 @@ namespace OFIQ_LIB::modules::detectors
 
         if (!isRGB)
             cv::cvtColor(cvImage, cvImage, cv::COLOR_GRAY2RGB);
-        // else
-        //     cv::cvtColor(cvImage, cvImage, cv::COLOR_RGB2BGR);
 
         int paddingHorizontal = 0;
         int paddingVertical = 0;
-        if (padding > 0)
+        if (m_padding > 0)
         {
-            paddingHorizontal = faceImage.width * padding;
-            paddingVertical = faceImage.height * padding;
+            paddingHorizontal = static_cast<int>(faceImage.width * m_padding);
+            paddingVertical = static_cast<int>(faceImage.height * m_padding);
             cv::copyMakeBorder(cvImage, cvImage, paddingVertical, paddingVertical, paddingHorizontal, paddingHorizontal, BORDER_CONSTANT);
         }
 
-        cv::Scalar meanBGR = Scalar(104, 117, 123);
-        bool doSwapRB = true, // need to swap RB for RGB images
-            doCrop = false;
+        auto meanBGR = Scalar(104, 117, 123);
+        bool doSwapRB = true; // need to swap RB for RGB images
+        bool doCrop = false;
 
         // Create a 4D blob from the image.
         Mat blob = dnn::blobFromImage(cvImage, 1.0, Size(300, 300), meanBGR, doSwapRB, doCrop);
 
         // Run a model.
-        dnnNet->setInput(blob /*, "", 1.0, mean*/);
+        m_dnnNet->setInput(blob /*, "", 1.0, mean*/);
         std::vector<Mat> netOuts;
-        dnnNet->forward(netOuts);
+        m_dnnNet->forward(netOuts);
 
         // Network produces output blob with a shape 1x1xNx7 where N is a number of
         // detections and an every detection is a vector of values
@@ -121,38 +119,36 @@ namespace OFIQ_LIB::modules::detectors
 
         std::vector<int> classIds;
         std::vector<float> confidences;
-        //std::vector<Rect> boxes;
         for (size_t k = 0; k < netOuts.size(); k++)
         {
-            float* data = (float*)netOuts[k].data;
+            const float* data = (float*)netOuts[k].data;
             for (size_t i = 0; i < netOuts[k].total(); i += 7)
             {
-                float confidence = data[i + 2], 
-                    l = data[i + 3], 
-                    t = data[i + 4], 
-                    r = data[i + 5],
-                    b = data[i + 6];
+                float confidence = data[i + 2];
+                float l = data[i + 3]; 
+                float t = data[i + 4]; 
+                float r = data[i + 5];
+                float b = data[i + 6];
 
-                // printf("face %d: conf = %.2f\n", n, confidence);
-                if ((double)confidence >= confidenceThreshold &&
+                if ((double)confidence >= m_confidenceThreshold &&
                     l > 0 &&
                     t > 0 &&
                     r < 1 &&
                     b < 1 &&
-                    r - l > minimalRelativeFaceSize)
+                    r - l > m_minimalRelativeFaceSize)
                 {
-                    int left = (int)round(l * cvImage.cols) - paddingHorizontal;
-                    int top = (int)round(t * cvImage.rows) - paddingVertical;
-                    int width = (int)round((r - l) * cvImage.cols);
-                    int height = (int)round((b - t) * cvImage.rows);
+                    auto left = static_cast<int>(round(l * static_cast<float>(cvImage.cols))) - paddingHorizontal;
+                    auto top = static_cast<int>(round(t * static_cast<float>(cvImage.rows))) - paddingVertical;
+                    auto width = static_cast<int>(round((r - l) * static_cast<float>(cvImage.cols)));
+                    auto height = static_cast<int>(round((b - t) * static_cast<float>(cvImage.rows)));
                     
                     classIds.push_back((int)(data[i + 1]) - 1); // Skip 0th background class id.
-                    //boxes.push_back(Rect(left, top, width, height));
                     confidences.push_back(confidence);
 
-                    faceRects.push_back(BoundingBox(left, top, width, height, FaceDetectorType::OPENCVSSD));
-                    // printf("face %d (%.2f): x,y,w,h = %d %d %d %d\n", n, confidence, left, top,
-                    // width, height);
+                    faceRects.push_back
+                        (BoundingBox(static_cast<int16_t>(left), static_cast<int16_t>(top), 
+                                     static_cast<int16_t>(width), static_cast<int16_t>(height),
+                                     FaceDetectorType::OPENCVSSD));
                 }
             }
         }

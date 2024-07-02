@@ -31,7 +31,7 @@ namespace OFIQ_LIB::modules::measures
 
     void log(const std::string_view& msg)
     {
-        if (execLogActive)
+        if (ExecutorLogActive)
             std::cout << msg;
     }
 
@@ -39,9 +39,10 @@ namespace OFIQ_LIB::modules::measures
     {
         int i = 1;
         log("\t");
-        for (const auto& measure : measures)
+        for (const auto& measure : m_measures)
         {
-            log(std::to_string(i++) + ". " + measure->GetName() + " ");
+            auto s = std::to_string(i);
+            log(s + ". " + measure->GetName() + " ");
             try {
                 measure->Execute(i_currentSession);
             }
@@ -50,6 +51,7 @@ namespace OFIQ_LIB::modules::measures
                 measure->SetQualityMeasure(i_currentSession, measure->GetQualityMeasure(), .0f, OFIQ::QualityMeasureReturnCode::FailureToAssess);
                 log("Exception in " + measure->GetName() + "!!! ");
             }
+            ++i;
         }
         log("\nfinished\n");
     }

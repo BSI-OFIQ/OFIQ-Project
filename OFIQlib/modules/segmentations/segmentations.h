@@ -170,18 +170,18 @@ namespace OFIQ_LIB
 		 * @brief Accesses the last session id for this interface.
 		 * @return Session id
 		 */
-        std::string GetLastSessionId() const { return lastSessionId; };
+        std::string GetLastSessionId() const { return m_lastSessionId; };
 
     private:
         /**
          * @brief id of the session that has been used in the latest request, for internal use.
          * 
          */
-		std::string lastSessionId;
+		std::string m_lastSessionId;
         /**
          * @brief Container for storing the segmented face region masks.
          * 
          */
-        std::map<modules::segmentations::SegmentClassLabels, OFIQ::Image> masks;
+        std::map<modules::segmentations::SegmentClassLabels, OFIQ::Image> m_masks;
     };
 }

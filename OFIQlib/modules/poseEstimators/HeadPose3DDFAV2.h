@@ -71,7 +71,7 @@ namespace OFIQ_LIB::modules::poseEstimators
         /**
          * @brief Name of the used CNN net, passed from the configuration.
          */
-        static const std::string paramPoseEstimatorModel;
+        static const std::string m_paramPoseEstimatorModel;
 
         /**
          * @brief ONNXRuntime environment handle.
@@ -81,32 +81,32 @@ namespace OFIQ_LIB::modules::poseEstimators
         /**
          * @brief ONNXRuntime session handle.
          */
-        std::unique_ptr<Ort::Session> m_ort_session;
+        std::unique_ptr<Ort::Session> m_ortSession;
 
         /**
          * @brief Width of the CNN used for computation, read from the loaded model.
          */
-        int64_t m_expected_image_width = 0;
+        int64_t m_expectedImageWidth = 0;
 
         /**
          * @brief Height of the CNN used for computation, read from the loaded model.
          */
-        int64_t m_expected_image_height = 0;
+        int64_t m_expectedImageHeight = 0;
 
         /**
          * @brief Expected number of channels of the input image, read from the loaded model.
          */
-        int64_t m_expected_image_number_of_channels = 0;
+        int64_t m_expectedImageNumberOfChannels = 0;
 
         /**
          * @brief Number of input elements of the CNN used for computation, read from the loaded model.
          */
-        int64_t m_number_of_input_elements = 0;
+        int64_t m_numberOfInputElements = 0;
 
         /**
          * @brief inputShape of the CNN used for computation, read from the loaded model.
          */
-        std::array<int64_t, 4> inputShape;
+        std::array<int64_t, 4> m_inputShape;
 
         /**
          * @brief Crop face from image. Internally the passed bounding box will be transformed to a square region.

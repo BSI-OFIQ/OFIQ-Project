@@ -32,11 +32,11 @@ namespace OFIQ_LIB
     PoseEstimatorInterface::EulerAngle&
         PoseEstimatorInterface::estimatePose(OFIQ_LIB::Session& session)
     {
-        if (session.Id() != lastSessionId)
+        if (session.Id() != m_lastSessionId)
         {
-            updatePose(session, pose);
-            lastSessionId = session.Id();
+            updatePose(session, m_pose);
+            m_lastSessionId = session.Id();
         }
-        return pose;
+        return m_pose;
     }
 }

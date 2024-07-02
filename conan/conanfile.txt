@@ -1,5 +1,5 @@
 [requires]
-gtest/cci.20210126
+gtest/1.14.0
 opencv/4.5.5
 spdlog/1.10.0
 taocpp-json/1.0.0-beta.13

@@ -44,7 +44,7 @@ namespace OFIQ_LIB::modules::measures
         configuration.GetNumber(extendedKey + "x0", sigmoidParams.x0);
         configuration.GetNumber(extendedKey + "w", sigmoidParams.w);
         configuration.GetBool(extendedKey + "round", sigmoidParams.round);
-        sigmoidMap[key] = sigmoidParams;
+        m_sigmoidMap[key] = sigmoidParams;
     }
 
     double Measure::ExecuteScalarConversion(OFIQ::QualityMeasure measure, double rawValue)
@@ -54,7 +54,7 @@ namespace OFIQ_LIB::modules::measures
 
     double Measure::ExecuteScalarConversion(const std::string& key, double rawValue)
     {
-        return ScalarConversion(rawValue, sigmoidMap[key]);
+        return ScalarConversion(rawValue, m_sigmoidMap[key]);
     }
 
     void Measure::SetQualityMeasure(OFIQ_LIB::Session& session, OFIQ::QualityMeasure measure, double rawScore, OFIQ::QualityMeasureReturnCode code)

@@ -38,9 +38,8 @@ namespace OFIQ_LIB::modules::measures
     static double CalculateScore(const cv::Mat1f& histogram);
 
     DynamicRange::DynamicRange(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
     }
 

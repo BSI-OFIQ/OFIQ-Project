@@ -31,6 +31,8 @@
 #include "FaceMeasures.h"
 #include "utils.h"
 #include "image_io.h"
+#include <chrono>
+using hrclock = std::chrono::high_resolution_clock;
 
 using namespace std;
 using namespace OFIQ;
@@ -91,18 +93,34 @@ ReturnStatus OFIQImpl::scalarQuality(const OFIQ::Image& face, double& quality)
 
 void OFIQImpl::performPreprocessing(Session& session)
 {
+    std::chrono::time_point<hrclock> tic;
+
     log("\t1. detectFaces ");
+    tic = hrclock::now();
+
     std::vector<OFIQ::BoundingBox> faces = networks->faceDetector->detectFaces(session);
     if (faces.empty())
     {
         log("\n\tNo faces were detected, abort preprocessing\n");
         throw OFIQError(ReturnCode::FaceDetectionError, "No faces were detected");
     }
+    log(std::to_string(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            hrclock::now() - tic).count()) + std::string(" ms "));
+
     session.setDetectedFaces(faces);
     log("2. estimatePose ");
+    tic = hrclock::now();
+
     session.setPose(networks->poseEstimator->estimatePose(session));
 
+    log(std::to_string(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            hrclock::now() - tic).count()) + std::string(" ms "));
+
     log("3. extractLandmarks ");
+    tic = hrclock::now();
+
 #ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
     session.setLandmarksAllFaces(networks->landmarkExtractor->extractLandmarksAllFaces(session, session.getDetectedFaces()));
     if (!session.getLandmarksAllFaces().empty())
@@ -116,25 +134,40 @@ void OFIQImpl::performPreprocessing(Session& session)
 #else
     session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
 #endif
+    log(std::to_string(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            hrclock::now() - tic).count()) + std::string(" ms "));
 
     log("4. alignFaceImage ");
+    tic = hrclock::now();
     // aligned face requires the landmarks of the face thus it must come after the landmark extraction.
     alignFaceImage(session);
+    log(std::to_string(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            hrclock::now() - tic).count()) + std::string(" ms "));
 
     log("5. getSegmentationMask ");
+    tic = hrclock::now();
     // segmentation results for face_parsing
     session.setFaceParsingImage(OFIQ_LIB::copyToCvImage(
         networks->segmentationExtractor->GetMask(
             session,
             OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
         true));
+    log(std::to_string(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            hrclock::now() - tic).count()) + std::string(" ms "));
 
     log("6. getFaceOcclusionMask ");
+    tic = hrclock::now();
     session.setFaceOcclusionSegmentationImage(OFIQ_LIB::copyToCvImage(
         networks->faceOcclusionExtractor->GetMask(
             session,
             OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
         true));
+    log(std::to_string(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            hrclock::now() - tic).count()) + std::string(" ms "));
 
     static const std::string alphaParamPath = "params.measures.FaceRegion.alpha";
     double alpha = 0.0f;
@@ -148,6 +181,7 @@ void OFIQImpl::performPreprocessing(Session& session)
     }
 
     log("7. getAlignedFaceMask ");
+    tic = hrclock::now();
 
     session.setAlignedFaceLandmarkedRegion(
          OFIQ_LIB::modules::landmarks::FaceMeasures::GetFaceMask(
@@ -157,6 +191,10 @@ void OFIQImpl::performPreprocessing(Session& session)
             (float)alpha
          )
     );
+    log(std::to_string(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            hrclock::now() - tic).count()) + std::string(" ms "));
+
     log("\npreprocessing finished\n");
 }
 
@@ -165,9 +203,9 @@ void OFIQImpl::alignFaceImage(Session& session) {
     OFIQ::FaceLandmarks alignedFaceLandmarks;
     alignedFaceLandmarks.type = landmarks.type;
     cv::Mat transformationMatrix;
-    cv::Mat aligned = alignImage(session.image(), landmarks, alignedFaceLandmarks, transformationMatrix);
+    cv::Mat alignedBGRimage = alignImage(session.image(), landmarks, alignedFaceLandmarks, transformationMatrix);
 
-    session.setAlignedFace(aligned);
+    session.setAlignedFace(alignedBGRimage);
     session.setAlignedFaceLandmarks(alignedFaceLandmarks);
     session.setAlignedFaceTransformationMatrix(transformationMatrix);
 

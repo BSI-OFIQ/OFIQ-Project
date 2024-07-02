@@ -32,16 +32,16 @@ namespace OFIQ_LIB
     OFIQ::Image& SegmentationExtractorInterface::GetMask(
         OFIQ_LIB::Session& session, modules::segmentations::SegmentClassLabels faceSegment)
     {
-        if (session.Id() != lastSessionId)
+        if (session.Id() != m_lastSessionId)
         {
-            masks.clear();
+            m_masks.clear();
             // may be we should update lastSessionId = session.Id() ?
         }
 
-        if (auto it = masks.find(faceSegment); it != masks.end())
+        if (auto it = m_masks.find(faceSegment); it != m_masks.end())
             return it ->second;
 
-        masks[faceSegment] = UpdateMask(session, faceSegment);
-        return masks[faceSegment];
+        m_masks[faceSegment] = UpdateMask(session, faceSegment);
+        return m_masks[faceSegment];
     }
 }

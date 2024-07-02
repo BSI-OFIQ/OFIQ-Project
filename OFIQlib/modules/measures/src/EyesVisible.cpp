@@ -38,9 +38,8 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityMeasure = OFIQ::QualityMeasure::EyesVisible;
 
     EyesVisible::EyesVisible(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
     }
 
@@ -55,7 +54,7 @@ namespace OFIQ_LIB::modules::measures
         auto interEyeDistance = landmarks::FaceMeasures::InterEyeDistance(alignedFaceLandmarks, headPose[1]);
 
         // Determine EVZ according to ISO/IEC 39794-5
-        int V = interEyeDistance / 20;
+        int V = static_cast<int>(std::floor(interEyeDistance / 20.0));
         std::vector<cv::Point2i> leftEyePoints;
         for (auto landmark : leftEye)
         {

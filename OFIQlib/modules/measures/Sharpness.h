@@ -46,13 +46,8 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Construct a new Sharpness object
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results 
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing() 
-         * OFIQImpl::performPreprocessing()\endlink method 
          */
-        Sharpness(
-            const Configuration& configuration,
-            Session& session);
+        explicit Sharpness(const Configuration& configuration);
 
         /**
          * @brief Run  computation of the sharpness measure.
@@ -66,33 +61,33 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Name of the random forest model, extracted from the configuration file.
          */
-        std::string modelFile;
+        std::string m_modelFile;
 
         /**
          * @brief Instance of the random forest model.
          * 
          */
-        std::shared_ptr<cv::ml::RTrees> rtree;
+        std::shared_ptr<cv::ml::RTrees> m_rtree;
 
         /**
          * @brief The sharpness measure can be computed on the aligned or the original image. useAligned set to true will 
          * run the computation on the aligned image. The member is read from the configuration file.
          * 
          */
-        bool useAligned;
+        bool m_useAligned;
 
         /**
          * @brief For faceRegionAlpha = 0, the algorithm uses the inner face region. 
          * For faceRegionAlpha = 0.85, the algorithm uses the extended face region as specified for the FaceOcclusionin FRVT Quality.
          * 
          */
-        double faceRegionAlpha;
+        double m_faceRegionAlpha;
 
         /**
          * @brief This member stores the number of trees used for the random forest. Internal use only.
          * 
          */
-        int numTrees;
+        int m_numTrees;
 
         /**
          * @brief Get the cropped face region.
@@ -103,7 +98,12 @@ namespace OFIQ_LIB::modules::measures
          * @param useAligned Switch for using the aligned image.
          * @param faceRegionAlpha Enlarge the face region by passing this parameter.
          */
-        void GetCroppedImages(Session& session, cv::Mat& faceCrop, cv::Mat& maskCrop, bool useAligned, float faceRegionAlpha);
+        void GetCroppedImages(
+            const Session& session,
+            cv::Mat& faceCrop,
+            cv::Mat& maskCrop,
+            bool useAligned,
+            float faceRegionAlpha) const;
         
         /**
          * @brief Computation of the input features using different edge detectors.
@@ -113,6 +113,6 @@ namespace OFIQ_LIB::modules::measures
          * @param applyBlur Wheter or not rub a GaussianBlur before the edge detection.
          * @return cv::Mat Container storing the results of the different edge detectors.
          */
-        cv::Mat GetClassifierFocusFeatures(cv::Mat& image, cv::Mat& mask, bool applyBlur);
+        cv::Mat GetClassifierFocusFeatures(const cv::Mat& image, const cv::Mat& mask, bool applyBlur) const;
     };
 }

@@ -39,9 +39,8 @@ namespace OFIQ_LIB::modules::measures
     static const std::string modelConfigItem = "params.measures.CompressionArtifacts.model_path";
 
     CompressionArtifacts::CompressionArtifacts(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
         SigmoidParameters defaultValues;
         defaultValues.h = 1.0;
@@ -54,23 +53,17 @@ namespace OFIQ_LIB::modules::measures
 
         auto modelPath = configuration.getDataDir() + "/" + configuration.GetString(modelConfigItem);
 
-        try
-        {
-            m_crop = (uint16_t)configuration.GetNumber(cropConfigItem);
-        }
-        catch (const std::exception& e)
-        {
-            m_crop = 184;
-        }
+        double confVal;
 
-        try
-        {
-            m_dim = (uint16_t)configuration.GetNumber(dimConfigItem);
-        }
-        catch (const std::exception& e)
-        {
+        if (configuration.GetNumber(cropConfigItem, confVal))
+            m_crop = static_cast<int>(confVal);
+        else
+            m_crop = 184;
+
+        if (configuration.GetNumber(dimConfigItem, confVal))
+            m_dim = static_cast<int>(confVal);
+        else
             m_dim = 248;
-        }
 
         try
         {

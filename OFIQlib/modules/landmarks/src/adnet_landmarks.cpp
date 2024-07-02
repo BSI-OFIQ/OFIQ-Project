@@ -82,7 +82,7 @@ namespace OFIQ_LIB::modules::landmarks
         }
 
     private:
-        std::vector<float> convert_to_net_input(cv::Mat& i_input_image)
+        std::vector<float> convert_to_net_input(cv::Mat& i_input_image) const
         {
             // reshape to 1D
             auto image = i_input_image.reshape(1, 1);
@@ -105,7 +105,7 @@ namespace OFIQ_LIB::modules::landmarks
             return output;
         }
 
-        cv::Mat scale_image_to_inputsize(cv::Mat& i_input_image)
+        cv::Mat scale_image_to_inputsize(cv::Mat& i_input_image) const
         {
 
             if ((i_input_image.cols == m_expected_image_width) &&
@@ -121,7 +121,7 @@ namespace OFIQ_LIB::modules::landmarks
             cv::resize(
                 i_input_image,
                 scaled_image,
-                cv::Size(m_expected_image_width, m_expected_image_height),
+                cv::Size(static_cast<int>(m_expected_image_width), static_cast<int>(m_expected_image_height)),
                 0,
                 0,
                 cv::INTER_LINEAR);
@@ -133,7 +133,7 @@ namespace OFIQ_LIB::modules::landmarks
             int64_t& io_expected_image_width,
             int64_t& io_expected_image_height,
             int64_t& io_expected_image_number_of_channels,
-            int64_t& io_number_of_input_elements)
+            int64_t& io_number_of_input_elements) const
         {
             auto type_info = m_ort_session->GetInputTypeInfo(0);
             auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
@@ -247,7 +247,7 @@ namespace OFIQ_LIB::modules::landmarks
         try
         {
 
-            landmarkExtractor = std::make_unique<ADNetFaceLandmarkExtractorImpl>();
+            landmarkExtractor_ = std::make_unique<ADNetFaceLandmarkExtractorImpl>();
             const auto modelPath =
                 config.getDataDir() + "/" + config.GetString("params.landmarks.ADNet.model_path");
 
@@ -256,7 +256,7 @@ namespace OFIQ_LIB::modules::landmarks
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
 
-            landmarkExtractor->init_session(modelData);
+            landmarkExtractor_->init_session(modelData);
         }
         catch (const std::exception&)
         {
@@ -320,8 +320,10 @@ namespace OFIQ_LIB::modules::landmarks
 
         // Crop the image using the ROI
         cv::Mat croppedImage = cvImage(roi);
+        if (!croppedImage.isContinuous())
+            croppedImage = croppedImage.clone();
 
-        std::vector<float> landmarks_from_net = landmarkExtractor->extractLandMarks(croppedImage);
+        std::vector<float> landmarks_from_net = landmarkExtractor_->extractLandMarks(croppedImage);
         float scalingFactor = detectedFace.height / 256.0f;
 
         int offset_x = detectedFace.xleft - translationVector.x;
@@ -329,11 +331,9 @@ namespace OFIQ_LIB::modules::landmarks
         for (int i = 0; i < landmarks_from_net.size(); i += 2)
         {
             auto x = static_cast<int>(
-                std::round(landmarks_from_net[i] * scalingFactor));
+                std::round(landmarks_from_net[i] * scalingFactor+static_cast<float>(offset_x)));
             auto y = static_cast<int>(
-                std::round(landmarks_from_net[i+1] * scalingFactor));
-            x += offset_x;
-            y += offset_y;
+                std::round(landmarks_from_net[i+1] * scalingFactor+static_cast<float>(offset_y)));
             landmarks.landmarks.emplace_back(
                 LandmarkPoint(static_cast<uint16_t>(x), static_cast<uint16_t>(y)));
         }
@@ -389,9 +389,11 @@ namespace OFIQ_LIB::modules::landmarks
                 detectedFace.height); // (x, y, width, height)
 
             // Crop the image using the ROI
-            cv::Mat croppedImage = cvImage(roi).clone();
+            cv::Mat croppedImage = cvImage(roi);
+            if (!croppedImage.isContinuous())
+                croppedImage = croppedImage.clone();
 
-            std::vector<float> landmarks_from_net = landmarkExtractor->extractLandMarks(croppedImage);
+            std::vector<float> landmarks_from_net = landmarkExtractor_->extractLandMarks(croppedImage);
             float scalingFactor = detectedFace.height / 256.0f;
 
             int offset_x = detectedFace.xleft - translationVector.x;
@@ -399,11 +401,9 @@ namespace OFIQ_LIB::modules::landmarks
             for (int i = 0; i < landmarks_from_net.size(); i += 2)
             {
                 auto x = static_cast<int>(
-                    std::floor(landmarks_from_net[i] * scalingFactor));
+                    std::round(landmarks_from_net[i] * scalingFactor+offset_x));
                 auto y = static_cast<int>(
-                    std::floor(landmarks_from_net[i + 1] * scalingFactor));
-                x += offset_x;
-                y += offset_y;
+                    std::round(landmarks_from_net[i + 1] * scalingFactor+offset_y));
                 landmarks.landmarks.emplace_back(
                     LandmarkPoint(static_cast<uint16_t>(x), static_cast<uint16_t>(y)));
             }

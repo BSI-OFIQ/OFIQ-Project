@@ -34,8 +34,8 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityMeasure = OFIQ::QualityMeasure::SingleFacePresent;
 
     SingleFacePresent::SingleFacePresent(
-        const Configuration& configuration, Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
         // Note: Mapping the native score f to the quality measure qc=100*(1-f)
         // seems not to be possing using SigmoidParameter; thus this is set
@@ -46,9 +46,8 @@ namespace OFIQ_LIB::modules::measures
     {
 #ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
         float f = 1.0f;
-        auto detectedLandmarksList = session.getLandmarksAllFaces();
-
-        if (detectedLandmarksList.size() == 0)
+        if (auto detectedLandmarksList = session.getLandmarksAllFaces(); 
+            detectedLandmarksList.empty())
         {
             if (session.getDetectedFaces().size() == 1)
             {
@@ -62,8 +61,9 @@ namespace OFIQ_LIB::modules::measures
         else if (detectedLandmarksList.size() > 1)
         {
             // Determine the two largest T-metrics over detected faces
-            float T1 = 0.0f, T2 = 0.0f;
-            for (auto& lms : detectedLandmarksList)
+            float T1 = 0.0f;
+            float T2 = 0.0f;
+            for (const auto& lms : detectedLandmarksList)
             {
                 float T = tmetric(lms);
                 if (T > T1)
@@ -85,19 +85,20 @@ namespace OFIQ_LIB::modules::measures
         }
 
         float qc = round(100.0f * (1.0f - f));
-        session.assessment().qAssessments[qualityMeasure] = { static_cast<double>(f),static_cast<double>(qc), OFIQ::QualityMeasureReturnCode::Success };
+        session.assessment().qAssessments[qualityMeasure] = 
+            { static_cast<double>(f), static_cast<double>(qc), OFIQ::QualityMeasureReturnCode::Success };
 #else
         float f = 1.0f;
-        auto& detectedFaces = session.getDetectedFaces();
-        if (detectedFaces.size() == 1)
+        const auto& m_detectedFaces = session.getDetectedFaces();
+        if (m_detectedFaces.size() == 1)
         {
             f = 0.0f;
         }
-        else if (detectedFaces.size() > 1)
+        else if (m_detectedFaces.size() > 1)
         {
             // Determine the two largest face bounding box areas
             float a1 = 0.0f, a2 = 0.0f;
-            for (auto& face : detectedFaces)
+            for (auto& face : m_detectedFaces)
             {
                 float a = (float)face.width * (float)face.height;
                 if (a > a1)
@@ -115,11 +116,12 @@ namespace OFIQ_LIB::modules::measures
 
             // Update face unicity: the more it approaches zero, the more
             // dominant is the largest face.
-            f = sqrtf(a2 / a1);
+            f = a2 / a1;
         }
 
         float qc = round(100.0f * (1.0f - f));
-        session.assessment().qAssessments[qualityMeasure] = { static_cast<double>(f),static_cast<double>(qc), OFIQ::QualityMeasureReturnCode::Success };
+        session.assessment().qAssessments[qualityMeasure] = 
+            { static_cast<double>(f), static_cast<double>(qc), OFIQ::QualityMeasureReturnCode::Success };
 #endif
     }
 }

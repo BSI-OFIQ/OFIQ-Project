@@ -38,37 +38,55 @@ using namespace OFIQ;
 
 namespace OFIQ_LIB
 {
-    OFIQ_EXPORT OFIQ::ReturnStatus readImage(const std::string& filename, OFIQ::Image& image)
+    OFIQ::ReturnStatus copyImageData(const cv::Mat& cvImage, OFIQ::Image& image)
     {
         ReturnCode retCode = ReturnCode::Success;
         std::string retStatusInfo{""};
-
-        try
-        {
-            cv::Mat cvImage = cv::imread(filename, cv::IMREAD_COLOR);
-            if(cvImage.empty())
-            {
-                retCode = ReturnCode::ImageReadingError;
-                retStatusInfo = std::string("failed to read image or image is empty: ") + filename;
-                return ReturnStatus(retCode, retStatusInfo);
-            }
-
-            cv::cvtColor(cvImage, cvImage, cv::COLOR_BGR2RGB);
-            image.width = static_cast<uint16_t>(cvImage.cols);
-            image.height = static_cast<uint16_t>(cvImage.rows);
-            image.depth = 24;
-
-            image.data = std::shared_ptr<uint8_t>(new uint8_t[image.size()]);
-
-            memcpy(image.data.get(), cvImage.data, image.size());
-        }
-        catch (const std::exception&)
+        if(cvImage.empty())
         {
             retCode = ReturnCode::ImageReadingError;
-            retStatusInfo = std::string("failed to read image: ") + filename;
+            retStatusInfo = std::string("failed to read image or image is empty");
             return ReturnStatus(retCode, retStatusInfo);
         }
 
+        cv::cvtColor(cvImage, cvImage, cv::COLOR_BGR2RGB);
+        image.width = static_cast<uint16_t>(cvImage.cols);
+        image.height = static_cast<uint16_t>(cvImage.rows);
+        image.depth = 24;
+
+        image.data = std::shared_ptr<uint8_t>(new uint8_t[image.size()]);
+        memcpy(image.data.get(), cvImage.data, image.size());
+
         return ReturnStatus(retCode, retStatusInfo);
+    }
+    
+    OFIQ_EXPORT OFIQ::ReturnStatus readImage(const std::string& filename, OFIQ::Image& image)
+    {
+        try
+        {
+            cv::Mat cvImage = cv::imread(filename, cv::IMREAD_COLOR);
+            
+            return copyImageData(cvImage, image);
+        }
+        catch (const std::exception&)
+        {
+            return ReturnStatus(ReturnCode::ImageReadingError, std::string("failed to read image file: ") + filename);
+        }
+    }
+
+    OFIQ_EXPORT OFIQ::ReturnStatus readImageFromBuffer(const char* buffer, OFIQ::Image& image)
+    {
+        try
+        {
+            std::string decoded =  base64Decode(buffer);
+            std::vector<uchar> data(decoded.begin(), decoded.end());
+            cv::Mat cvImage = cv::imdecode(cv::Mat(data), cv::IMREAD_COLOR);
+            
+            return copyImageData(cvImage, image);
+        }
+        catch (const std::exception&)
+        {
+            return ReturnStatus(ReturnCode::ImageReadingError, std::string("failed to decode image from buffer"));
+        }
     }
 }

@@ -35,17 +35,12 @@ namespace OFIQ_LIB::modules::landmarks
         const FaceMap* FaceMap;
         OFIQ::Landmarks selectedLandmarks;
 
-        switch (faceLandmarks.type)
-        {
-        case OFIQ::LandmarkType::LM_98:
+        if(faceLandmarks.type == OFIQ::LandmarkType::LM_98)
             FaceMap = &adnet::FaceMap;
-            break;
-        default:
+        else
             throw std::invalid_argument("Unknown LandmarkType");
-        }
 
-        auto iterator = FaceMap->find(part);
-        if (iterator != FaceMap->end())
+        if (auto iterator = FaceMap->find(part); iterator != FaceMap->end())
         {
             const auto& list = iterator->second;
             for (const auto& index : list)
@@ -63,17 +58,12 @@ namespace OFIQ_LIB::modules::landmarks
         const FacePairMap* FacePairMap;
         std::vector<LandmarkPair> selectedLandmarkPairs;
 
-        switch (faceLandmarks.type)
-        {
-        case OFIQ::LandmarkType::LM_98:
+        if (faceLandmarks.type == OFIQ::LandmarkType::LM_98)
             FacePairMap = &adnet::FacePairMap;
-            break;
-        default:
+        else
             throw std::invalid_argument("Unknown LandmarkType");
-        }
 
-        auto iterator = FacePairMap->find(part);
-        if (iterator != FacePairMap->end())
+        if (auto iterator = FacePairMap->find(part); iterator != FacePairMap->end())
         {
             const auto& list = iterator->second;
             for (const auto& index : list)

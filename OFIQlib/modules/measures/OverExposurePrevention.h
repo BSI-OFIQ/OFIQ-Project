@@ -45,13 +45,8 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Constructor a new Over Exposure Prevention 
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results 
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing() 
-         * OFIQImpl::performPreprocessing()\endlink method 
          */
-        OverExposurePrevention(
-            const Configuration& configuration,
-            Session& session);
+        explicit OverExposurePrevention(const Configuration& configuration);
 
         /**
          * @brief Run the computation of the over-exposure prevention measure.

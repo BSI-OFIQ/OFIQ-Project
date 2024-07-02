@@ -43,6 +43,16 @@ namespace OFIQ_LIB {
 	 */
 	OFIQ_EXPORT OFIQ::ReturnStatus
 		readImage(const std::string& filename, OFIQ::Image& image);
+
+	/**
+	 * @brief Read image from buffer.
+	 * 
+	 * @param[in] buffer Data buffer of the image being read.
+	 * @param[out] image Reference to the image object where the data is loaded to.
+	 * @return OFIQ::ReturnStatus
+	 */
+	OFIQ_EXPORT OFIQ::ReturnStatus 
+		readImageFromBuffer(const char* buffer, OFIQ::Image& image);
 }
 
 #endif

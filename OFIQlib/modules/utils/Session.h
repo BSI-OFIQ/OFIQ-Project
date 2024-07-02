@@ -59,9 +59,9 @@ namespace OFIQ_LIB
          * @param assessment Container to staore the computed measures.
          */
         Session(const OFIQ::Image& image, OFIQ::FaceImageQualityAssessment& assessment)
-            : _image{image},
-              _assessment{assessment},
-              id{GenerateId()}
+            : m_image{image},
+              m_assessment{assessment},
+              m_id{GenerateId()}
         {
         }
 
@@ -69,20 +69,20 @@ namespace OFIQ_LIB
          * @brief Acess reference to the input image, connected to this session.
          * @return input image reference.
          */
-        const OFIQ::Image& image() const { return _image; }
+        const OFIQ::Image& image() const { return m_image; }
 
         /**
          * @brief Access reference to the FaceImageQualityAssessment object, connected to this session.
          * @return quality assessment object reference.
          */
-        OFIQ::FaceImageQualityAssessment& assessment() { return _assessment; }
+        OFIQ::FaceImageQualityAssessment& assessment() { return m_assessment; }
 
         /**
          * @brief Access to the id connected to this session.
          * 
          * @return const std::string& Reference to the id of this session.
          */
-        const std::string& Id() const { return id; }
+        const std::string& Id() const { return m_id; }
 
         // use the session object as data container 
 
@@ -225,70 +225,70 @@ namespace OFIQ_LIB
          * @brief Reference to the input image, connected to this session.
          * 
          */
-        const OFIQ::Image& _image;
+        const OFIQ::Image& m_image;
 
         /**
          * @brief Refernce to the FaceImageQualityAssessment object, connected to this session.
          * 
          */
-        OFIQ::FaceImageQualityAssessment& _assessment;
+        OFIQ::FaceImageQualityAssessment& m_assessment;
         /**
          * @brief Container for the faces found on the input image.
          * 
          */
-        std::vector<OFIQ::BoundingBox> detectedFaces;
+        std::vector<OFIQ::BoundingBox> m_detectedFaces;
 
 #ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
-        std::vector<OFIQ::FaceLandmarks> landmarksAllFaces;
+        std::vector<OFIQ::FaceLandmarks> m_landmarksAllFaces;
 #endif
 
         /**
          * @brief Container for storing the pose information.
          * 
          */
-        EulerAngle pose;
+        EulerAngle m_pose;
 
         /**
          * @brief Container for storing the landmark information.
          * 
          */
-        OFIQ::FaceLandmarks landmarks;
+        OFIQ::FaceLandmarks m_landmarks;
 
         /**
          * @brief Container for storing the landmark information of the aligned image.
          * 
          */
-        OFIQ::FaceLandmarks alignedFaceLandmarks;
+        OFIQ::FaceLandmarks m_alignedFaceLandmarks;
 
         /**
          * @brief Container for storing the transformation matrix that led to the aligned image.
          * 
          */
-        cv::Mat alignedFaceTransformationMatrix;
+        cv::Mat m_alignedFaceTransformationMatrix;
 
         /**
          * @brief Container for storing the aligned image.
          * 
          */
-        cv::Mat alignedFace;
+        cv::Mat m_alignedFace;
 
         /**
          * @brief Container for storing the landmarks of the aligned face image
          * 
          */
-        cv::Mat alignedFacelandmarkedRegion;
+        cv::Mat m_alignedFacelandmarkedRegion;
 
         /**
          * @brief Container for storing the segmented face image
          * 
          */
-        cv::Mat faceParsingImage;
+        cv::Mat m_faceParsingImage;
 
         /**
          * @brief Container for storing the result of the face occlusion segmented image.
          * 
          */
-        cv::Mat faceOcclusionSegmentationImage;
+        cv::Mat m_faceOcclusionSegmentationImage;
 
         /**
          * @brief Method for generating uuid's for the session.
@@ -301,6 +301,6 @@ namespace OFIQ_LIB
          * @brief Container for storing the id of the session.
          * 
          */
-        std::string id;
+        std::string m_id;
     };
 }

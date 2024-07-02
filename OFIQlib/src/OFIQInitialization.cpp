@@ -68,7 +68,7 @@ namespace OFIQ_LIB
         {
             measure_instances.emplace_back(
                 MeasureFactory::CreateMeasure(
-                    m, configuration, session));
+                    m, configuration));
         }
         return measure_instances;
     }

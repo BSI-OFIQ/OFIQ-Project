@@ -33,15 +33,24 @@ namespace OFIQ_LIB::modules::measures
     using Segment = OFIQ_LIB::modules::segmentations::SegmentClassLabels;
 
     static const auto qualityMeasure = OFIQ::QualityMeasure::NoHeadCoverings;
-    static const std::string paramThreshold = "params.measures.NoHeadCoverings.threshold";
+    static const std::string paramThreshold0 = "params.measures.NoHeadCoverings.T0";
+    static const std::string paramThreshold1 = "params.measures.NoHeadCoverings.T1";
+    static const std::string paramStandardDev = "params.measures.NoHeadCoverings.w";
+    static const std::string paramDevPoint = "params.measures.NoHeadCoverings.x0";
+
 
     NoHeadCoverings::NoHeadCoverings(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
-        if (!configuration.GetNumber(paramThreshold, this->threshold))
-            this->threshold = 0.02;
+        if (!configuration.GetNumber(paramThreshold0, this->m_t0))
+            this->m_t0 = 0.0;
+        if (!configuration.GetNumber(paramThreshold1, this->m_t1))
+            this->m_t0 = 0.95;
+        if (!configuration.GetNumber(paramStandardDev, this->m_w))
+            this->m_w = 0.1;
+        if (!configuration.GetNumber(paramDevPoint, this->m_x0))
+            this->m_x0 = 0.02;
     }
 
     void NoHeadCoverings::Execute(OFIQ_LIB::Session & session)
@@ -70,14 +79,26 @@ namespace OFIQ_LIB::modules::measures
         auto totalPixels = croppedImage.size().area();
         double rawScore = nonZeroPixels / (double)totalPixels;
 
-        double scalarScore;
-        if (rawScore > this->threshold)
+        double scalarScore = 0.0;
+
+        if (rawScore <= this->m_t0)
         {
-            scalarScore = 0;
+            scalarScore = 100.0;
+        }
+        else if (rawScore >= this->m_t1)
+        {
+            scalarScore = 0.0;
         }
         else
         {
-            scalarScore = 100;
+            double s = 1 / (1 + std::exp((this->m_x0 - rawScore) / this->m_w));
+            double s0 = 1 / (1 + std::exp((this->m_x0 - this->m_t0) / this->m_w));
+            double s1 = 1 / (1 + std::exp((this->m_x0 - this->m_t1) / this->m_w));
+            double h = s1 - s;
+            double h0 = s1 - s0;
+            double q = h / h0;
+            
+            scalarScore = round(100.0 * q);
         }
 
         session.assessment().qAssessments[qualityMeasure] = { rawScore, scalarScore, OFIQ::QualityMeasureReturnCode::Success };

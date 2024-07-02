@@ -50,7 +50,7 @@ private:
      * @brief ONNXRuntime variable to setup the tensors used in ONNXRuntime.
      * 
      */
-    Ort::MemoryInfo m_memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
+    Ort::MemoryInfo m_memoryInfo = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
     
     /**
      * @brief Description of the shape of the input data expected by the model.
@@ -62,7 +62,7 @@ private:
      * @brief Handle to the ONNXRuntime session.
      * 
      */
-    std::unique_ptr<Ort::Session> m_ort_session;
+    std::unique_ptr<Ort::Session> m_ortSession;
 
     /**
      * @brief Private method to generate an ONNXRuntime session object.

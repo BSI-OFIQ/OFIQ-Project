@@ -144,7 +144,6 @@ namespace OFIQ_LIB::modules::measures
          * @param measure Enum of the measure.
          */
         Measure(const Configuration& configuration, 
-            const OFIQ_LIB::Session&,
             OFIQ::QualityMeasure measure)
             : configuration{configuration}, m_measure(measure)
         {
@@ -292,7 +291,7 @@ namespace OFIQ_LIB::modules::measures
          * @brief Used to map the measure name to the sigmoid-based
          * quality mapping function.
          */
-        std::map<std::string, SigmoidParameters, std::less<>> sigmoidMap;
+        std::map<std::string, SigmoidParameters, std::less<>> m_sigmoidMap;
         
         /**
          * @brief Returns the name of the specified measure.

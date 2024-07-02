@@ -72,24 +72,24 @@ namespace OFIQ_LIB::modules::detectors
          * @brief Instance of an opencv dnn::Net.
          * 
          */
-        std::shared_ptr<cv::dnn::Net> dnnNet{nullptr};
+        std::shared_ptr<cv::dnn::Net> m_dnnNet{nullptr};
 
         /**
          * @brief Confidence threshold used for the face detection. The value is read from the configuration file.
          * 
          */
-        double confidenceThreshold;
+        double m_confidenceThreshold;
         
         /**
          * @brief Add padding around the image (faceImage.width * padding; faceImage.height * padding;)
          * 
          */
-        double padding;
+        double m_padding;
         
         /**
          * @brief Filter threshold for removing to small face found on the image. This value is read from the configuration file.
          * 
          */
-        double minimalRelativeFaceSize;
+        double m_minimalRelativeFaceSize;
     };
 }

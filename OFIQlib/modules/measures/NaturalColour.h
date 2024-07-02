@@ -46,13 +46,8 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Constructor
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing()
-         * OFIQImpl::performPreprocessing()\endlink method
          */
-        NaturalColour(
-            const Configuration& configuration,
-            Session& session);
+        explicit NaturalColour(const Configuration& configuration);
 
         /**
          * @brief Assesses natural colourness
@@ -71,7 +66,7 @@ namespace OFIQ_LIB::modules::measures
          * @param cvImage The mask image returned has the same dimension as <code>cvImage</code>.
          * @return Mask image
          */
-        cv::Mat CreateMaskedImage(const OFIQ::FaceLandmarks& landmarks, const cv::Mat& cvImage);
+        cv::Mat CreateMaskedImage(const OFIQ::FaceLandmarks& landmarks, const cv::Mat& cvImage) const;
 
         /**
          * @brief Extracts two rectangular regions from an image and returns its concatenation.
@@ -83,10 +78,10 @@ namespace OFIQ_LIB::modules::measures
          * <code>leftRegionOfInterest</code>.
          * @attention An error occurs if the height of the two requested regions differ.
          */
-        cv::Mat ReduceImageToRegionOfInterest
-        (const cv::Mat maskedImage, 
-         const cv::Rect& leftRegionOfInterest, 
-         const cv::Rect& rightRegionOfInterest);
+        cv::Mat ReduceImageToRegionOfInterest(
+            const cv::Mat& maskedImage, 
+            const cv::Rect& leftRegionOfInterest, 
+            const cv::Rect& rightRegionOfInterest) const;
         
         /**
          * @brief Combines two CIELAB values a* and b* to computed
@@ -101,6 +96,6 @@ namespace OFIQ_LIB::modules::measures
          * @param meanChannelB The CIELAB value \f$b^*\f$ input value.
          * @return Native quality score
          */
-        double CalculateScore(double meanChannelA, double meanChannelB);
+        double CalculateScore(double meanChannelA, double meanChannelB) const;
     };
 }

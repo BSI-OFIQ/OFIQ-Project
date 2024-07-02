@@ -36,9 +36,8 @@ namespace OFIQ_LIB::modules::measures
     static cv::Mat GetGradients(const cv::Mat& L);
 
     BackgroundUniformity::BackgroundUniformity(
-        const Configuration& configuration,
-        OFIQ_LIB::Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
         SigmoidParameters defaultValues;
         defaultValues.h = 100.0;
@@ -73,12 +72,12 @@ namespace OFIQ_LIB::modules::measures
         cv::warpAffine(A, P, T, cv::Size(I.cols, I.rows), cv::INTER_NEAREST, 0, 255);
 
         // Step 3. Crop both I and P by 62 pixels from both sides and by 108 pixels from the bottom.
-        I = cv::Mat(I, cv::Range(m_crop_top,I.rows-m_crop_bottom),cv::Range(m_crop_left,I.cols-m_crop_right));
-        P = cv::Mat(P, cv::Range(m_crop_top,P.rows-m_crop_bottom),cv::Range(m_crop_left,P.cols-m_crop_right));
+        I = cv::Mat(I, cv::Range(m_cropTop,I.rows-m_cropBottom),cv::Range(m_cropLeft,I.cols-m_cropRight));
+        P = cv::Mat(P, cv::Range(m_cropTop,P.rows-m_cropBottom),cv::Range(m_cropLeft,P.cols-m_cropRight));
 
         // Step 4. Resize both I and P to size (354,295)
-        cv::resize(I, I, cv::Size(m_target_width, m_target_height), 0.0, 0.0, cv::INTER_LINEAR);
-        cv::resize(P, P, cv::Size(m_target_width, m_target_height), 0.0, 0.0, cv::INTER_NEAREST);
+        cv::resize(I, I, cv::Size(m_targetWidth, m_targetHeight), 0.0, 0.0, cv::INTER_LINEAR);
+        cv::resize(P, P, cv::Size(m_targetWidth, m_targetHeight), 0.0, 0.0, cv::INTER_NEAREST);
 
         // Step 5. Crop the segmentation map S by 23 pixels from both sides and 108 pixels from the bottom
         auto marginX = (S.cols-I.cols)/2; // marginX shall be 23 as per ISO/IEC 29794-5
@@ -100,7 +99,7 @@ namespace OFIQ_LIB::modules::measures
 
 
         // Step 7. Apply to B the OpenCV function erode with kernel size 4.
-        cv::Mat kernel = cv::Mat::ones(m_erosion_kernel_size, m_erosion_kernel_size, CV_8U);
+        cv::Mat kernel = cv::Mat::ones(m_erosionKernelSize, m_erosionKernelSize, CV_8U);
         cv::erode(B, B, kernel, cv::Point(-1, -1), 1);
 
         // if B has only zeroes, i.e. the background mask is empty,

@@ -53,32 +53,32 @@ namespace OFIQ_LIB
          * 
          * @return const char* Pointer to the extended message.
          */
-        const char* what() const noexcept override { return extendedMessage.c_str(); }
+        const char* what() const noexcept override { return m_extendedMessage.c_str(); }
         
         /**
          * @brief Getter to the ReturnCode of the QFIQError.
          * 
          * @return OFIQ::ReturnCode 
          */
-        OFIQ::ReturnCode whatCode() const noexcept { return returnCode; }
+        OFIQ::ReturnCode whatCode() const noexcept { return m_returnCode; }
 
     private:
         /**
          * @brief Member storing the ReturnCode.
          * 
          */
-        OFIQ::ReturnCode returnCode;
+        OFIQ::ReturnCode m_returnCode;
         
         /**
          * @brief Member, storing the message passed in the constructor.
          * 
          */
-        std::string message;
+        std::string m_message;
 
         /**
          * @brief The extended message merges the ReturnCode and the message into one string.
          * 
          */
-        std::string extendedMessage;
+        std::string m_extendedMessage;
     };
 }

@@ -37,9 +37,8 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityUp = OFIQ::QualityMeasure::UpwardCropOfTheFaceImage;
 
     CropOfTheFaceImage::CropOfTheFaceImage(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, OFIQ::QualityMeasure::CropOfTheFaceImage }
+        const Configuration& configuration)
+        : Measure{ configuration, OFIQ::QualityMeasure::CropOfTheFaceImage }
     {
         SigmoidParameters defaultValues;
         defaultValues.h = 100;

@@ -46,13 +46,9 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Constructor
          * @param configuration Configuration object from which the measure related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results, 
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing() 
-         * OFIQImpl::performPreprocessing()\endlink.
          */
-        BackgroundUniformity(
-            const Configuration& configuration,
-            Session& session);
+        explicit BackgroundUniformity(
+            const Configuration& configuration);
 
         /**
          * @brief Assesses uniformity of the background.
@@ -68,41 +64,41 @@ namespace OFIQ_LIB::modules::measures
          * @brief The aligned image and the face parsing mask is brought to 
          * an image of the target height before gradient computations and assessment is applied.
          */
-        uint16_t m_target_height = 292;
+        uint16_t m_targetHeight = 292;
 
         /**
          * @brief The aligned image and the face parsing mask is brought to
          * an image of the target width before gradient computations and assessment is applied.
          */
-        uint16_t m_target_width = 354;
+        uint16_t m_targetWidth = 354;
 
         /**
          * @brief Crop from the left side of the aligned image 
          * (returned by \link OFIQ_LIB::Session::getAlignedFace() \endlink)
          * before scaling to the target dimension is applied.
          */
-        uint16_t m_crop_left = 62;
+        uint16_t m_cropLeft = 62;
 
         /**
          * @brief Crop from the right side of the aligned image
          * (returned by \link OFIQ_LIB::Session::getAlignedFace() \endlink)
          * before scaling to the target dimension is applied.
          */
-        uint16_t m_crop_right = 62;
+        uint16_t m_cropRight = 62;
 
         /**
          * @brief Crop from the top of the aligned image
          * (returned by \link OFIQ_LIB::Session::getAlignedFace() \endlink)
          * before scaling to the target dimension is applied.
          */
-        uint16_t m_crop_top = 0;
+        uint16_t m_cropTop = 0;
 
         /**
          * @brief Crop from the bottom of the aligned image
          * (returned by \link OFIQ_LIB::Session::getAlignedFace() \endlink)
          * before scaling to the target dimension is applied.
          */
-        uint16_t m_crop_bottom = 210;
+        uint16_t m_cropBottom = 210;
 
         /**
          * @brief Size of the erosion kernel applied to the background
@@ -110,6 +106,6 @@ namespace OFIQ_LIB::modules::measures
          * to reduce the risk that background unformity estimation is applied
          * to part of the subject.
          */
-        uint16_t m_erosion_kernel_size = 4;
+        uint16_t m_erosionKernelSize = 4;
     };
 }

@@ -50,12 +50,9 @@ namespace OFIQ_LIB::modules::measures
         /**
          * @brief Construct a new Expression Neutrality object
          * @param configuration Configuration object from which measure-related configuration is read.
-         * @param session Session object containing the original facial image and pre-processing results 
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing() 
-         * OFIQImpl::performPreprocessing()\endlink method 
          */
-        ExpressionNeutrality(
-            const Configuration& configuration, Session& session);
+        explicit ExpressionNeutrality(
+            const Configuration& configuration);
 
         /**
          * @brief Run the computation based on the data passed by the session object.
@@ -81,6 +78,6 @@ namespace OFIQ_LIB::modules::measures
          * @brief Instance of the AdaBoost classifier
          * Set by ExpressionNeutrality.adaboost_model_path in the configuration file.
          */
-        std::shared_ptr<cv::ml::Boost> classifier;
+        std::shared_ptr<cv::ml::Boost> m_classifier;
     };
 }

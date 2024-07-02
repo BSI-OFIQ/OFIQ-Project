@@ -1,6 +1,39 @@
 message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
-find_package(GTest REQUIRED)
+if(USE_CONAN)
+	find_package(GTest REQUIRED)
+else(USE_CONAN)
+        if(${OS} STREQUAL "Windows")
+                add_library(GTest::gtest SHARED IMPORTED)
+                set_target_properties(GTest::gtest PROPERTIES
+                IMPORTED_IMPLIB ${PROJECT_SOURCE_DIR}/extern/googletest/build/lib/${BUILD_TYPE}/gtest.lib
+                IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/extern/googletest/build/bin/${BUILD_TYPE}/gtest.dll
+                INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/extern/googletest/googletest/include
+                )
+
+                add_library(GTest::gtest_main SHARED IMPORTED)
+                set_target_properties(GTest::gtest_main PROPERTIES
+                IMPORTED_IMPLIB ${PROJECT_SOURCE_DIR}/extern/googletest/build/lib/${BUILD_TYPE}/gtest_main.lib
+                IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/extern/googletest/build/bin/${BUILD_TYPE}/gtest_main.dll
+                INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/extern/googletest/googletest/include
+                )
+        else(${OS} STREQUAL "Windows") # Linux
+                add_library(GTest::gtest SHARED IMPORTED)
+                set_target_properties(GTest::gtest PROPERTIES
+                IMPORTED_IMPLIB ${PROJECT_SOURCE_DIR}/extern/googletest/build/lib/libgtest.so
+                IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/extern/googletest/build/lib/libgtest.so.1.14.0
+                INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/extern/googletest/googletest/include
+                )
+
+                add_library(GTest::gtest_main SHARED IMPORTED)
+                set_target_properties(GTest::gtest_main PROPERTIES
+                IMPORTED_IMPLIB ${PROJECT_SOURCE_DIR}/extern/googletest/build/lib/libgtest_main.so
+                IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/extern/googletest/build/lib/libgtest_main.so.1.14.0
+                INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/extern/googletest/googletest/include
+                )
+        endif(${OS} STREQUAL "Windows")
+endif(USE_CONAN)
+
 include(GoogleTest)
 
 # #############
@@ -34,10 +67,15 @@ gtest_discover_tests(
         DISCOVERY_MODE PRE_TEST
 )
 
-if(WIN32)
-        add_custom_command(TARGET ${ut_target} PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy
-                $<TARGET_RUNTIME_DLLS:${ut_target}>
-                $<TARGET_FILE_DIR:${ut_target}>
-                COMMAND_EXPAND_LISTS)
-endif()
+#if(WIN32)
+#        add_custom_command(TARGET ${ut_target} PRE_BUILD
+#                COMMAND ${CMAKE_COMMAND} -E copy
+#                $<TARGET_RUNTIME_DLLS:${ut_target}>
+#                $<TARGET_FILE_DIR:${ut_target}>
+#                COMMAND_EXPAND_LISTS)
+#endif()
+
+if(${OS} STREQUAL "windows")
+        get_property(IMPORTED_LIB_LOCATION TARGET onnxruntime PROPERTY IMPORTED_LOCATION)
+        install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION ${CMAKE_BINARY_DIR}/Testing/${CMAKE_BUILD_TYPE}/)
+endif(${OS} STREQUAL "windows")

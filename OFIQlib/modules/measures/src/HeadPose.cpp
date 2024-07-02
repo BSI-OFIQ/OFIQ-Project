@@ -33,8 +33,8 @@ namespace OFIQ_LIB::modules::measures
 {
 
     HeadPose::HeadPose(
-        const Configuration& configuration, Session& session)
-        : Measure{configuration, session, OFIQ::QualityMeasure::HeadPose}
+        const Configuration& configuration)
+        : Measure{configuration, OFIQ::QualityMeasure::HeadPose}
     {
     }
 

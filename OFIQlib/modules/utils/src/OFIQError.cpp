@@ -30,10 +30,10 @@
 namespace OFIQ_LIB
 {
     OFIQError::OFIQError(OFIQ::ReturnCode returnCode, std::string_view message)
-        : returnCode{ returnCode },
-        message{ message }
+        : m_returnCode{ returnCode },
+        m_message{ message }
     {
-        extendedMessage = static_cast<std::string>(magic_enum::enum_name(returnCode)) +
-            ": " + this->message;
+        m_extendedMessage = static_cast<std::string>(magic_enum::enum_name(returnCode)) +
+            ": " + this->m_message;
     }
 }

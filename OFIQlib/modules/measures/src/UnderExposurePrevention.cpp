@@ -38,17 +38,10 @@ namespace OFIQ_LIB::modules::measures
     static const ExposureRange darkRange = {0, 25};
     
     static const auto qualityMeasure = OFIQ::QualityMeasure::UnderExposurePrevention;
-
-    static double ComputeBrightnessAspect(
-        const cv::Mat& luminanceImage,
-        const cv::Mat& maskImage,
-        const ExposureRange& exposureRange);
-    static double CalculateScore(const cv::Mat1f& histogram, const ExposureRange& exposureRange);
     
     UnderExposurePrevention::UnderExposurePrevention(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
         SigmoidParameters defaultValues;
         defaultValues.h = 120;
@@ -63,6 +56,11 @@ namespace OFIQ_LIB::modules::measures
     void UnderExposurePrevention::Execute(OFIQ_LIB::Session & session)
     {
         double rawScore = CalculateExposure(session, darkRange);
+        if (std::isnan(rawScore))
+        {
+            session.assessment().qAssessments[qualityMeasure] = { rawScore,-1,OFIQ::QualityMeasureReturnCode::FailureToAssess };
+            return;
+        }
         SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);
     }
 }

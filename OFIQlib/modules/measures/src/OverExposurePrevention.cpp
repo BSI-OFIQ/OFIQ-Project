@@ -40,15 +40,21 @@ namespace OFIQ_LIB::modules::measures
     static const auto qualityMeasure = OFIQ::QualityMeasure::OverExposurePrevention;
 
     OverExposurePrevention::OverExposurePrevention(
-        const Configuration& configuration,
-        Session& session)
-        : Measure{ configuration, session, qualityMeasure }
+        const Configuration& configuration)
+        : Measure{ configuration, qualityMeasure }
     {
     }
 
     void OverExposurePrevention::Execute(OFIQ_LIB::Session & session)
     {
         double rawScore = CalculateExposure(session, lightRange);
+
+        if (std::isnan(rawScore))
+        {
+            session.assessment().qAssessments[qualityMeasure] = { rawScore,-1,OFIQ::QualityMeasureReturnCode::FailureToAssess };
+            return;
+        }
+
         double scalarScore = round(1.0 / (rawScore + 0.01));
         if (scalarScore < 0)
         {
@@ -58,6 +64,7 @@ namespace OFIQ_LIB::modules::measures
         {
             scalarScore = 100;
         }
-        session.assessment().qAssessments[qualityMeasure] = { rawScore, scalarScore, OFIQ::QualityMeasureReturnCode::Success };
+        session.assessment().qAssessments[qualityMeasure] = 
+            { rawScore, scalarScore, OFIQ::QualityMeasureReturnCode::Success };
     }
 }
