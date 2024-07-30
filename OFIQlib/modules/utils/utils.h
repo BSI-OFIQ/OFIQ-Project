@@ -156,22 +156,6 @@ namespace OFIQ_LIB
      * @return float Computed distance.
      */
     OFIQ_EXPORT float tmetric(const OFIQ::FaceLandmarks& faceLandmarks);
-
-    /**
-     * @brief Based on a given rotation matrix this functions computes and returns the corresponding Euler angles.
-     * 
-     * @param R Input rotation matrix
-     * @param angles Container with the computed Euler angles for [x,y,z] axis
-     */
-    OFIQ_EXPORT void rotationMatrixToEulerAngles(const cv::Mat& R, std::vector<double>& angles);
-
-    /**
-     * @brief Decodes a base64 encoded string
-     * 
-     * @param encodedString Input encoded string
-     * @return std::string Decoded string.
-     */
-    OFIQ_EXPORT std::string base64Decode(std::string const& encodedString);
 }
 
 #endif

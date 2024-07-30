@@ -27,14 +27,18 @@
 #include "CropOfTheFaceImage.h"
 #include "FaceMeasures.h"
 #include "FaceParts.h"
+#include "PartExtractor.h"
 #include "utils.h"
+
+using PartExtractor = OFIQ_LIB::modules::landmarks::PartExtractor;
+using FaceParts = OFIQ_LIB::modules::landmarks::FaceParts;
 
 namespace OFIQ_LIB::modules::measures
 {
-    static const auto qualityDown = OFIQ::QualityMeasure::DownwardCropOfTheFaceImage;
+    static const auto qualityDown = OFIQ::QualityMeasure::MarginAboveOfTheFaceImage;
     static const auto qualityLeft = OFIQ::QualityMeasure::LeftwardCropOfTheFaceImage;
     static const auto qualityRight = OFIQ::QualityMeasure::RightwardCropOfTheFaceImage;
-    static const auto qualityUp = OFIQ::QualityMeasure::UpwardCropOfTheFaceImage;
+    static const auto qualityUp = OFIQ::QualityMeasure::MarginBelowOfTheFaceImage;
 
     CropOfTheFaceImage::CropOfTheFaceImage(
         const Configuration& configuration)
@@ -78,7 +82,9 @@ namespace OFIQ_LIB::modules::measures
 
         auto eyeMidPoint =
             landmarks::FaceMeasures::GetMiddle(OFIQ::Landmarks{ leftEyeCenter, rightEyeCenter });
-
+        auto chinPoint = PartExtractor::getFacePart(faceLandmarks, FaceParts::CHIN)[0];
+        auto t = landmarks::FaceMeasures::GetDistance(eyeMidPoint, chinPoint);
+        
         double interEyeDistance = landmarks::FaceMeasures::GetDistance(leftEyeCenter, rightEyeCenter);
 
         double rawScoreLeft = rightEyeCenter.x / interEyeDistance;
@@ -87,7 +93,6 @@ namespace OFIQ_LIB::modules::measures
         double rawScoreRight = (session.image().width - leftEyeCenter.x) / interEyeDistance;
         SetQualityMeasure(session, qualityRight, rawScoreRight, OFIQ::QualityMeasureReturnCode::Success);
 
-        double t = tmetric(faceLandmarks);
         double rawScoreUp = (session.image().height - eyeMidPoint.y) / t;
         SetQualityMeasure(session, qualityUp, rawScoreUp, OFIQ::QualityMeasureReturnCode::Success);
 

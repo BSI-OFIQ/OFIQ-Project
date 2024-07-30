@@ -38,8 +38,9 @@ namespace OFIQ_LIB::modules::measures
         : Measure{ configuration, qualityMeasure}
     {
         SigmoidParameters defaultValues;
-        defaultValues.setInverse();
         defaultValues.h = 200;
+        defaultValues.a = 1.0;
+        defaultValues.s = -1.0;
         defaultValues.x0 = 0.0;
         defaultValues.w = 0.05;
         defaultValues.round = true;

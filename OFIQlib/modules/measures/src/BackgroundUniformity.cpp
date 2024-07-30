@@ -40,10 +40,11 @@ namespace OFIQ_LIB::modules::measures
         : Measure{ configuration, qualityMeasure }
     {
         SigmoidParameters defaultValues;
-        defaultValues.h = 100.0;
-        defaultValues.x0 = 10;
-        defaultValues.w = 30;
-        defaultValues.setInverse();
+        defaultValues.h = 190.0;
+        defaultValues.a = 1.0;
+        defaultValues.s = -1.0;
+        defaultValues.x0 = 10.0;
+        defaultValues.w = 100.0;
         defaultValues.round = true;
         AddSigmoid(qualityMeasure, defaultValues);
     }

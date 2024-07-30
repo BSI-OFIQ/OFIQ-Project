@@ -55,7 +55,7 @@ namespace OFIQ_LIB::modules::measures
             return;
         }
 
-        double scalarScore = round(1.0 / (rawScore + 0.01));
+        double scalarScore = round(1.0/(rawScore+0.01));
         if (scalarScore < 0)
         {
             scalarScore = 0;

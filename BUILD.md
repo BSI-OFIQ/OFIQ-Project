@@ -219,15 +219,84 @@ Then apply the same actions as for MacOS compilation on ARM64.
 
 ## Download model files
 To run OFIQ, the model files from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-MODELS.zip) 
-need to be downloaded and be placed in the <code>./data/models/</code> directory. 
-This step is integrated in the cmake building process.
+need to be downloaded and be placed in the <code>./data/models/</code> directory so that the file structure matches the following.
+<table>
+ <tr><td>/path/to/OFIQ-Project/data/models/expression_neutrality/*</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/models/face_detection/*</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/models/face_landmark_estimation/*</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/models/face_occlusion_segmentation/*</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/models/face_parsing/*</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/models/head_pose_estimation/*</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/models/no_compression_artifacts/*</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/models/sharpness/*</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/models/unified_quality_score/*</td></td>
+</table>
+<br/><br/>
+Here, <code>/path/to/OFIQ-Project/</code> denotes the path to OFIQ's root folder.
+<br/><br/>
+This step is integrated in the cmake building process when using conan.
  
 ## Download conformance test images
 To run conformance tests, the conformance test
 images need to be downloaded from 
 [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-IMAGES.zip) 
-and be placed in the <code>./data/tests/images/</code> directory.
-This step is integrated in the cmake building process.
+and be placed in the <code>./data/tests/images/</code> directory so that the file structure matches the following.
+<table>
+ <tr><td>/path/to/OFIQ-Project/data/tests/images/b-01-smile.png</td></td>
+ <tr><td>...</td></td>
+ <tr><td>/path/to/OFIQ-Project/data/tests/images/r-09-background.png</td></td>
+</table>
+<br/><br/>
+Here, <code>/path/to/OFIQ-Project/</code> denotes the path to OFIQ's root folder. Download and extraction of conformance test images can be performed when running the cmake building process.
+
+## Download of external libraries
+The source of the external libraries that are used by OFIQ can be downloaded 
+from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-EXTERN.zip). To build
+OFIQ without conan as described below, we need to extract the archive so that file structure
+matches the following:
+<table>
+ <tr><td>/path/to/OFIQ-Project/extern/di/*</td></tr>
+ <tr><td>/path/to/OFIQ-Project/extern/flatbuffers/*</td></tr>
+ <tr><td>/path/to/OFIQ-Project/extern/googletest/*</td></tr>
+ <tr><td>/path/to/OFIQ-Project/extern/json/*</td></tr>
+ <tr><td>/path/to/OFIQ-Project/extern/magic_enum/*</td></tr>
+ <tr><td>/path/to/OFIQ-Project/extern/onnxruntime/*</td></tr>
+ <tr><td>/path/to/OFIQ-Project/extern/openvc-4.5.5/*</td></tr>
+ <tr><td>/path/to/OFIQ-Project/extern/PEGTL/*</td></tr>
+ <tr><td>/path/to/OFIQ-Project/extern/spdlog/*</td></tr>
+</table>
+Here, <code>/path/to/OFIQ-Project/</code> denotes the path to OFIQ's root folder.
+<br/><br/>
+Note, download and extraction of the external libraries can be done automatically by the cmake building process described below.
+<br/><br/>
+Furthermore note, at the time of writing this documentation, the link https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-EXTERN.zip 
+did not exist due to ongoing clarification of license conditions concerning republication of third-party source code. Hence, if the
+link does not work, this may be due to this clarification process has not yet been finished. 
+
+## Building without conan
+To build OFIQ without conan, one can run
+<pre>
+$ cd C:\Path\To\OFIQ-Project\scripts\
+$ .\build.cmd --no-conan
+</pre>
+on Windows or
+<pre>
+$ cd /path/to/OFIQ-Project/scripts/
+$ sh build.sh --no-conan
+</pre>
+on Linux and MacOS. This will download and extract the model files, conformance test images, and external libraries from the ISO portal as described above. 
+<br/><br/>
+To suppress download of the dependencies (e.g., when one wants to compile without an internet connection), one can run
+<pre>
+$ cd C:\Path\To\OFIQ-Project\scripts\
+$ .\build.cmd --no-conan --no-download
+</pre>
+on Windows or
+<pre>
+$ cd /path/to/OFIQ-Project/scripts/
+$ sh build.sh --no-conan --no-download
+</pre>
+on Linux and MacOS. Note that this requires that the extraction of model files and external library dependencies (and perhaps conformance test images) is done manually before running the building scripts.
 
 # Running conformance tests
 The conformance tests are executed by going to <code>/path/to/OFIQ_Project/scripts/</code> 
@@ -238,7 +307,7 @@ and run
  
 # Running the sample executable
 In this section, we describe how to run the sample application of OFIQ after
-compilation (see @ref sec_compilation). A documentation for the arguments that
+compilation. A documentation for the arguments that
 can be passed can be found @ref sec_sample_args "below".
  
 ## Quality assessment for a single facial image

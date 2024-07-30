@@ -24,6 +24,8 @@
  * @author OFIQ development team
  */
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "HeadPose3DDFAV2.h"
 #include "OFIQError.h"
 #include "FaceMeasures.h"
@@ -140,12 +142,51 @@ namespace OFIQ_LIB::modules::poseEstimators
         rotationMatrix.convertTo(rotationMatrix, CV_64FC1);
 
         std::vector<double> angles(3);
-        rotationMatrixToEulerAngles(rotationMatrix, angles);
+        const static double thres = 0.9975;
+        const double r11 = rotationMatrix.at<double>(0, 0);
+        const double r12 = rotationMatrix.at<double>(0, 1);
+        const double r13 = rotationMatrix.at<double>(0, 2);
+        const double r21 = rotationMatrix.at<double>(1, 0);
+        const double r22 = rotationMatrix.at<double>(1, 1);
+        const double r23 = rotationMatrix.at<double>(1, 2);
+        const double r31 = rotationMatrix.at<double>(2, 0);
+        const double r32 = rotationMatrix.at<double>(2, 1);
+        const double r33 = rotationMatrix.at<double>(2, 2);
 
-        for (int i = 0; i < 3; i++)
+        double phi_pitch = 0.0;
+        double phi_yaw = 0.0;
+        double phi_roll = 0.0;
+        if (r31 <= thres && r31 >= -thres)
         {
-            pose[i] = angles[i];
+            phi_pitch = asin(r31);
+            double s = 1.0 / cos(phi_pitch);
+            phi_yaw = -atan2(s*r32, s*r33);
+            phi_roll = -atan2(s*r21, s*r11);
         }
+        else if (r31 < -thres )
+        {
+            phi_pitch = -0.5 * M_PI;
+            phi_yaw = -atan2(r12, r13);
+            phi_roll = 0.0;
+        }
+        else /* if ( r31 > thres */
+        {
+            phi_pitch = 0.5 * M_PI;
+            phi_yaw = atan2(r12,r13);
+            phi_roll = 0.0;
+        }
+
+        phi_pitch *= 180.0 / M_PI;
+        phi_yaw *= 180.0 / M_PI;
+        phi_roll *= 180.0 / M_PI;
+
+        angles[0] = phi_yaw;
+        angles[1] = phi_pitch;
+        angles[2] = phi_roll;
+
+        pose[0] = angles[0]; // Yaw
+        pose[1] = angles[1]; // Pitch
+        pose[2] = angles[2]; // Roll
     }
 
     cv::Mat HeadPose3DDFAV2::CropImage(const cv::Mat& image, const OFIQ::BoundingBox& detectedFace)

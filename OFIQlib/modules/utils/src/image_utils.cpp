@@ -151,6 +151,7 @@ namespace OFIQ_LIB
         cv::calcHist(std::vector{ luminanceImage }, { 0 }, maskImage, histogram, { histSize }, range);
 
         auto pixelsInHistogram = cv::sum(histogram).val[0];
+
         histogram = histogram / pixelsInHistogram;
     }
 

@@ -63,10 +63,9 @@ if %use_conan%==ON (
     --output-folder=../build/conan || goto end
   )
 ) else (
-  echo This function is not yet supported
-  echo In the future, we may activate building OFIQ from source without conan
-  goto :end
-  
+  if %download%==ON (
+    cmake -P ../cmake/DownloadExternalSourceCode.cmake
+  )
   echo Building dependencies from source for %config% mode
   @REM build opencv
   cd ../extern/opencv-4.5.5 || goto end

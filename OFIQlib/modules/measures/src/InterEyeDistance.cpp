@@ -52,7 +52,14 @@ namespace OFIQ_LIB::modules::measures
 
         auto rawScore = interEyeDistance;
 
-        SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);
+        if (std::isnan(rawScore))
+        {
+            SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::FailureToAssess);
+        }
+        else
+        {
+            SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);
+        }
     }
 
 }

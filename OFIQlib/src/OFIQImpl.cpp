@@ -121,19 +121,8 @@ void OFIQImpl::performPreprocessing(Session& session)
     log("3. extractLandmarks ");
     tic = hrclock::now();
 
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
-    session.setLandmarksAllFaces(networks->landmarkExtractor->extractLandmarksAllFaces(session, session.getDetectedFaces()));
-    if (!session.getLandmarksAllFaces().empty())
-    {
-        session.setLandmarks(session.getLandmarksAllFaces().front());
-    }
-    else
-    {
-        session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
-    }
-#else
     session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
-#endif
+
     log(std::to_string(
         std::chrono::duration_cast<std::chrono::milliseconds>(
             hrclock::now() - tic).count()) + std::string(" ms "));
@@ -240,9 +229,9 @@ ReturnStatus OFIQImpl::vectorQuality(
                 { 0, -1, OFIQ::QualityMeasureReturnCode::FailureToAssess };
                 session.assessment().qAssessments[QualityMeasure::RightwardCropOfTheFaceImage] =
                 { 0, -1, OFIQ::QualityMeasureReturnCode::FailureToAssess };
-                session.assessment().qAssessments[QualityMeasure::UpwardCropOfTheFaceImage] =
+                session.assessment().qAssessments[QualityMeasure::MarginBelowOfTheFaceImage] =
                 { 0, -1, OFIQ::QualityMeasureReturnCode::FailureToAssess };
-                session.assessment().qAssessments[QualityMeasure::DownwardCropOfTheFaceImage] =
+                session.assessment().qAssessments[QualityMeasure::MarginAboveOfTheFaceImage] =
                 { 0, -1, OFIQ::QualityMeasureReturnCode::FailureToAssess };
                 break;
             case QualityMeasure::HeadPose:
@@ -272,4 +261,12 @@ ReturnStatus OFIQImpl::vectorQuality(
 OFIQ_EXPORT std::shared_ptr<Interface> Interface::getImplementation()
 {
     return std::make_shared<OFIQImpl>();
+}
+
+OFIQ_EXPORT void Interface::getVersion(int& major, int& minor, int& patch) const
+{
+    major = int(OFIQ_VERSION_MAJOR);
+    minor = int(OFIQ_VERSION_MINOR);
+    patch = int(OFIQ_VERSION_PATCH);
+    return;
 }

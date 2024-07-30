@@ -43,6 +43,9 @@ namespace OFIQ_LIB
     class PoseEstimatorInterface
     {
     public:
+        /**
+         * The first entry encodes yaw, the second encodes pitch, and the third encodes roll. 
+         */
         using EulerAngle = std::array<double, 3>;
 
         /**

@@ -25,7 +25,6 @@ include_directories (
 if(USE_CONAN)
 	# Add packages from conan
 	find_package(OpenCV REQUIRED COMPONENTS core calib3d imgcodecs imgproc highgui dnn ml)
-	find_package(spdlog REQUIRED)
 	find_package(taocpp-json REQUIRED)
 	find_package(magic_enum REQUIRED)
 
@@ -38,7 +37,6 @@ if(USE_CONAN)
 else(USE_CONAN)
 	list(APPEND OFIQ_LINK_INCLUDE_LIST 
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/flatbuffers/include"
-		"${CMAKE_CURRENT_SOURCE_DIR}/extern/spdlog/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/json/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/magic_enum/include/magic_enum"
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/di/include"
@@ -114,7 +112,6 @@ endif(USE_CONAN)
 # Find all source files
 
 add_definitions(-DOFIQ_EXPORTS)
-# add_definitions(-DOFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -177,7 +174,6 @@ list(APPEND module_sources
 if(USE_CONAN)
 	list(APPEND OFIQ_LINK_LIB_LIST 
 		opencv::opencv
-		spdlog::spdlog
 		taocpp::json
 		magic_enum::magic_enum
 		onnxruntime
@@ -268,6 +264,7 @@ install(TARGETS ofiq_lib
 install(TARGETS ofiq_lib
 	CONFIGURATIONS Debug
     DESTINATION Debug/bin
+    PUBLIC_HEADER DESTINATION include/
 )
 
 install(FILES "$<TARGET_FILE_DIR:ofiq_lib>/ofiq_lib.pdb" DESTINATION "Debug/bin" OPTIONAL)

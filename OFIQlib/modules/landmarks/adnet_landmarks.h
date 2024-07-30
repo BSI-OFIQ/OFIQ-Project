@@ -70,24 +70,6 @@ namespace OFIQ_LIB::modules::landmarks
          */
         OFIQ::FaceLandmarks updateLandmarks(OFIQ_LIB::Session& session) override;
 
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
-        /**
-         * @brief Computes all landmarks for all faces passed to the function.
-         * @details The landmarks are computed using ADNet.
-         * @param session Session object containing preprocessing results
-         * used by the function to compute the landmarks.
-         * @param faces List of face bounding boxes.
-         * @return List of facial landmarks for all elements in <code>faces</code>
-         * @deprecated The function is deprecated and implemented because the ISO/IEC
-         * DIS 29794-5 requires to computed T-metrics from landmarks for all faces detected
-         * for the measure \link OFIQ_LIB::modules::measures::SingleFacePresent SingleFacePresent\endlink;
-         * however, landmark extraction is slow and we may get rid of that implementation
-         * variant on FDIS level. In a further version, this function may be removed.
-         */
-        std::vector<OFIQ::FaceLandmarks> updateLandmarksAllFaces
-        (OFIQ_LIB::Session& session, const std::vector<OFIQ::BoundingBox>& faces) override;
-#endif
-
     private:
         
         /**

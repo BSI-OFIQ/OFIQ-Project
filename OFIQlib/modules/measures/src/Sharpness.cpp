@@ -68,9 +68,11 @@ namespace OFIQ_LIB::modules::measures
         m_numTrees = m_rtree->getTermCriteria().maxCount;
 
         SigmoidParameters defaultValues;
-        defaultValues.h = 100;
-        defaultValues.x0 = 20.0;
-        defaultValues.w = 10.0;
+        defaultValues.h = 1;
+        defaultValues.a = -14.0;
+        defaultValues.s = 115.0;
+        defaultValues.x0 = -20.0;
+        defaultValues.w = 15.0;
         defaultValues.round = true;
         AddSigmoid(qualityMeasure, defaultValues);
     }

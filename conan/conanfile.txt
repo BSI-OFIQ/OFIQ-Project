@@ -1,7 +1,6 @@
 [requires]
 gtest/1.14.0
 opencv/4.5.5
-spdlog/1.10.0
 taocpp-json/1.0.0-beta.13
 magic_enum/0.8.1
 [options]

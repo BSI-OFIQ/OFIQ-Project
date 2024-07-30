@@ -46,7 +46,7 @@ namespace OFIQ_LIB::modules::measures
         if (!configuration.GetNumber(paramThreshold0, this->m_t0))
             this->m_t0 = 0.0;
         if (!configuration.GetNumber(paramThreshold1, this->m_t1))
-            this->m_t0 = 0.95;
+            this->m_t1 = 0.95;
         if (!configuration.GetNumber(paramStandardDev, this->m_w))
             this->m_w = 0.1;
         if (!configuration.GetNumber(paramDevPoint, this->m_x0))

@@ -40,15 +40,42 @@ namespace OFIQ_LIB::modules::measures
 
     static const auto qualityMeasure = OFIQ::QualityMeasure::NaturalColour;
 
+    static bool IsColoured(const cv::Mat& image)
+    {
+        int channelCount = image.channels();
+
+        if (channelCount != 3)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < image.rows; i++)
+        {
+            for (int j = 0; j < image.cols; j++)
+            {
+                uchar c0 = image.data[channelCount*(i*image.cols+j)+0];
+                uchar c1 = image.data[channelCount*(i*image.cols+j)+1];
+                uchar c2 = image.data[channelCount*(i*image.cols+j)+2];
+                if (c0 != c1 || c0 != c2 || c1 != c2)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     NaturalColour::NaturalColour(
         const Configuration& configuration)
         : Measure{ configuration, qualityMeasure }
     {
         SigmoidParameters defaultValues;
         defaultValues.h = 200.0;
+        defaultValues.a = 1.0;
+        defaultValues.s = -1.0;
         defaultValues.x0 = 0.0;
         defaultValues.w = 10.0;
-        defaultValues.setInverse();
         AddSigmoid(qualityMeasure, defaultValues);
     }
 
@@ -56,6 +83,13 @@ namespace OFIQ_LIB::modules::measures
     {
         auto landmarks = session.getAlignedFaceLandmarks();
         auto alignedFace = session.getAlignedFace();
+
+        if (!IsColoured(alignedFace))
+        {
+            double D = 0.0;
+            SetQualityMeasure(session, qualityMeasure, D, OFIQ::QualityMeasureReturnCode::Success);
+            return;
+        }
 
         cv::Mat cvMask = session.getAlignedFaceLandmarkedRegion();
         cv::Mat faceSegmentation;
