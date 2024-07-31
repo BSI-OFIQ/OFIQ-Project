@@ -131,7 +131,6 @@
             "round": true
           }
         },
-        "CropOfTheFaceImage": {
           "LeftwardCropOfTheFaceImage": {
             "Sigmoid" : {
               "h": 100,
@@ -148,7 +147,7 @@
               "round": true
             }
           },
-          "UpwardCropOfTheFaceImage": {
+          "MarginBelowOfTheFaceImage": {
             "Sigmoid" : {
               "h": 100,
               "x0": 1.8,
@@ -156,15 +155,14 @@
               "round": true
             }
           },
-          "DownwardCropOfTheFaceImage": {
+          "MarginAboveOfTheFaceImage": {
             "Sigmoid" : {
               "h": 100,
               "x0": 1.4,
               "w": 0.1,
               "round": true
             }
-          }
-        },
+          },
         "NoHeadCoverings": {
 		  // Proportion of pixels classified as head covering <= T0 will lead to a quality component value of 100 (best)
           "T0": 0.0,
