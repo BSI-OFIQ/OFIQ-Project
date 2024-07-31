@@ -131,6 +131,9 @@ namespace OFIQ
          * @return std::shared_ptr<Interface> pointer to the implementation of the interface.
          */
         OFIQ_EXPORT static std::shared_ptr<Interface> getImplementation();
+
+        OFIQ_EXPORT void getVersion(int& major, int& minor, int& patch) const;
+
     };
 }
 

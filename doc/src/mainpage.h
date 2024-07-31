@@ -466,7 +466,7 @@
  *  <tr>
  *  <td>0x54</td>
  *  <td>Leftward crop of the face image</td>
- *  <td>"config">"params".<br/>"measures".<br/>"CropOfTheFaceImage".<br/>"LeftwardCropOfTheFaceImage"</td>
+ *  <td>"config">"params".<br/>"measures".<br/>"LeftwardCropOfTheFaceImage"</td>
  *  <td>"config".<br/>"measures".<br/>"CropOfTheFaceImage"</td>
  *  <td>none</td>
  *  <td>yes</td>
@@ -475,7 +475,7 @@
  *  <tr>
  *  <td>0x55</td>
  *  <td>Rightward crop of the face image</td>
- *  <td>"config">"params".<br/>"measures".<br/>"CropOfTheFaceImage".<br/>"RightwardCropOfTheFaceImage"</td>
+ *  <td>"config">"params".<br/>"measures".<br/>"RightwardCropOfTheFaceImage"</td>
  *  <td>"config".<br/>"measures".<br/>"CropOfTheFaceImage"</td>
  *  <td>none</td>
  *  <td>yes</td>
@@ -483,8 +483,8 @@
  *
  *  <tr>
  *  <td>0x56</td>
- *  <td>Upward crop of the face image</td>
- *  <td>"config">"params".<br/>"measures".<br/>"CropOfTheFaceImage".<br/>"UpwardCropOfTheFaceImage"</td>
+ *  <td>Margin above of the face image</td>
+ *  <td>"config">"params".<br/>"measures".<br/>"MarginAboveOfTheFaceImage"</td>
  *  <td>"config".<br/>"measures".<br/>"CropOfTheFaceImage"</td>
  *  <td>none</td>
  *  <td>yes</td>
@@ -492,8 +492,8 @@
  *
  *  <tr>
  *  <td>0x57</td>
- *  <td>Downward crop of the face image</td>
- *  <td>"config">"params".<br/>"measures".<br/>"CropOfTheFaceImage".<br/>"DownwardCropOfTheFaceImage"</td>
+ *  <td>Margin below of the face image</td>
+ *  <td>"config">"params".<br/>"measures".<br/>"MarginBelowOfTheFaceImage"</td>
  *  <td>"config".<br/>"measures".<br/>"CropOfTheFaceImage"</td>
  *  <td>none</td>
  *  <td>yes</td>
@@ -551,7 +551,12 @@
  *  <td>Abscence of head coverings</td>
  *  <td>"config">"params".<br/>"measures".<br/>"NoHeadCovering"</td>
  *  <td>"config".<br/>"measures".<br/>"NoHeadCovering"</td>
- *  <td><code>threshold</code> - threshold between 0 and 1-/td>
+ *  <td>
+ *   <code>T0</code> - Proportion of pixels classified as head covering <= T0 will lead to a quality component value of 100 (best)<br/>
+ *   <code>T1</code> - Proportion of pixels classified as head covering >= T1 will lead to a quality component value of 0 (worst)<br/>
+ *   <code>w</code> -Proportion of pixels classified as head covering in (T0,T1) will be interpolated using a sigmoid function with w as standard deviation<br/>
+ *   <code>x0</code> - Proportion of pixels classified as head covering in (T0,T1) will be interpolated using a sigmoid function with x0 as development point
+ *  </td>
  *  <td>no</td>
  *  </tr>
  * </table>
@@ -745,7 +750,7 @@
  * </ol>
  * 
  * @section sec_release_notes Release notes
- * This is OFIQ @ref sec_version_1_0_0_rc. 
+ * This is OFIQ @ref sec_version_1_0_0_rc2. 
  * The following table lists all measures and its implementation provided by this release of OFIQ. Details on the 
  * configuration and on requesting measures can be found
  * @ref sec_default_config "here". Note, the QAA identifiers listed in the table are defined in ISO/IEC 29794-5.
@@ -770,7 +775,7 @@
  * 
  *  <tr>
  *   <td>0x43</td>
- *   <td>Illumination unformity by summing up the minima of the histograms of the left and the right side of the face.</td>
+ *   <td>Illumination uniformity by summing up the minima of the histograms of the left and the right side of the face.</td>
  *   <td>\link OFIQ_LIB::modules::measures::IlluminationUniformity IlluminationUniformity\endlink</td>
  *  </tr>
  * 
@@ -895,13 +900,13 @@
  * 
  *  <tr>
  *   <td>0x56</td>
- *   <td>Downward crop of the face image</td>
+ *   <td>Margin above of the face image</td>
  *   <td>\link OFIQ_LIB::modules::measures::CropOfTheFaceImage CropOfTheFaceImage\endlink</td>
  *  </tr>
  * 
  *  <tr>
  *   <td>0x57</td>
- *   <td>Upward crop of the face image</td>
+ *   <td>Margin below of the face image</td>
  *   <td>\link OFIQ_LIB::modules::measures::CropOfTheFaceImage CropOfTheFaceImage\endlink</td>
  *  </tr>
  *  
@@ -940,7 +945,33 @@
  * </table>
  * 
  * @subsection sec_changelog Changelog
- * @subsubsection sec_version_1_0_0_rc Version 1.0.0-RC (2024-03-15)
- * Initial release of OFIQ's release candidate providing the measures described in the @ref sec_release_notes
+ * @subsubsection sec_version_1_0_0_rc2 Version 1.0.0-RC.2 (2024-07-31)
+ * Second release of OFIQ's release candidate. The following changes have been implemented.
+ * <ul>
+ *  <li>Supports compilation on MacOS</li>
+ *  <li>Successfully tested that it is possible (with some effort) to compile for and be conformant with mobile devices such as Android and iOS.</li>
+ *  <li>Revisions as per up coming FDIS (e.g., quality mappings, update of conformance test table, etc.)</li>
+ *  <li>Fix of the default config file: Changes to the CropOfTheFaceImage measures did not affect the quality mappings</li>
+ *  <li>Fixes link to the OFIQ-MODELS.zip archive: https://github.com/BSI-OFIQ/OFIQ-Project/issues/12</li>
+ *  <li>Removes libgtk dependency: https://github.com/BSI-OFIQ/OFIQ-Project/issues/18</li>
+ *  <li>Removes Lapack from ubuntu cmake file which wasn't used: https://github.com/BSI-OFIQ/OFIQ-Project/issues/20</li>
+ *  <li>Improves readability of source code by applying a style guide to member variables: https://github.com/BSI-OFIQ/OFIQ-Project/issues/27</li>
+ *  <li>Fixes from static code analyses, for example:
+ *   <ul>
+ *    <li>https://github.com/BSI-OFIQ/OFIQ-Project/issues/28</li>
+ *    <li>https://github.com/BSI-OFIQ/OFIQ-Project/issues/29</li>
+ *    <li>https://github.com/BSI-OFIQ/OFIQ-Project/issues/30</li>
+ *    <li>https://github.com/BSI-OFIQ/OFIQ-Project/issues/31</li>
+ *    <li>and others</li>
+ *   </ul>
+ *  </li>
+ *  <li>Removes mis-leading usage hint in the sample app: https://github.com/BSI-OFIQ/OFIQ-Project/issues/34</li>
+ *  <li>Avoids redundant RGB conversions: https://github.com/BSI-OFIQ/OFIQ-Project/issues/36</li>
+ *  <li>Fixes a bug on continuous OpenCV matrices: https://github.com/BSI-OFIQ/OFIQ-Project/issues/41</li>
+ *  <li>Fixes further issues and bugs and code beautification</li>
+ * </ul>
+ * 
+ * @subsubsection sec_version_1_0_0_rc1 Version 1.0.0-RC.1 (2024-03-15)
+ * Initial release of OFIQ's release candidate.
  */
 #pragma once

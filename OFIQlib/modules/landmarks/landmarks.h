@@ -54,9 +54,6 @@ namespace OFIQ_LIB
          * @return OFIQ::FaceLandmarks 
          */
         OFIQ::FaceLandmarks extractLandmarks(OFIQ_LIB::Session& session);
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC //deprecated but required by DIS of ISO/IEC 29794-5
-        std::vector<OFIQ::FaceLandmarks> extractLandmarksAllFaces(OFIQ_LIB::Session& session, const std::vector<OFIQ::BoundingBox>& faces );
-#endif
 
     protected:
         /**
@@ -66,9 +63,5 @@ namespace OFIQ_LIB
          * @return OFIQ::FaceLandmarks 
          */
         virtual OFIQ::FaceLandmarks updateLandmarks(OFIQ_LIB::Session& session) = 0;
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC //deprecated but required by DIS of ISO/IEC 29794-5
-        virtual std::vector<OFIQ::FaceLandmarks> updateLandmarksAllFaces(
-            OFIQ_LIB::Session& session, const std::vector<OFIQ::BoundingBox>& faces) = 0;
-#endif
     };
 }

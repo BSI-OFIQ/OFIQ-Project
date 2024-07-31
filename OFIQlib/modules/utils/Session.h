@@ -100,11 +100,6 @@ namespace OFIQ_LIB
          */
         std::vector<OFIQ::BoundingBox> getDetectedFaces() const;
 
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
-        void setLandmarksAllFaces(const std::vector<OFIQ::FaceLandmarks>& i_detectedLandmarks);
-        std::vector<OFIQ::FaceLandmarks> getLandmarksAllFaces() const;
-#endif
-
         /**
          * @brief Set the Pose of the input image.
          * 
@@ -237,10 +232,6 @@ namespace OFIQ_LIB
          * 
          */
         std::vector<OFIQ::BoundingBox> m_detectedFaces;
-
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
-        std::vector<OFIQ::FaceLandmarks> m_landmarksAllFaces;
-#endif
 
         /**
          * @brief Container for storing the pose information.

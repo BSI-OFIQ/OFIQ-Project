@@ -59,10 +59,10 @@ then
         -g CMakeToolchain
     fi
 else
-    echo "This function is not yet supported"
-    echo "In the future, we may activate building OFIQ from source without conan"
-    exit
-	
+    if [ "$download" = "ON" ]
+    then
+        cmake -P ../cmake/DownloadExternalSourceCode.cmake
+    fi
     # build opencv
     cd ../extern/opencv-4.5.5
     cmake -S ./ -B build -DBUILD_LIST=core,calib3d,imgcodecs,highgui,improc,dnn,ml \

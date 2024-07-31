@@ -35,13 +35,4 @@ namespace OFIQ_LIB
         auto landmarks = updateLandmarks(session);
         return landmarks;
     }
-
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
-    // public
-    std::vector<OFIQ::FaceLandmarks> FaceLandmarkExtractorInterface::extractLandmarksAllFaces(OFIQ_LIB::Session& session, const std::vector<OFIQ::BoundingBox>& faces)
-    {
-        auto detectedLandmarks = updateLandmarksAllFaces(session,faces);
-        return detectedLandmarks;
-    }
-#endif
 }

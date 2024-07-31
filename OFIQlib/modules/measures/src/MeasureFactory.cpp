@@ -77,8 +77,8 @@ namespace OFIQ_LIB::modules::measures
         case OFIQ::QualityMeasure::CropOfTheFaceImage:
         case OFIQ::QualityMeasure::LeftwardCropOfTheFaceImage:
         case OFIQ::QualityMeasure::RightwardCropOfTheFaceImage:
-        case OFIQ::QualityMeasure::UpwardCropOfTheFaceImage:
-        case OFIQ::QualityMeasure::DownwardCropOfTheFaceImage:
+        case OFIQ::QualityMeasure::MarginBelowOfTheFaceImage:
+        case OFIQ::QualityMeasure::MarginAboveOfTheFaceImage:
             return std::make_unique<CropOfTheFaceImage>(configuration);
         case OFIQ::QualityMeasure::NaturalColour:
             return std::make_unique<NaturalColour>(configuration);

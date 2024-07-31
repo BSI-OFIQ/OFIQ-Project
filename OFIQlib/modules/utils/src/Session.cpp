@@ -45,18 +45,6 @@ namespace OFIQ_LIB
         return m_detectedFaces;
     }
 
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
-    void Session::setLandmarksAllFaces(const std::vector<OFIQ::FaceLandmarks>& i_detectedLandmarks)
-    {
-        m_landmarksAllFaces = i_detectedLandmarks;
-    }
-
-    std::vector<OFIQ::FaceLandmarks> Session::getLandmarksAllFaces() const
-    {
-        return m_landmarksAllFaces;
-    }
-#endif
-
     void Session::setPose(const EulerAngle& i_pose) {
         m_pose = i_pose;
     }

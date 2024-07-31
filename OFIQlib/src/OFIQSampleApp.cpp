@@ -352,6 +352,13 @@ int main(int argc, char* argv[])
         return FAILURE;
     }
 
+    int major;
+    int minor;
+    int patch;
+    implPtr->getVersion(major, minor, patch);
+    
+    cout << "OFIQ library version: " << major << '.' << minor << '.' << patch << endl;
+
     // write to output file
     if (outputFile != nullptr)
     {

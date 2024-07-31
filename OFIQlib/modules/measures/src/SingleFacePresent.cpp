@@ -44,53 +44,18 @@ namespace OFIQ_LIB::modules::measures
 
     void SingleFacePresent::Execute(OFIQ_LIB::Session & session)
     {
-#ifdef OFIQ_SINGLE_FACE_PRESENT_WITH_TMETRIC
-        float f = 1.0f;
-        if (auto detectedLandmarksList = session.getLandmarksAllFaces(); 
-            detectedLandmarksList.empty())
-        {
-            if (session.getDetectedFaces().size() == 1)
-            {
-                f = 0.0f;
-            }
-        }
-        else if (detectedLandmarksList.size() == 1)
-        {
-            f = 0.0f;
-        }
-        else if (detectedLandmarksList.size() > 1)
-        {
-            // Determine the two largest T-metrics over detected faces
-            float T1 = 0.0f;
-            float T2 = 0.0f;
-            for (const auto& lms : detectedLandmarksList)
-            {
-                float T = tmetric(lms);
-                if (T > T1)
-                {
-                    T2 = T1;
-                    T1 = T;
-                }
-                else if (T > T2)
-                {
-                    T2 = T;
-                }
-            }
-            // Now 'T1' will be the largest T-metric and 'T2' will be 
-            // the second largest T-metric.
-
-            // Update face unicity: the more it approaches zero, the more
-            // dominant is the largest face.
-            f = sqrtf(T2 / T1);
-        }
-
-        float qc = round(100.0f * (1.0f - f));
-        session.assessment().qAssessments[qualityMeasure] = 
-            { static_cast<double>(f), static_cast<double>(qc), OFIQ::QualityMeasureReturnCode::Success };
-#else
         float f = 1.0f;
         const auto& m_detectedFaces = session.getDetectedFaces();
-        if (m_detectedFaces.size() == 1)
+        if (m_detectedFaces.size() == 0)
+        {
+            // This should never occur since many measures are set
+            // to FailureToAssess if no face is detected and then this
+            // method would not be called by OFIQ's logic.
+            session.assessment().qAssessments[qualityMeasure] =
+            { 0.0, -1.0, OFIQ::QualityMeasureReturnCode::FailureToAssess};
+            return;
+        }
+        else if (m_detectedFaces.size() == 1)
         {
             f = 0.0f;
         }
@@ -122,6 +87,5 @@ namespace OFIQ_LIB::modules::measures
         float qc = round(100.0f * (1.0f - f));
         session.assessment().qAssessments[qualityMeasure] = 
             { static_cast<double>(f), static_cast<double>(qc), OFIQ::QualityMeasureReturnCode::Success };
-#endif
     }
 }
