@@ -41,8 +41,9 @@ namespace OFIQ_LIB::modules::measures
     OFIQ::QualityMeasureResult CalculateQuality(const double& rawValue)
     {
         auto myCos = cos(rawValue * M_PI / 180);
-        myCos *= myCos;
-        auto scalarScore = std::max(0.0, round(100 * myCos));
+		myCos = std::max(0.0,myCos);
+		myCos *= myCos;
+        auto scalarScore = round(100 * myCos);
         return {rawValue, scalarScore, OFIQ::QualityMeasureReturnCode::Success};
     }
 
