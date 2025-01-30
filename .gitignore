@@ -17,3 +17,6 @@
 /install_x86_64_linux/
 /install_arm64_mac/
 /install_x86_64/
+
+# Results directory
+/results/

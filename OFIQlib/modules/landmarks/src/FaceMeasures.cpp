@@ -102,7 +102,8 @@ namespace OFIQ_LIB::modules::landmarks
         {
             landmarkPoints.emplace_back(landmark.x, landmark.y);
         }
-        // optional: expand convex hull
+
+        // Optional: expand convex hull
         if (alpha > 0)
         {
             std::vector<cv::Point2i> contour;
@@ -150,8 +151,19 @@ namespace OFIQ_LIB::modules::landmarks
             landmarkPoints.insert(landmarkPoints.end(), polyPoints.begin(), polyPoints.end());
         }
 
+        // Compute hullPoints from landmarkPoints
         std::vector<cv::Point2i> hullPoints;
         cv::convexHull(landmarkPoints, hullPoints);
+
+        // Generate mask from hullPoints
+        cv::Mat mask = cv::Mat::zeros(cv::Size(height, width), CV_8UC1);
+        cv::fillConvexPoly(mask, hullPoints, cv::Scalar(1));
+
+        return mask;
+
+        /***
+         * This whole re-sizing code is not necessary
+
         cv::Rect rect = cv::boundingRect(hullPoints);
         auto b = (int)(rect.y - rect.height * 0.05);
         auto d = (int)(rect.y + rect.height * 1.05);
@@ -204,6 +216,7 @@ namespace OFIQ_LIB::modules::landmarks
         cv::Mat crop = maskRescaled(cv::Range(top, bottom), cv::Range(left, right));
         crop.copyTo(faceRegion(cv::Range(bn, dn), cv::Range(an, cn)));
         return faceRegion;
+        ***/
     }
 
     double FaceMeasures::GetMaxPairDistance(
