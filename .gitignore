@@ -1,0 +1,19 @@
+# IDE
+/.vscode/
+
+# Build directory
+/build/
+
+# Data directory
+/data/models/*
+!/data/models/README.md 
+/data/tests/images/*
+!/data/tests/images/README.md 
+
+# Extern directory
+/extern/
+
+# Install directories
+/install_x86_64_linux/
+/install_arm64_mac/
+/install_x86_64/
