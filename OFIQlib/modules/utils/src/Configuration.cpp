@@ -74,7 +74,7 @@ namespace OFIQ_LIB
 
         std::ifstream istream(fullConfPath.string());
         if(!istream.good())
-            throw std::runtime_error("Invalid path to config file: " + fullConfPath.string());
+            throw std::invalid_argument("Invalid path to config file: " + fullConfPath.string());
 
         std::string source;
         tao::json::value jsonValue = tao::json::jaxn::from_stream(istream, source);
@@ -86,14 +86,14 @@ namespace OFIQ_LIB
         return m_dataDir.string();
     }
 
-    void Configuration::SetDataDir(std::string dataDir)
+    void Configuration::SetDataDir(std::string_view dataDir)
     {
         m_dataDir = dataDir;
     }
 
     bool Configuration::GetBool(const std::string& key, bool& value) const
     {
-        std::map<std::string, tao::json::value>::const_iterator citModel = parameters.find(key);
+        std::map<std::string, tao::json::value, std::less<>>::const_iterator citModel = parameters.find(key);
         if (citModel == parameters.cend())
             return false;
         if (!citModel->second.is_boolean())
@@ -104,7 +104,7 @@ namespace OFIQ_LIB
 
     bool Configuration::GetString(const std::string& key, std::string& value) const
     {
-        std::map<std::string, tao::json::value>::const_iterator citModel = parameters.find(key);
+        std::map<std::string, tao::json::value, std::less<>>::const_iterator citModel = parameters.find(key);
         if (citModel == parameters.cend())
             return false;
         if (!citModel->second.is_string())
@@ -116,7 +116,7 @@ namespace OFIQ_LIB
 
     bool Configuration::GetStringList(const std::string& key, std::vector<std::string>& value) const
     {
-        std::map<std::string, tao::json::value>::const_iterator citModel = parameters.find(key);
+        std::map<std::string, tao::json::value, std::less<>>::const_iterator citModel = parameters.find(key);
         if (citModel == parameters.cend()) {
             return false;
         }
@@ -141,7 +141,7 @@ namespace OFIQ_LIB
 
     bool Configuration::GetNumber(const std::string& key, double& value) const
     {
-        std::map<std::string, tao::json::value>::const_iterator citModel = parameters.find(key);
+        std::map<std::string, tao::json::value, std::less<>>::const_iterator citModel = parameters.find(key);
         if (citModel == parameters.cend())
             return false;
         const auto& item = citModel->second;
@@ -160,7 +160,7 @@ namespace OFIQ_LIB
             break;
 
         default:
-            throw std::runtime_error(
+            throw std::invalid_argument(
                 "invalid type in Configuration::GetNumber: " +
                 static_cast<std::string>(magic_enum::enum_name(item.type())));
         }

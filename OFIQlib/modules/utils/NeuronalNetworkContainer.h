@@ -86,14 +86,14 @@ namespace OFIQ_LIB
 
         /**
          * @brief Pointer to a \link OFIQ_LIB::SegmentationExtractorInterface SegmentationExtractorInterface \endlink
+         */
+        std::shared_ptr<PoseEstimatorInterface> poseEstimator;
+
+        /**
+         * @brief Pointer to a \link OFIQ_LIB::SegmentationExtractorInterface SegmentationExtractorInterface \endlink
          * @details A pointer to an object instantiated from the \link OFIQ_LIB::modules::segmentations::FaceOcclusionSegmentation FaceOcclusionSegmentation\endlink class would
          * be valid.
          */
         std::shared_ptr<SegmentationExtractorInterface> faceOcclusionExtractor;
-
-        /**
-         * @brief Pointer to a \link OFIQ_LIB::SegmentationExtractorInterface SegmentationExtractorInterface \endlink 
-         */
-        std::shared_ptr<PoseEstimatorInterface> poseEstimator;
     };
 }

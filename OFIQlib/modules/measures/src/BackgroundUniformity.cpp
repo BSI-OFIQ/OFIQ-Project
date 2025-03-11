@@ -105,8 +105,7 @@ namespace OFIQ_LIB::modules::measures
 
         // if B has only zeroes, i.e. the background mask is empty,
         // can break at this point
-        int nNonZeroBg = cv::countNonZero(B);
-        if ( nNonZeroBg == 0)
+        if (int nNonZeroBg = cv::countNonZero(B); nNonZeroBg == 0)
             return SetQualityMeasure(session, qualityMeasure, 0, OFIQ::QualityMeasureReturnCode::FailureToAssess);
 
         // Step 8. Compute the luminance image L for image I as specified in ISO/IEC CD2 29794-5:2023 [1].
@@ -151,7 +150,7 @@ namespace OFIQ_LIB::modules::measures
                 auto& v = G.at<double>(i, j);
                 auto sx = (double)sX.at<float>(i, j);
                 auto sy = (double)sY.at<float>(i, j);
-                v = (double)sqrt(sx * sx + sy * sy);
+                v = sqrt(sx * sx + sy * sy);
             }
         }
 

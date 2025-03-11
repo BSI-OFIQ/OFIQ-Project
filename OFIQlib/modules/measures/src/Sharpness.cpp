@@ -81,7 +81,7 @@ namespace OFIQ_LIB::modules::measures
     {
         cv::Mat faceCrop;
         cv::Mat maskCrop;
-        GetCroppedImages(session, faceCrop, maskCrop, m_useAligned, m_faceRegionAlpha);
+        GetCroppedImages(session, faceCrop, maskCrop, m_useAligned, static_cast<float>(m_faceRegionAlpha));
 
         cv::Mat features = GetClassifierFocusFeatures(faceCrop, maskCrop, true);
         features.convertTo(features, CV_32F);

@@ -83,7 +83,7 @@ namespace OFIQ_LIB::modules::poseEstimators
         cv::Mat croppedImageBGR = CropImage(cvImageBGR, biggestFace);
 
         cv::Mat resizedImage;
-        cv::resize(croppedImageBGR, resizedImage, cv::Size(m_expectedImageWidth, m_expectedImageHeight), 0, 0, cv::INTER_LINEAR);
+        cv::resize(croppedImageBGR, resizedImage, cv::Size(static_cast<int>(m_expectedImageWidth), static_cast<int>(m_expectedImageHeight)), 0, 0, cv::INTER_LINEAR);
         resizedImage.convertTo(resizedImage, CV_32FC3);
         cv::Mat normalizedImageBGR;
         normalizedImageBGR = resizedImage - cv::Scalar(127.5, 127.5, 127.5);
@@ -147,8 +147,6 @@ namespace OFIQ_LIB::modules::poseEstimators
         const double r12 = rotationMatrix.at<double>(0, 1);
         const double r13 = rotationMatrix.at<double>(0, 2);
         const double r21 = rotationMatrix.at<double>(1, 0);
-        const double r22 = rotationMatrix.at<double>(1, 1);
-        const double r23 = rotationMatrix.at<double>(1, 2);
         const double r31 = rotationMatrix.at<double>(2, 0);
         const double r32 = rotationMatrix.at<double>(2, 1);
         const double r33 = rotationMatrix.at<double>(2, 2);
@@ -189,7 +187,7 @@ namespace OFIQ_LIB::modules::poseEstimators
         pose[2] = angles[2]; // Roll
     }
 
-    cv::Mat HeadPose3DDFAV2::CropImage(const cv::Mat& image, const OFIQ::BoundingBox& detectedFace)
+    cv::Mat HeadPose3DDFAV2::CropImage(const cv::Mat& image, const OFIQ::BoundingBox& detectedFace) const
     {
         double centerX = detectedFace.xleft + detectedFace.width / 2.0;
         double centerY = detectedFace.ytop + detectedFace.height / 2.0;

@@ -102,7 +102,7 @@ public:
      * 
      * @return size_t number of output nodes (results).
      */
-    size_t getNumberOfOutputNodes();
+    size_t getNumberOfOutputNodes() const;
 
     /**
      * @brief Perform the computation.

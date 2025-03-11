@@ -48,7 +48,7 @@ namespace OFIQ_LIB::modules::segmentations
                 std::istreambuf_iterator<char>());
             m_onnxRuntimeEnv.initialize(modelData, m_scaledWidth, m_scaledHeight);
         }
-        catch (const std::exception& e)
+        catch (const std::exception&)
         {
             throw OFIQError(
                 OFIQ::ReturnCode::FaceOcclusionSegmentationError,
@@ -90,8 +90,8 @@ namespace OFIQ_LIB::modules::segmentations
         auto width = static_cast<int>(shape[3]);
 
         // Create a cv::Mat from the tensor data
-        int sizeMat[] = {batchSize, nbChannels, height, width};
-        auto mat = cv::Mat(4, sizeMat, CV_32FC1, elementPtr);
+        std::array<int, 4> sizeMat = { batchSize, nbChannels, height, width };
+        auto mat = cv::Mat(4, sizeMat.data(), CV_32FC1, elementPtr);
 
         cv::Mat outputReshaped(size, CV_32F, elementPtr);
 
@@ -131,7 +131,7 @@ namespace OFIQ_LIB::modules::segmentations
             }
 
         OFIQ::Image maskImage =
-            OFIQ_LIB::MakeGreyImage(m_segmentationImage->cols, m_segmentationImage->rows);
+            OFIQ_LIB::MakeGreyImage(static_cast<uint16_t>(m_segmentationImage->cols), static_cast<uint16_t>(m_segmentationImage->rows));
 
 
         if (OFIQ_LIB::modules::segmentations::SegmentClassLabels::face == faceSegment)

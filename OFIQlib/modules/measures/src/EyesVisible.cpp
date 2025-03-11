@@ -54,7 +54,7 @@ namespace OFIQ_LIB::modules::measures
         auto interEyeDistance = landmarks::FaceMeasures::InterEyeDistance(alignedFaceLandmarks, headPose[1]);
 
         // Determine EVZ according to ISO/IEC 39794-5
-        int V = static_cast<int>(std::floor(interEyeDistance / 20.0));
+        auto V = static_cast<int>(std::floor(interEyeDistance / 20.0));
         std::vector<cv::Point2i> leftEyePoints;
         for (auto landmark : leftEye)
         {

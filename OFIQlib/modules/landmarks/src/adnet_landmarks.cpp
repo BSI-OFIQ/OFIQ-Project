@@ -48,7 +48,7 @@ namespace OFIQ_LIB::modules::landmarks
 
         ~ADNetFaceLandmarkExtractorImpl() = default;
 
-        std::vector<float> extractLandMarks(cv::Mat& i_input_image)
+        std::vector<float> extractLandMarks(const cv::Mat& i_input_image)
         {
             // scale image
             cv::Mat scaled_image = scale_image_to_inputsize(i_input_image);
@@ -82,7 +82,7 @@ namespace OFIQ_LIB::modules::landmarks
         }
 
     private:
-        std::vector<float> convert_to_net_input(cv::Mat& i_input_image) const
+        std::vector<float> convert_to_net_input(const cv::Mat& i_input_image) const
         {
             // reshape to 1D
             auto image = i_input_image.reshape(1, 1);
@@ -91,8 +91,7 @@ namespace OFIQ_LIB::modules::landmarks
             std::vector<float> vec;
             image.convertTo(vec, CV_32FC1, 2. / 255, -1.);
 
-            // Transpose (Height, Width, Channel)(224,224,3) to (Chanel, Height,
-            // Width)(3,224,224)
+            // Transpose Height, Width, Channel to Channel, Height, Width
             std::vector<float> output;
             for (size_t ch = 0; ch < 3; ++ch)
             {
@@ -105,7 +104,7 @@ namespace OFIQ_LIB::modules::landmarks
             return output;
         }
 
-        cv::Mat scale_image_to_inputsize(cv::Mat& i_input_image) const
+        cv::Mat scale_image_to_inputsize(const cv::Mat& i_input_image) const
         {
 
             if ((i_input_image.cols == m_expected_image_width) &&
@@ -199,10 +198,6 @@ namespace OFIQ_LIB::modules::landmarks
                     num_output_nodes - 1; // take last output like in python implementation
 
                 auto element = results[useThisOutput].GetTensorTypeAndShapeInfo();
-                std::vector<int64_t> shape = element.GetShape();
-
-
-
                 auto elementPtr = results[useThisOutput].GetTensorMutableData<float>();
 
                 std::vector<float> landmarks(elementPtr, elementPtr + element.GetElementCount());
@@ -226,8 +221,6 @@ namespace OFIQ_LIB::modules::landmarks
             return std::vector<float>();
         }
 
-
-    private:
         Ort::Env m_ortenv;
         std::unique_ptr<Ort::Session> m_ort_session;
 

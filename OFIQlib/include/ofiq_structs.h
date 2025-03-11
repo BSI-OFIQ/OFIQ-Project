@@ -28,6 +28,7 @@
 #define OFIQ_STRUCTS_H
 
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -66,22 +67,49 @@ namespace OFIQ
 
         /**
          * @brief Constructor
-         * 
+         *
+         * @attention The constructor sets a shallow copy of the specified data pointer. 
+         * Therefore, this constructor should no be used from binding such as Java/JNI using
+         * byte data of which memory is managed by another mechanism. Rather, for a binding
+         * such as Java/JNI, one should use the \link OFIQ::Image::deepcopy deepcopy\endlink method.
+         *
          * @param width of the image.
          * @param height of the image.
          * @param depth of the image
          * @param data of the image.
          */
         Image(uint16_t width, uint16_t height, uint8_t depth, const std::shared_ptr<uint8_t>& data)
-            : width{width},
-              height{height},
-              depth{depth},
-              data{data}
+            : width{ width },
+            height{ height },
+            depth{ depth },
+            data{ data }
         {
         }
 
         /** @brief This function returns the size of the image data. */
         size_t size() const { return (static_cast<size_t>(width) * height * (depth / 8)); }
+
+        /**
+         * @brief Overwrites the data of the image being a deepcopy of the specified
+         * parameters.
+         * 
+         * @details This method can be used by a binding such as Java/JNI when the memory
+         * of the specified data is managed by another mechanism such as Java's garbage collector.
+         *
+         * @param[in] width of the image.
+         * @param[in] height of the image.
+         * @param[in] depth of the image
+         * @param[in] data of the image.
+         */
+        void deepcopy(uint16_t width, uint16_t height, uint8_t depth, const std::shared_ptr<uint8_t>& data)
+        {
+            this->width = width;
+            this->height = height;
+            this->depth = depth;
+            size_t size = this->size();
+            this->data.reset(new uint8_t[size], std::default_delete<uint8_t[]>());
+            memcpy(this->data.get(), data.get(), size);
+        }
     };
 
 

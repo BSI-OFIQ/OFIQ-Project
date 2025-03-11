@@ -48,7 +48,7 @@ ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::strin
     {
         this->config = std::make_unique<Configuration>(configDir, configFilename);
         CreateNetworks();
-        m_executorPtr = CreateExecutor(m_emptySession);
+        m_executorPtr = CreateExecutor();
     }
     catch (const OFIQError & ex)
     {
@@ -164,7 +164,7 @@ void OFIQImpl::performPreprocessing(Session& session)
     {
         alpha = this->config->GetNumber(alphaParamPath);
     }
-    catch(...)
+    catch(OFIQError&)
     {
         alpha = 0.0f;
     }
@@ -187,7 +187,8 @@ void OFIQImpl::performPreprocessing(Session& session)
     log("\npreprocessing finished\n");
 }
 
-void OFIQImpl::alignFaceImage(Session& session) {
+void OFIQImpl::alignFaceImage(Session& session) const
+{
     auto landmarks = session.getLandmarks();
     OFIQ::FaceLandmarks alignedFaceLandmarks;
     alignedFaceLandmarks.type = landmarks.type;

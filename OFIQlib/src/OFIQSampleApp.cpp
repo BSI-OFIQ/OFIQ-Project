@@ -41,6 +41,7 @@
 #include <cmath>
 #include <magic_enum.hpp>
 #include <filesystem>
+#include <chrono>
 
 constexpr int SUCCESS = 0;
 constexpr int FAILURE = 1;
@@ -54,9 +55,9 @@ using namespace OFIQ_LIB;
 
 
 int getQualityAssessmentResults(
-    std::shared_ptr<Interface>& implPtr,
+    const std::shared_ptr<Interface>& implPtr,
     const string& inputFile,
-    FaceImageQualityAssessment& assessments);
+    FaceImageQualityAssessment& assessments, int & r_elapsed );
 
 std::vector<std::string> readFileLines(
     const std::string& inputFile);
@@ -71,7 +72,7 @@ std::vector<std::string> readFileLines(const std::string& inputFile)
     std::ifstream ifs(inputFile);
     std::string line;
 
-    while(ifs)
+    while (ifs)
     {
         std::getline(ifs, line);
         // ignore empty lines and comment lines
@@ -112,7 +113,7 @@ bool isStringContained(
     bool isCaseSensitive=false)
 {
     std::string s = str;
-    if(!isCaseSensitive)
+    if (!isCaseSensitive)
         std::transform(s.begin(), s.end(), s.begin(),
             [](unsigned char c) { return std::tolower(c); });
 
@@ -121,42 +122,91 @@ bool isStringContained(
 }
 
 int runQuality(
-    std::shared_ptr<Interface>& implPtr, const string& inputFile, std::ostream* p_outStream = &std::cout )
+    const std::shared_ptr<Interface>& implPtr,
+    const fs::path& inputFile,
+    std::ostream* outStreamPtr = &std::cout,
+    bool doConsoleOut = false)
 {
     std::vector<std::string> imageFiles;
     std::vector<FaceImageQualityAssessment> faceImageQAs;
     std::vector<int> faceImageQAresultCodes;
-
-    fs::path inputFilePath(inputFile);
+    std::vector<int> faceImageQAassessmentTimes;
 
     if (fs::is_directory(fs::path(inputFile)))
     {
-        imageFiles = readImageFilesFromDirectory(inputFile);
+        imageFiles = readImageFilesFromDirectory(inputFile.generic_string());
     }
-    else if (std::string fileExt = inputFilePath.extension().string();
+    else if (std::string fileExt = inputFile.extension().string();
         isStringContained({ ".txt", ".csv" }, fileExt))
         // a list of image files
-        imageFiles = readFileLines(inputFile);
+        imageFiles = readFileLines(inputFile.generic_string());
     else
         // single image file
-        imageFiles.push_back(inputFile);
+        imageFiles.push_back(inputFile.generic_string());
 
     // process image file(s)
+    constexpr bool EXPORT_RAW = false;
+    constexpr bool EXPORT_SCALAR = true;
+    bool outputHeaderIn1stIter = true;
     for (auto const& imageFile: imageFiles)
     {
-        FaceImageQualityAssessment assessment;
-        int resCode = getQualityAssessmentResults(implPtr, imageFile, assessment);
-        faceImageQAresultCodes.push_back(resCode);
+        FaceImageQualityAssessment assessmentResult;
 
-        faceImageQAs.push_back(assessment);
+        int time_elapsed_ms = 0;
+        int resCode = getQualityAssessmentResults(implPtr, imageFile, assessmentResult, time_elapsed_ms);
+        faceImageQAresultCodes.push_back(resCode);
+        faceImageQAassessmentTimes.push_back(time_elapsed_ms);
+
+        faceImageQAs.push_back(assessmentResult);
 
         string strQAresRaw = exportAssessmentResultsToString(
-            assessment, false);
+            assessmentResult, EXPORT_RAW);
         string strQAresScalar = exportAssessmentResultsToString(
-            assessment, true);
+            assessmentResult, EXPORT_SCALAR);
 
-        cout << "raw scores:" << strQAresRaw << std::endl;
-        cout << "scalar scores:" << strQAresScalar << std::endl;
+        // output result of each file right after it was processed
+        if (outputHeaderIn1stIter)
+        {
+            // print the header. the format is the following
+            // "Filename", MeasurementName1, ..., MeasurementNameN, MeasurementName1.scalar, ..., MeasurementNameN.scalar
+            // Filename,      Measurement1.raw, ..., MeasurementN.raw, Measurement1.scalar, ..., MeasurementN.scalar
+            vector<string> measureNames;
+            vector<string> measureNamesScalar;
+            for (const auto& [measure, measure_result] : faceImageQAs[0].qAssessments)
+            {
+                auto mName = static_cast<std::string>(magic_enum::enum_name(measure));
+                measureNames.push_back(mName);
+                measureNamesScalar.push_back(mName + string(".scalar"));
+            }
+
+            *outStreamPtr << "Filename;";
+            for (const auto& mn : measureNames)
+                *outStreamPtr << mn << ';';
+            for (const auto& mn : measureNamesScalar)
+                *outStreamPtr << mn << ';';
+            *outStreamPtr << "assessment_time_in_ms;" << std::endl;
+
+            outputHeaderIn1stIter = false;
+        }
+
+        *outStreamPtr << imageFile << ';' << strQAresRaw << ';' << strQAresScalar << ';' << time_elapsed_ms << std::endl;
+
+        if (doConsoleOut)
+        {
+            std::cout << "-------------------------------------------------------" << std::endl;
+            std::cout << "Image file: '" << imageFile << "' has attributes:" << std::endl;
+            for (const auto& [measure, measure_result] : assessmentResult.qAssessments)
+            {
+                auto mName = static_cast<std::string>(magic_enum::enum_name(measure));
+                auto rawScore = measure_result.rawScore;
+                auto scalarScore = measure_result.scalar;
+                if (measure_result.code != QualityMeasureReturnCode::Success)
+                    scalarScore = -1;
+                std::cout << mName << "-> rawScore:  " << rawScore << "   scalar: " << scalarScore
+                    << std::endl;
+            }
+            std::cout << "-------------------------------------------------------" << std::endl;
+        }
     }
 
     if (faceImageQAs.empty())
@@ -172,65 +222,14 @@ int runQuality(
         return FAILURE;
     }
 
-    // export to csv file, output format is the folliwing
-    // "Filename", MeasurementName1, ..., MeasurementNameN, MeasurementName1.scalar, ..., MeasurementNameN.scalar
-    // Filename,      Measurement1.raw, ..., MeasurementN.raw, Measurement1.scalar, ..., MeasurementN.scalar
-    vector<string> measureNames;
-    vector<string> measureNamesScalar;
-    for (const auto& [measure, measure_result]: faceImageQAs[0].qAssessments)
-    {
-        auto mName = static_cast<std::string>(magic_enum::enum_name(measure));
-        measureNames.push_back(mName);
-        measureNamesScalar.push_back(mName+string(".scalar"));
-    }
-
-    *p_outStream << "Filename;";
-    for(const auto& mn: measureNames)
-        *p_outStream << mn << ';';
-    for (const auto& mn : measureNamesScalar)
-        *p_outStream << mn << ';';
-    //for (size_t i = 0; i < measureNames.size(); i++)
-    //    *outStream << measureNames[i] << ';';
-    //for (size_t i = 0; i < measureNamesScalar.size(); i++)
-    //    *outStream << measureNames[i] << ';';
-    *p_outStream << std::endl;
-
-    for (size_t i = 0; i < imageFiles.size(); i++)
-    {
-        string strQAresRaw = exportAssessmentResultsToString(
-            faceImageQAs[i], false);
-        string strQAresScalar = exportAssessmentResultsToString(
-            faceImageQAs[i], true);
-        
-        *p_outStream << imageFiles[i] << ';' << strQAresRaw << ';' << strQAresScalar << std::endl;
-
-#if 1                
-        std::cout << "-------------------------------------------------------" << std::endl;
-        std::cout << "Image file: '" << imageFiles[i] << "' has attributes:" << std::endl; 
-        for (const auto& [measure, measure_result] : faceImageQAs[i].qAssessments)
-        {
-            auto mName = static_cast<std::string>(magic_enum::enum_name(measure));
-            auto rawScore = measure_result.rawScore;
-            auto scalarScore = measure_result.scalar;
-            if (measure_result.code != QualityMeasureReturnCode::Success)
-            {
-                scalarScore = -1;
-            }
-
-            std::cout << mName << "-> rawScore:  " << rawScore << "   scalar: " << scalarScore
-                      << std::endl;
-        }
-        std::cout << "-------------------------------------------------------" << std::endl;
-#endif        
-    }
-    
     return SUCCESS;
 }
 
 int getQualityAssessmentResults(
-    std::shared_ptr<Interface>& implPtr,
+    const std::shared_ptr<Interface>& implPtr,
     const string& inputFile,
-    FaceImageQualityAssessment& assessments)
+    FaceImageQualityAssessment& assessments,
+    int & r_elapsed)
 {
     Image image;
     ReturnStatus retStatus = readImage(inputFile, image);
@@ -241,8 +240,12 @@ int getQualityAssessmentResults(
         return FAILURE;
     }
 
-    std::cout << "--> Start processing image file: " << inputFile << std::endl;
+    //std::cout << "--> Start processing image file: " << inputFile << std::endl;
+    auto start_time = std::chrono::high_resolution_clock::now();
     retStatus = implPtr->vectorQuality(image, assessments);
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    r_elapsed = static_cast<int>(elapsed.count());
 
     return retStatus.code == ReturnCode::Success ? SUCCESS : FAILURE;
 }
@@ -303,27 +306,29 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    string configDir{ "config" };
+    fs::path configDir("config");
     const char* outputFile = nullptr;
-    string inputFile;
-    string configFile;
+    fs::path inputFile;
+    fs::path configFile;
 
-    for (int i = 0; i < argc - requiredArgs; i++)
+    int i = 0;
+    while (i < argc - requiredArgs)
     {
         if (strcmp(argv[requiredArgs + i], "-c") == 0)
-            configDir = argv[requiredArgs + (++i)];
+            configDir = fs::path(argv[requiredArgs + (++i)]);
         else if (strcmp(argv[requiredArgs + i], "-o") == 0)
             outputFile = argv[requiredArgs + (++i)];
         else if (strcmp(argv[requiredArgs + i], "-i") == 0)
-            inputFile = argv[requiredArgs + (++i)];
+            inputFile = fs::path(argv[requiredArgs + (++i)]);
         else if (strcmp(argv[requiredArgs + i], "-cf") == 0)
-            configFile = argv[requiredArgs + (++i)];
+            configFile = fs::path(argv[requiredArgs + (++i)]);
         else
         {
             cerr << "[ERROR] Unrecognized flag: " << argv[requiredArgs + i] << endl;
             usage(argv[0]);
             return FAILURE;
         }
+        ++i;
     }
 
     if (fs::is_regular_file(configDir))
@@ -334,16 +339,18 @@ int main(int argc, char* argv[])
             return FAILURE;
         }
 
-        configFile = fs::path(configDir).filename().generic_string();
-        configDir = fs::path(configDir).parent_path().generic_string();
+        configFile = fs::path(configDir).filename();
+        configDir = fs::path(configDir).parent_path();
     }
 
     /* Get implementation pointer */
     auto implPtr = Interface::getImplementation();
     /* Initialization */
+    auto start_time = std::chrono::high_resolution_clock::now();
     auto ret = implPtr->initialize(
-        configDir,
-        configFile);
+        configDir.generic_string(),
+        configFile.generic_string());
+    auto end_time = std::chrono::high_resolution_clock::now();
 
     if (ret.code != ReturnCode::Success)
     {
@@ -351,6 +358,9 @@ int main(int argc, char* argv[])
              << ret.info << endl;
         return FAILURE;
     }
+
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "[INFO] Initialization took: " << elapsed.count() << "ms" << std::endl;
 
     int major;
     int minor;

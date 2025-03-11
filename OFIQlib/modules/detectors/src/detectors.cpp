@@ -34,7 +34,7 @@ namespace OFIQ_LIB
         FaceDetectorInterface::detectFaces(OFIQ_LIB::Session& session)
     {
         auto faces = UpdateFaces(session);
-        if (faces.size() == 0)
+        if (faces.empty())
             return faces;
 
         // sort by face box area, so that biggest face will be on the first index.

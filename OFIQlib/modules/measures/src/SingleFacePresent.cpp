@@ -45,8 +45,7 @@ namespace OFIQ_LIB::modules::measures
     void SingleFacePresent::Execute(OFIQ_LIB::Session & session)
     {
         float f = 1.0f;
-        const auto& m_detectedFaces = session.getDetectedFaces();
-        if (m_detectedFaces.size() == 0)
+        if (const auto& m_detectedFaces = session.getDetectedFaces(); m_detectedFaces.empty())
         {
             // This should never occur since many measures are set
             // to FailureToAssess if no face is detected and then this
@@ -62,7 +61,8 @@ namespace OFIQ_LIB::modules::measures
         else if (m_detectedFaces.size() > 1)
         {
             // Determine the two largest face bounding box areas
-            float a1 = 0.0f, a2 = 0.0f;
+            float a1 = 0.0f;
+            float a2 = 0.0f;
             for (auto& face : m_detectedFaces)
             {
                 float a = (float)face.width * (float)face.height;
