@@ -115,6 +115,6 @@ namespace OFIQ_LIB::modules::poseEstimators
          * @param biggestFace Input region to be cropped.
          * @return cv::Mat Cropped face region.
          */
-        cv::Mat CropImage(const cv::Mat& image, const OFIQ::BoundingBox& biggestFace);
+        cv::Mat CropImage(const cv::Mat& image, const OFIQ::BoundingBox& biggestFace) const;
     };
 }

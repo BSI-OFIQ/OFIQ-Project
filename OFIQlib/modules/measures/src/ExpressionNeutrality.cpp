@@ -58,7 +58,7 @@ namespace OFIQ_LIB::modules::measures
                 std::istreambuf_iterator<char>());
             m_onnxRuntimeEnvCNN1.initialize(modelData, dimCNN1, dimCNN1);
         }
-        catch (std::exception & e)
+        catch (std::exception&)
         {
             throw OFIQError(
                 OFIQ::ReturnCode::UnknownError,

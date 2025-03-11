@@ -60,8 +60,7 @@ namespace OFIQ_LIB
 
     std::vector<std::unique_ptr<Measure>> create_measures(
         const std::vector<OFIQ::QualityMeasure>& measures,
-        const Configuration& configuration,
-        OFIQ_LIB::Session& session)
+        const Configuration& configuration)
     {
         std::vector<std::unique_ptr<Measure>> measure_instances;
         for (auto m : measures)
@@ -73,9 +72,8 @@ namespace OFIQ_LIB
         return measure_instances;
     }
 
-    std::unique_ptr<Executor> OFIQImpl::CreateExecutor(Session& session)
+    std::unique_ptr<Executor> OFIQImpl::CreateExecutor()
     {
-
         std::vector<std::string> requested_measurs;
         if (!config->GetStringList("measures", requested_measurs) ||
             requested_measurs.empty())
@@ -101,7 +99,7 @@ namespace OFIQ_LIB
         // initialise measures
         
         return std::make_unique<Executor>(create_measures(
-            measures, *config, session));
+            measures, *config));
     }
 
     void OFIQImpl::CreateNetworks()

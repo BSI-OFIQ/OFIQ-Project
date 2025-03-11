@@ -165,11 +165,6 @@ namespace OFIQ_LIB::modules::segmentations
         /**
          * @brief Cropping parameter.
          */
-        const int m_cropTop = 0;
-
-        /**
-         * @brief Cropping parameter.
-         */
         const int m_cropBottom = 60;
         
         /**
@@ -206,6 +201,6 @@ namespace OFIQ_LIB::modules::segmentations
          * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing()
          * OFIQImpl::performPreprocessing()\endlink method.
          */
-        void SetImage(OFIQ_LIB::Session& session);
+        void SetImage(const OFIQ_LIB::Session& session);
     };
 }

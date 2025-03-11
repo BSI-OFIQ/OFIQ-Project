@@ -64,7 +64,7 @@ namespace OFIQ_LIB::modules::measures
                 std::istreambuf_iterator<char>());
             m_onnxRuntimeEnv.initialize(modelData, imageSize,imageSize); 
         }
-        catch (std::exception& e)
+        catch (std::exception&)
         {
             throw OFIQError(
                 OFIQ::ReturnCode::UnknownError,

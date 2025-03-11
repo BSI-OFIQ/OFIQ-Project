@@ -51,8 +51,8 @@ namespace OFIQ_LIB::modules::landmarks
         OFIQ::LandmarkPoint point;
         if (count > 0)
         {
-            point.x = static_cast<int32_t>(round(static_cast<float>(sumX) / static_cast<float>(count)));
-            point.y = static_cast<int32_t>(round(static_cast<float>(sumY) / static_cast<float>(count)));
+            point.x = static_cast<int16_t>(round(static_cast<float>(sumX) / static_cast<float>(count)));
+            point.y = static_cast<int16_t>(round(static_cast<float>(sumY) / static_cast<float>(count)));
         }
 
         return point;
@@ -80,8 +80,7 @@ namespace OFIQ_LIB::modules::landmarks
 
         double distance;
 
-        double cos_of_yaw = cos(yaw * M_PI / 180.0);
-        if (std::abs(cos_of_yaw) < EPS)
+        if (double cos_of_yaw = cos(yaw * M_PI / 180.0); std::abs(cos_of_yaw) < EPS)
         {
             distance = std::nan("");
         }
@@ -111,9 +110,9 @@ namespace OFIQ_LIB::modules::landmarks
             OFIQ::Landmarks eyeCorners = PartExtractor::getFacePart(faceLandmarks, FaceParts::LEFT_EYE_CORNERS);
             OFIQ::Landmarks rightEyeCorners = PartExtractor::getFacePart(faceLandmarks, FaceParts::RIGHT_EYE_CORNERS);
             eyeCorners.insert(eyeCorners.end(), rightEyeCorners.begin(), rightEyeCorners.end());
-            for (int i = 0; i < eyeCorners.size(); i++)
+            for (auto eyeCorner : eyeCorners)
             {
-                eyesMidpoint += cv::Point2f(eyeCorners[i].x, eyeCorners[i].y);
+                eyesMidpoint += cv::Point2f(eyeCorner.x, eyeCorner.y);
             }
             eyesMidpoint /= (int)eyeCorners.size();
 
@@ -122,9 +121,9 @@ namespace OFIQ_LIB::modules::landmarks
                 int chinIndex = 16;
                 chin = landmarkPoints[chinIndex];
                 std::vector<int> contourIndices = { 0, 7, 25, 32 };
-                for (int i = 0; i < contourIndices.size(); i++)
+                for (auto index : contourIndices)
                 {
-                    contour.push_back(landmarkPoints[contourIndices[i]]);
+                    contour.push_back(landmarkPoints[index]);
                 }
             }
             else

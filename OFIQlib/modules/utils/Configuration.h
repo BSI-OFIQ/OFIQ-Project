@@ -140,7 +140,7 @@ namespace OFIQ_LIB
          * @attention The configurations will not be updated when this method is called;
          * it causes only an update of an internal private path member.
          */
-        void SetDataDir(std::string dataDir);
+        void SetDataDir(std::string_view dataDir);
 
     private:
         /**

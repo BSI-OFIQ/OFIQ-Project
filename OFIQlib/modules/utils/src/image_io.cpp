@@ -54,7 +54,7 @@ namespace OFIQ_LIB
         image.height = static_cast<uint16_t>(cvImage.rows);
         image.depth = 24;
 
-        image.data = std::shared_ptr<uint8_t>(new uint8_t[image.size()]);
+        image.data = std::shared_ptr<uint8_t>(new uint8_t[image.size()], std::default_delete<uint8_t[]>());
         memcpy(image.data.get(), cvImage.data, image.size());
 
         return ReturnStatus(retCode, retStatusInfo);
@@ -62,28 +62,27 @@ namespace OFIQ_LIB
     
     OFIQ_EXPORT OFIQ::ReturnStatus readImage(const std::string& filename, OFIQ::Image& image)
     {
-        try
-        {
-            cv::Mat cvImage = cv::imread(filename, cv::IMREAD_COLOR);
-            
-            return copyImageData(cvImage, image);
-        }
-        catch (const std::exception&)
-        {
-            return ReturnStatus(ReturnCode::ImageReadingError, std::string("failed to read image file: ") + filename);
-        }
+        cv::Mat cvImage = cv::imread(filename, cv::IMREAD_COLOR);
+
+        if (cvImage.empty())
+            return ReturnStatus(
+                ReturnCode::ImageReadingError,
+                std::string("failed to read image file: ") + filename);
+
+        return copyImageData(cvImage, image);
     }
 
-    OFIQ_EXPORT OFIQ::ReturnStatus readImageFromByteArray(const std::vector<unsigned char>& byteArray, OFIQ::Image& image)
+    OFIQ_EXPORT OFIQ::ReturnStatus readImageFromByteArray(
+        const std::vector<unsigned char>& byteArray,
+        OFIQ::Image& image)
     {
-        try
-        {
-            cv::Mat cvImage = cv::imdecode(cv::Mat(byteArray), cv::IMREAD_COLOR);
-            return copyImageData(cvImage, image);
-        }
-        catch (const std::exception&)
-        {
-            return ReturnStatus(ReturnCode::ImageReadingError, std::string("failed to read image from byte array"));
-        }
+        cv::Mat cvImage = cv::imdecode(cv::Mat(byteArray), cv::IMREAD_COLOR);
+
+        if (cvImage.empty())
+            return ReturnStatus(
+                ReturnCode::ImageReadingError,
+                std::string("failed to read image from byte array"));
+
+        return copyImageData(cvImage, image);
     }
 }

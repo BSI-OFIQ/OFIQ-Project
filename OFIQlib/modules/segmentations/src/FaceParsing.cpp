@@ -59,7 +59,7 @@ namespace OFIQ_LIB::modules::segmentations
         }
     }
 
-    void FaceParsing::SetImage(OFIQ_LIB::Session& session)
+    void FaceParsing::SetImage(const OFIQ_LIB::Session& session)
     {
         cv::Mat inputImage = session.getAlignedFace();
         cv::Mat croppedImage = inputImage(
@@ -72,7 +72,6 @@ namespace OFIQ_LIB::modules::segmentations
         std::vector<float> net_input;
         net_input.assign(blob.begin<float>(), blob.end<float>());
 
-        size_t nbOutputNodes = m_onnxRuntimeEnv.getNumberOfOutputNodes();
         auto results = m_onnxRuntimeEnv.run(net_input);
         
         size_t useThisOutput = 0;
@@ -88,8 +87,8 @@ namespace OFIQ_LIB::modules::segmentations
         auto width = static_cast<int>(shape[3]);
 
         // Create a cv::Mat from the tensor data
-        int size[] = { batchSize, nbChannels, height, width};
-        auto mat = cv::Mat(4, size, CV_32FC1, elementPtr);
+        std::array<int, 4> size = { batchSize, nbChannels, height, width };
+        auto mat = cv::Mat(4, size.data(), CV_32FC1, elementPtr);
         
         std::vector<cv::Mat> out;
         cv::dnn::imagesFromBlob(mat, out);
@@ -116,7 +115,7 @@ namespace OFIQ_LIB::modules::segmentations
         }
 
         cv::Mat mask;
-        OFIQ::Image maskImage = OFIQ_LIB::MakeGreyImage(m_segmentationImage->cols, m_segmentationImage->rows);
+        OFIQ::Image maskImage = OFIQ_LIB::MakeGreyImage(static_cast<uint16_t>(m_segmentationImage->cols), static_cast<uint16_t>(m_segmentationImage->rows));
 
 
         if (OFIQ_LIB::modules::segmentations::SegmentClassLabels::face == faceSegment) {

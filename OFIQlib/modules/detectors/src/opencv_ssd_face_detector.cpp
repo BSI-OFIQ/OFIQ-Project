@@ -96,7 +96,12 @@ namespace OFIQ_LIB::modules::detectors
         {
             paddingHorizontal = static_cast<int>(faceImage.width * m_padding);
             paddingVertical = static_cast<int>(faceImage.height * m_padding);
-            cv::copyMakeBorder(cvImage, cvImage, paddingVertical, paddingVertical, paddingHorizontal, paddingHorizontal, BORDER_CONSTANT);
+            cv::Mat paddedImage{
+                cvImage.rows + paddingVertical * 2,
+                cvImage.cols + paddingHorizontal * 2,
+                cvImage.type() };
+            cv::copyMakeBorder(cvImage, paddedImage, paddingVertical, paddingVertical, paddingHorizontal, paddingHorizontal, BORDER_CONSTANT);
+            cvImage = paddedImage;
         }
 
         auto meanBGR = Scalar(104, 117, 123);
@@ -119,10 +124,10 @@ namespace OFIQ_LIB::modules::detectors
 
         std::vector<int> classIds;
         std::vector<float> confidences;
-        for (size_t k = 0; k < netOuts.size(); k++)
+        for (auto output : netOuts)
         {
-            const float* data = (float*)netOuts[k].data;
-            for (size_t i = 0; i < netOuts[k].total(); i += 7)
+            const float* data = (float*)output.data;
+            for (size_t i = 0; i < output.total(); i += 7)
             {
                 float confidence = data[i + 2];
                 float l = data[i + 3]; 

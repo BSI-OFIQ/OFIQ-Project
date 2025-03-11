@@ -86,15 +86,22 @@ namespace OFIQ_LIB
             o_bb.xleft += o_translation_vector.x;
             o_bb.ytop += o_translation_vector.y;
 
+            cv::Mat paddedImage{
+                i_input_image.rows + topBorder + bottomBorder,
+                i_input_image.cols + leftBorder + rightBorder,
+                i_input_image.type() };
+
             cv::copyMakeBorder(
                 i_input_image,
-                o_output_image,
+                paddedImage,
                 topBorder,
                 bottomBorder,
                 leftBorder,
                 rightBorder,
                 cv::BORDER_CONSTANT,
                 cv::Scalar(0, 0, 0));
+
+            o_output_image = paddedImage.clone();
         }
         else
         {
@@ -128,9 +135,9 @@ namespace OFIQ_LIB
             // extend width
 
             x_top_left_trans =
-                std::floor((x_bottom_right_orig + x_top_left_orig - i_bb.height) * 0.5);
+                static_cast<uint16_t>(std::floor((x_bottom_right_orig + x_top_left_orig - i_bb.height) * 0.5));
             x_bottom_right_trans =
-                std::ceil((x_bottom_right_orig + x_top_left_orig + i_bb.height) * 0.5);
+                static_cast<uint16_t>(std::ceil((x_bottom_right_orig + x_top_left_orig + i_bb.height) * 0.5));
 
             y_top_left_trans = y_top_left_orig;
             y_bottom_right_trans = y_bottom_right_orig;
@@ -142,9 +149,9 @@ namespace OFIQ_LIB
             x_bottom_right_trans = x_bottom_right_orig;
 
             y_top_left_trans =
-                std::floor((y_bottom_right_orig + y_top_left_orig - i_bb.width) * 0.5);
+                static_cast<uint16_t>(std::floor((y_bottom_right_orig + y_top_left_orig - i_bb.width) * 0.5));
             y_bottom_right_trans =
-                std::ceil((y_bottom_right_orig + y_top_left_orig + i_bb.width) * 0.5);
+                static_cast<uint16_t>(std::ceil((y_bottom_right_orig + y_top_left_orig + i_bb.width) * 0.5));
         }
 
         OFIQ::BoundingBox square(
@@ -181,7 +188,7 @@ namespace OFIQ_LIB
 
     OFIQ_EXPORT OFIQ::Image MakeGreyImage(uint16_t width, uint16_t height)
     {
-        std::shared_ptr<uint8_t> data{new uint8_t[width * height]};
+        std::shared_ptr<uint8_t> data{new uint8_t[width * height],std::default_delete<uint8_t[]>()};
         return {width, height, 8, data};
     }
 
@@ -251,25 +258,22 @@ namespace OFIQ_LIB
         srcPoints.at<float>(4, 0) = lmPoint.x;
         srcPoints.at<float>(4, 1) = lmPoint.y;
         // define reference points
-        float refData[10] = {251, 272, 364, 272, 308, 336, 262, 402, 355, 402};
-        auto refPoints = cv::Mat(5, 2, CV_32F, refData);
+        std::array<float, 10> refData = {251, 272, 364, 272, 308, 336, 262, 402, 355, 402};
+        auto refPoints = cv::Mat(5, 2, CV_32F, refData.data());
         // calculate transformation matrix and warp image
         transformationMatrix = cv::estimateAffinePartial2D(srcPoints, refPoints, {}, cv::LMEDS);
         cv::Mat bgrAlignedImage;
-        // cv::Mat alignedLandmarks = cv::Mat::zeros(landmarks.size(), CV_16UC1);;
         cv::warpAffine(bgrCvImage, bgrAlignedImage, transformationMatrix, cv::Size(616, 616));
-        for (int i = 0; i < faceLandmarks.landmarks.size(); i++)
+        for (auto landmark : faceLandmarks.landmarks)
         {
-            OFIQ::LandmarkPoint landmark = faceLandmarks.landmarks[i];
-            //cv::Point point{landmark.x, landmark.y};
             landmarks.push_back({ static_cast<float>(landmark.x), static_cast<float>(landmark.y) });
         }
         cv::transform(landmarks, alignedLandmarks, transformationMatrix);
         for (const auto& p : alignedLandmarks)
         {
             OFIQ::LandmarkPoint landmark;
-            landmark.x = round(p.x);
-            landmark.y = round(p.y);
+            landmark.x = static_cast<uint16_t>(round(p.x));
+            landmark.y = static_cast<uint16_t>(round(p.y));
             alignedFaceLandmarks.landmarks.push_back(landmark);
         }
         return bgrAlignedImage;
@@ -282,10 +286,10 @@ namespace OFIQ_LIB
         auto rightEyePoints =
             PartExtractor::getFacePart(faceLandmarks, FaceParts::RIGHT_EYE_CORNERS);
         assert(leftEyePoints.size() == 2 && rightEyePoints.size() == 2);
-        leftEyeCenter.x = round(leftEyePoints[0].x + 0.5 * (leftEyePoints[1].x - leftEyePoints[0].x));
-        leftEyeCenter.y = round(leftEyePoints[0].y + 0.5 * (leftEyePoints[1].y - leftEyePoints[0].y));
-        rightEyeCenter.x = round(rightEyePoints[0].x + 0.5 * (rightEyePoints[1].x - rightEyePoints[0].x));
-        rightEyeCenter.y = round(rightEyePoints[0].y + 0.5 * (rightEyePoints[1].y - rightEyePoints[0].y));
+        leftEyeCenter.x = static_cast<float>(round(leftEyePoints[0].x + 0.5 * (leftEyePoints[1].x - leftEyePoints[0].x)));
+        leftEyeCenter.y = static_cast<float>(round(leftEyePoints[0].y + 0.5 * (leftEyePoints[1].y - leftEyePoints[0].y)));
+        rightEyeCenter.x = static_cast<float>(round(rightEyePoints[0].x + 0.5 * (rightEyePoints[1].x - rightEyePoints[0].x)));
+        rightEyeCenter.y = static_cast<float>(round(rightEyePoints[0].y + 0.5 * (rightEyePoints[1].y - rightEyePoints[0].y)));
     }
 
     OFIQ_EXPORT float tmetric(const OFIQ::FaceLandmarks& faceLandmarks)
@@ -294,9 +298,10 @@ namespace OFIQ_LIB
         Point2f rightEyeCenter;
         calculateEyeCenter(faceLandmarks, leftEyeCenter, rightEyeCenter);
         OFIQ::Landmarks chinLandmarks = PartExtractor::getFacePart(faceLandmarks, FaceParts::CHIN);
-        cv::Point2f eyeMidpoint((leftEyeCenter.x + rightEyeCenter.x) / 2.0, (leftEyeCenter.y + rightEyeCenter.y) / 2.0);
+        cv::Point2f eyeMidpoint(static_cast<float>((leftEyeCenter.x + rightEyeCenter.x) / 2.0), 
+            static_cast<float>((leftEyeCenter.y + rightEyeCenter.y) / 2.0));
         cv::Point2f chin(chinLandmarks[0].x, chinLandmarks[0].y);
 
-        return cv::norm(chin - eyeMidpoint);
+        return static_cast<float>(cv::norm(chin - eyeMidpoint));
     }
 }

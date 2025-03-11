@@ -44,7 +44,7 @@ void ONNXRuntimeSegmentation::initialize(
 }
 
 
-size_t ONNXRuntimeSegmentation::getNumberOfOutputNodes()
+size_t ONNXRuntimeSegmentation::getNumberOfOutputNodes() const
 {
     return m_ortSession->GetOutputCount();
 }
