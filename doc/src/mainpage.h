@@ -984,7 +984,7 @@
  * </pre>
  *
  * @section sec_release_notes Release notes
- * This is OFIQ @ref sec_version_1_0_1. 
+ * This is OFIQ v1.0.2. 
  * The following table lists all measures and its implementation provided by this release of OFIQ. Details on the 
  * configuration and on requesting measures can be found
  * @ref sec_default_config "here". Note, the QAA identifiers listed in the table are defined in ISO/IEC 29794-5.
@@ -1179,53 +1179,6 @@
  * </table>
  *
  * @subsection sec_changelog Changelog
- * @subsubsection sec_version_1_0_1 Version 1.0.1 (2025-03-11)
- * <ul>
- *  <li>OFIQ::Image struct had no method to import deep copies from binary data. 
- *   This made in unpractical to use OFIQ using a binding such as Java/JNI. Now OFIQ::Images provides
- *   a method \link OFIQ::Image::deepcopy deepcopy\endlink for importing deep copies from binary data.
- *
- *   This change resolves https://github.com/BSI-OFIQ/OFIQ-Project/issues/63.
- *  </li>
- *  <li>
- *   Code quality improvements as per Sonaqube checks (do not affect conformance tests)
- *  </li>
- *  <li>
- *   Memory management refinements
- *  </li>
- *  <li>
- *   Fixes memory allocations when cv::copyMakeBorder from OpenCV is invoked
- *  </li>
- * </ul>
- * @subsubsection sec_version_1_0_0 Version 1.0.0 (2025-03-07)
- * First OFIQ release being the reference implementation for ISO/IEC 29794-5.
- * @subsubsection sec_version_1_0_0_rc2 Version 1.0.0-RC.2 (2024-07-31)
- * Second release of OFIQ's release candidate. The following changes have been implemented.
- * <ul>
- *  <li>Supports compilation on MacOS</li>
- *  <li>Successfully tested that it is possible (with some effort) to compile for and be conformant with mobile devices such as Android and iOS.</li>
- *  <li>Revisions as per up coming FDIS (e.g., quality mappings, update of conformance test table, etc.)</li>
- *  <li>Fix of the default config file: Changes to the CropOfTheFaceImage measures did not affect the quality mappings</li>
- *  <li>Fixes link to the OFIQ-MODELS.zip archive: https://github.com/BSI-OFIQ/OFIQ-Project/issues/12</li>
- *  <li>Removes libgtk dependency: https://github.com/BSI-OFIQ/OFIQ-Project/issues/18</li>
- *  <li>Removes Lapack from ubuntu cmake file which wasn't used: https://github.com/BSI-OFIQ/OFIQ-Project/issues/20</li>
- *  <li>Improves readability of source code by applying a style guide to member variables: https://github.com/BSI-OFIQ/OFIQ-Project/issues/27</li>
- *  <li>Fixes from static code analyses, for example:
- *   <ul>
- *    <li>https://github.com/BSI-OFIQ/OFIQ-Project/issues/28</li>
- *    <li>https://github.com/BSI-OFIQ/OFIQ-Project/issues/29</li>
- *    <li>https://github.com/BSI-OFIQ/OFIQ-Project/issues/30</li>
- *    <li>https://github.com/BSI-OFIQ/OFIQ-Project/issues/31</li>
- *    <li>and others</li>
- *   </ul>
- *  </li>
- *  <li>Removes mis-leading usage hint in the sample app: https://github.com/BSI-OFIQ/OFIQ-Project/issues/34</li>
- *  <li>Avoids redundant RGB conversions: https://github.com/BSI-OFIQ/OFIQ-Project/issues/36</li>
- *  <li>Fixes a bug on continuous OpenCV matrices: https://github.com/BSI-OFIQ/OFIQ-Project/issues/41</li>
- *  <li>Fixes further issues and bugs and code beautification</li>
- * </ul>
- * 
- * @subsubsection sec_version_1_0_0_rc1 Version 1.0.0-RC.1 (2024-03-15)
- * Initial release of OFIQ's release candidate.
+ * @includedoc "../../CHANGELOG.md"
  */
 #pragma once

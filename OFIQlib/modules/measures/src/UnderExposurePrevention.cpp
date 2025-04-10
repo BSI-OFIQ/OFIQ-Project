@@ -58,7 +58,7 @@ namespace OFIQ_LIB::modules::measures
         double rawScore = CalculateExposure(session, darkRange);
         if (std::isnan(rawScore))
         {
-            session.assessment().qAssessments[qualityMeasure] = { rawScore,-1,OFIQ::QualityMeasureReturnCode::FailureToAssess };
+            SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::FailureToAssess);
             return;
         }
         SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);

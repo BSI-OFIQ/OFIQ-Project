@@ -53,59 +53,88 @@ else(USE_CONAN)
     IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/build/MacOS/${CMAKE_BUILD_TYPE}/libonnxruntime.1.18.0.dylib
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/include/onnxruntime/core/session
 	)
-	add_library(OpenCV::core SHARED IMPORTED)
+	add_library(IlmImf STATIC IMPORTED)
+	set_target_properties(IlmImf PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/libIlmImf.a
+	)
+	add_library(ittnotify STATIC IMPORTED)
+	set_target_properties(ittnotify PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/libittnotify.a
+	)
+	add_library(libjpeg-turbo STATIC IMPORTED)
+	set_target_properties(libjpeg-turbo PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/liblibjpeg-turbo.a
+	)
+	add_library(libopenjp2 STATIC IMPORTED)
+	set_target_properties(libopenjp2 PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/liblibopenjp2.a
+	)
+	add_library(libpng STATIC IMPORTED)
+	set_target_properties(libpng PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/liblibpng.a
+	)
+	add_library(libprotobuf STATIC IMPORTED)
+	set_target_properties(libprotobuf PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/liblibprotobuf.a
+	)
+	add_library(tegra_hal STATIC IMPORTED)
+	set_target_properties(tegra_hal PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/libtegra_hal.a
+	)
+	add_library(zlib STATIC IMPORTED)
+	set_target_properties(zlib PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/libzlib.a
+	)
+	add_library(OpenCV::core STATIC IMPORTED)
 	set_target_properties(OpenCV::core PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_core.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_core.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_core.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::calib3d SHARED IMPORTED)
+	add_library(OpenCV::calib3d STATIC IMPORTED)
 	set_target_properties(OpenCV::calib3d PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_calib3d.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_calib3d.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_calib3d.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::imgcodecs SHARED IMPORTED)
+	add_library(OpenCV::imgcodecs STATIC IMPORTED)
 	set_target_properties(OpenCV::imgcodecs PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgcodecs.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgcodecs.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgcodecs.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::imgproc SHARED IMPORTED)
+	add_library(OpenCV::imgproc STATIC IMPORTED)
 	set_target_properties(OpenCV::imgproc PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgproc.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgproc.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgproc.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::highgui SHARED IMPORTED)
+	add_library(OpenCV::highgui STATIC IMPORTED)
 	set_target_properties(OpenCV::highgui PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_highgui.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_highgui.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_highgui.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::dnn SHARED IMPORTED)
+	add_library(OpenCV::dnn STATIC IMPORTED)
 	set_target_properties(OpenCV::dnn PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_dnn.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_dnn.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_dnn.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::ml SHARED IMPORTED)
+	add_library(OpenCV::ml STATIC IMPORTED)
 	set_target_properties(OpenCV::ml PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_ml.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_ml.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_ml.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::features2d SHARED IMPORTED)
+	add_library(OpenCV::features2d STATIC IMPORTED)
 	set_target_properties(OpenCV::features2d PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_features2d.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_features2d.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_features2d.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::flann SHARED IMPORTED)
+	add_library(OpenCV::flann STATIC IMPORTED)
 	set_target_properties(OpenCV::flann PROPERTIES
-		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_flann.dylib
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_flann.4.5.5.dylib
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_flann.a
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
+	)
+
+	add_library(OpenCV INTERFACE)
+	target_link_libraries(OpenCV INTERFACE OpenCV::calib3d OpenCV::imgcodecs OpenCV::highgui
+		OpenCV::dnn OpenCV::ml OpenCV::features2d OpenCV::flann OpenCV::imgproc OpenCV::core IlmImf ittnotify libjpeg-turbo 
+		libopenjp2 libpng libprotobuf tegra_hal zlib
 	)
 endif(USE_CONAN)
 
@@ -115,61 +144,7 @@ add_definitions(-DOFIQ_EXPORTS)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-list(APPEND PUBLIC_HEADER_LIST 
-	${OFIQLIB_SOURCE_DIR}/include/ofiq_lib.h
-	${OFIQLIB_SOURCE_DIR}/include/ofiq_structs.h
-)
-
-list(APPEND libImplementationSources 
-	${OFIQLIB_SOURCE_DIR}/src/OFIQImpl.cpp
-	${OFIQLIB_SOURCE_DIR}/src/OFIQInitialization.cpp
-)
-
-list(APPEND module_sources 
-	${OFIQLIB_SOURCE_DIR}/modules/detectors/src/detectors.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/detectors/src/opencv_ssd_face_detector.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/landmarks/src/adnet_landmarks.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/landmarks/src/FaceMeasures.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/landmarks/src/landmarks.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/landmarks/src/PartExtractor.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/BackgroundUniformity.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/CompressionArtifacts.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/DynamicRange.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/Executor.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/ExpressionNeutrality.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/EyesOpen.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/EyesVisible.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/FaceOcclusionPrevention.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/CropOfTheFaceImage.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/UnifiedQualityScore.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/IlluminationUniformity.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/InterEyeDistance.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/Luminance.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/Measure.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/MeasureFactory.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/MouthOcclusionPrevention.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/MouthClosed.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/NoHeadCoverings.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/OverExposurePrevention.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/UnderExposurePrevention.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/HeadSize.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/HeadPose.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/Sharpness.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/SingleFacePresent.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/measures/src/NaturalColour.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/poseEstimators/src/HeadPose3DDFAV2.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/poseEstimators/src/poseEstimators.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/segmentations/src/ONNXRTSegmentation.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/segmentations/src/FaceParsing.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/segmentations/src/FaceOcclusionSegmentation.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/segmentations/src/segmentations.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/utils/src/Configuration.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/utils/src/OFIQError.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/utils/src/image_io.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/utils/src/image_utils.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/utils/src/Session.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/utils/src/utils.cpp
-)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SourceDefinition.cmake)
 
 if(USE_CONAN)
 	list(APPEND OFIQ_LINK_LIB_LIST 
@@ -181,16 +156,8 @@ if(USE_CONAN)
 else(USE_CONAN)
 	list(APPEND OFIQ_LINK_LIB_LIST
 		onnxruntime
-		OpenCV::core
-		OpenCV::calib3d
-		OpenCV::imgcodecs
-		OpenCV::imgproc
-		OpenCV::highgui
-		OpenCV::dnn
-		OpenCV::ml
-		OpenCV::features2d
-		OpenCV::flann
-		)
+		OpenCV
+	)
 endif(USE_CONAN)
 
 add_library (ofiq_objlib OBJECT
@@ -202,14 +169,14 @@ add_library (ofiq_objlib OBJECT
 
 target_link_libraries(ofiq_objlib
 	PRIVATE ${OFIQ_LINK_LIB_LIST}
-	)
+)
 
 
 add_library(ofiq_lib SHARED $<TARGET_OBJECTS:ofiq_objlib>)
 
 target_link_libraries(ofiq_lib
 	PRIVATE ${OFIQ_LINK_LIB_LIST}
-	)
+)
 
 
 # add a test application
@@ -221,8 +188,8 @@ target_link_libraries(OFIQSampleApp
 
 
 set_target_properties(ofiq_lib 
-        PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
-        )
+    PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
+)
 
 MESSAGE( STATUS "INSTALLING TARGETS ...")
 

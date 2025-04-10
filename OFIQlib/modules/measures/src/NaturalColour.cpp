@@ -107,6 +107,12 @@ namespace OFIQ_LIB::modules::measures
         cv::Mat reducedImage = ReduceImageToRegionOfInterest(maskedImage, leftRegionOfInterest, rightRegionOfInterest);
         double meanChannelA;
         double meanChannelB;
+        if (reducedImage.empty())
+        {
+            double D = 100.0;
+            SetQualityMeasure(session, qualityMeasure, D, OFIQ::QualityMeasureReturnCode::FailureToAssess);
+            return;
+        }
         ConvertBGRToCIELAB(reducedImage, meanChannelA, meanChannelB);
         double rawScore = CalculateScore(meanChannelA, meanChannelB);
         SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);

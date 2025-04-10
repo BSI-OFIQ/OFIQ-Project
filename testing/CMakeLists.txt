@@ -2,11 +2,6 @@ message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
 if(USE_CONAN)
 	find_package(GTest REQUIRED)
-
-        if(${OS} STREQUAL "windows")
-                get_property(IMPORTED_LIB_LOCATION TARGET onnxruntime PROPERTY IMPORTED_LOCATION)
-                install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION ${CMAKE_BINARY_DIR}/Testing/${CMAKE_BUILD_TYPE}/)
-        endif(${OS} STREQUAL "windows")
 else(USE_CONAN)
         if(${OS} STREQUAL "windows")
                 add_library(GTest::gtest SHARED IMPORTED)
@@ -27,11 +22,10 @@ else(USE_CONAN)
                         GTest::gtest
                         GTest::gtest_main
                 )
-
-                foreach(lib ${OFIQ_LINK_LIB_LIST})
-                        get_property(IMPORTED_LIB_LOCATION TARGET ${lib} PROPERTY IMPORTED_LOCATION)
-                        install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION ${CMAKE_BINARY_DIR}/Testing/${CMAKE_BUILD_TYPE}/)
-                endforeach(lib ${OFIQ_LINK_LIB_LIST})
+                get_property(IMPORTED_LIB_LOCATION TARGET GTest::gtest PROPERTY IMPORTED_LOCATION)
+                install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION ${CMAKE_BINARY_DIR}/Testing/${CMAKE_BUILD_TYPE}/)
+                get_property(IMPORTED_LIB_LOCATION TARGET GTest::gtest_main PROPERTY IMPORTED_LOCATION)
+                install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION ${CMAKE_BINARY_DIR}/Testing/${CMAKE_BUILD_TYPE}/)
         elseif(${OS} STREQUAL "linux")
                 add_library(GTest::gtest SHARED IMPORTED)
                 set_target_properties(GTest::gtest PROPERTIES
@@ -62,6 +56,11 @@ else(USE_CONAN)
                 )
         endif(${OS} STREQUAL "windows")
 endif(USE_CONAN)
+
+if(${OS} STREQUAL "windows")
+        get_property(IMPORTED_LIB_LOCATION TARGET onnxruntime PROPERTY IMPORTED_LOCATION)
+        install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION ${CMAKE_BINARY_DIR}/Testing/${CMAKE_BUILD_TYPE}/)
+endif(${OS} STREQUAL "windows")
 
 include(GoogleTest)
 
