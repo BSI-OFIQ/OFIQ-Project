@@ -54,7 +54,7 @@ namespace OFIQ_LIB
         image.height = static_cast<uint16_t>(cvImage.rows);
         image.depth = 24;
 
-        image.data = std::shared_ptr<uint8_t>(new uint8_t[image.size()], std::default_delete<uint8_t[]>());
+        image.data = std::shared_ptr<uint8_t[]>(new uint8_t[image.size()]);
         memcpy(image.data.get(), cvImage.data, image.size());
 
         return ReturnStatus(retCode, retStatusInfo);
