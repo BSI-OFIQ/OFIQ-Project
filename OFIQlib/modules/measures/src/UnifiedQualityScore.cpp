@@ -29,7 +29,7 @@
 #include "OFIQError.h"
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
-#include <fstream>
+#include "data_source.h"
 
 namespace OFIQ_LIB::modules::measures
 {
@@ -57,7 +57,7 @@ namespace OFIQ_LIB::modules::measures
 
             std::string modelPath = configuration.getDataDir()+"/"+configuration.GetString(paramModelpath);
 
-            std::ifstream instream(modelPath, std::ios::in | std::ios::binary);
+            data_source instream(modelPath, std::ios::in | std::ios::binary);
 
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),

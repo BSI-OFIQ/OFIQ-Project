@@ -31,6 +31,8 @@
 #include "utils.h"
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
+#include <iterator>
+#include "data_source.h"
 
 namespace OFIQ_LIB::modules::measures
 {
@@ -56,7 +58,9 @@ namespace OFIQ_LIB::modules::measures
         {
             try
             {
-                m_rtree = cv::ml::RTrees::load(configuration.getDataDir() + "/" + m_modelFile);
+                data_source modelstream(configuration.getDataDir() + "/" + m_modelFile);
+                std::string model(std::istreambuf_iterator<char>(modelstream), {});
+                m_rtree = cv::ml::RTrees::loadFromString<cv::ml::RTrees>(model);
             }
             catch (const std::exception&)
             {

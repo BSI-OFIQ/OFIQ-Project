@@ -28,9 +28,10 @@
 
 #include "OFIQError.h"
 #include <filesystem>
-#include <fstream>
+#include <istream>
 #include <magic_enum.hpp>
 #include <tao/json.hpp>
+#include "data_source.h"
 
 namespace fs = std::filesystem;
 using jType = tao::json::type;
@@ -58,6 +59,33 @@ namespace OFIQ_LIB
         }
     }
 
+#ifdef ANDROID
+    Configuration::Configuration(struct ::AAssetManager* assetManager, const std::string& configDir,  const std::string& configFilename)
+    {
+	if( assetManager == nullptr )
+            throw std::runtime_error("android asset manager is null");
+
+        SetAAssetManager(assetManager);
+        
+        m_dataDir = configDir;
+
+        fs::path fullConfPath;
+        fs::path pathConfFilename;
+        
+        // use default fileName 'ofiq_config.jaxn' if no configFilename was given
+        pathConfFilename = configFilename.empty() ? fs::path("ofiq_config.jaxn") : fs::path(configFilename);
+        
+        fullConfPath = pathConfFilename.parent_path().empty() ? configDir / pathConfFilename : pathConfFilename;
+
+	data_source istream(fullConfPath.string());
+        if(!istream.good())
+            throw std::runtime_error("Invalid path to config file: %s" + fullConfPath.string());
+
+        std::string source;
+        tao::json::value jsonValue = tao::json::jaxn::from_stream(istream, source);
+        ParseObject(parameters, jsonValue["config"], "");
+    }
+#else
     Configuration::Configuration(const std::string& configDir, const std::string& configFilename)
     {
         fs::path configDirPath(configDir);
@@ -72,7 +100,7 @@ namespace OFIQ_LIB
         fullConfPath = pathConfFilename.parent_path().empty() ?
             fs::weakly_canonical(configDirPath / pathConfFilename) : pathConfFilename;
 
-        std::ifstream istream(fullConfPath.string());
+        data_source istream(fullConfPath.string());
         if(!istream.good())
             throw std::invalid_argument("Invalid path to config file: " + fullConfPath.string());
 
@@ -81,7 +109,7 @@ namespace OFIQ_LIB
         ParseObject(parameters, jsonValue["config"], "");
 
     }
-
+#endif
     std::string Configuration::getDataDir() const {
         return m_dataDir.string();
     }

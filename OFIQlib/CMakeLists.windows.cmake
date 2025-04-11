@@ -175,6 +175,7 @@ list(APPEND module_sources
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/image_utils.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/Session.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/utils.cpp
+	${OFIQLIB_SOURCE_DIR}/modules/utils/src/data_source.cpp
 )
 
 list(APPEND module_headers
@@ -230,6 +231,7 @@ list(APPEND module_headers
 	${OFIQLIB_SOURCE_DIR}/modules/utils/NeuronalNetworkContainer.h
 	${OFIQLIB_SOURCE_DIR}/modules/utils/Session.h
 	${OFIQLIB_SOURCE_DIR}/modules/utils/utils.h
+	${OFIQLIB_SOURCE_DIR}/modules/utils/data_source.h
 )
 
 if(USE_CONAN)

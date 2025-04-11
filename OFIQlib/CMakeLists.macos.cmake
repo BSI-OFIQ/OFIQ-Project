@@ -169,6 +169,7 @@ list(APPEND module_sources
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/image_utils.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/Session.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/utils.cpp
+	${OFIQLIB_SOURCE_DIR}/modules/utils/src/data_source.cpp
 )
 
 if(USE_CONAN)

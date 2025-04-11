@@ -42,6 +42,28 @@ using namespace OFIQ_LIB::modules::measures;
 
 OFIQImpl::OFIQImpl():m_emptySession({this->dummyImage, this->dummyAssement}) {}
 
+#ifdef ANDROID
+ReturnStatus OFIQImpl::initialize(::AAssetManager* assetManager, const std::string& configDir, const std::string& configFilename)
+{
+    try
+    {
+        this->config = std::make_unique<Configuration>(assetManager, configDir, configFilename);
+        CreateNetworks();
+        m_executorPtr = CreateExecutor(m_emptySession);
+    }
+    catch (const OFIQError & ex)
+    {
+        return {ex.whatCode(), ex.what()};
+    }
+    catch (const std::exception & ex)
+    {
+        return {ReturnCode::UnknownError, ex.what()};
+    }
+
+    return ReturnStatus(ReturnCode::Success);
+}
+
+#else
 ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::string& configFilename)
 {
     try
@@ -61,6 +83,7 @@ ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::strin
 
     return ReturnStatus(ReturnCode::Success);
 }
+#endif
 
 ReturnStatus OFIQImpl::scalarQuality(const OFIQ::Image& face, double& quality)
 {

@@ -29,7 +29,7 @@
 #include "FaceMeasures.h"
 #include "FaceParts.h"
 
-#include <fstream>
+#include "data_source.h"
 
 namespace OFIQ_LIB::modules::measures
 {
@@ -67,7 +67,7 @@ namespace OFIQ_LIB::modules::measures
 
         try
         {
-            std::ifstream instream(modelPath, std::ios::in | std::ios::binary);
+            data_source instream(modelPath, std::ios::in | std::ios::binary);
 
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
