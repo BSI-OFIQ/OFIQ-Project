@@ -28,7 +28,7 @@
 #include "OFIQError.h"
 #include "utils.h"
 #include <string>
-#include <fstream>
+#include "data_source.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -42,7 +42,7 @@ namespace OFIQ_LIB::modules::segmentations
         
         try
         {
-            std::ifstream instream(modelPath, std::ios::in | std::ios::binary);
+            data_source instream(modelPath, std::ios::in | std::ios::binary);
 
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),

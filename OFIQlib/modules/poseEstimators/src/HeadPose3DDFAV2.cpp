@@ -31,7 +31,7 @@
 #include "FaceMeasures.h"
 #include "AllPoseEstimators.h"
 #include "utils.h"
-#include <fstream>
+#include "data_source.h"
 
 namespace OFIQ_LIB::modules::poseEstimators
 {
@@ -49,7 +49,7 @@ namespace OFIQ_LIB::modules::poseEstimators
             config.getDataDir() + "/" + config.GetString(m_paramPoseEstimatorModel);
         try
         {
-            std::ifstream instream(modelPath, std::ios::in | std::ios::binary);
+            data_source instream(modelPath, std::ios::in | std::ios::binary);
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());

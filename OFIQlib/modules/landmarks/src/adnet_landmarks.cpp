@@ -27,9 +27,9 @@
 #include "adnet_landmarks.h"
 #include "OFIQError.h"
 #include "utils.h"
+#include "data_source.h"
 
 #include <algorithm>
-#include <fstream>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -244,10 +244,9 @@ namespace OFIQ_LIB::modules::landmarks
             const auto modelPath =
                 config.getDataDir() + "/" + config.GetString("params.landmarks.ADNet.model_path");
 
-            std::ifstream instream(modelPath, std::ios::in | std::ios::binary);
-            std::vector<uint8_t> modelData(
-                (std::istreambuf_iterator<char>(instream)),
-                std::istreambuf_iterator<char>());
+
+            data_source instream(modelPath, std::ios::in | std::ios::binary);
+            std::vector<uint8_t> modelData( (std::istreambuf_iterator<char>(instream)), std::istreambuf_iterator<char>());
 
             landmarkExtractor_->init_session(modelData);
         }

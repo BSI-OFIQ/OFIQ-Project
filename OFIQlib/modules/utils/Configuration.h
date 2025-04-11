@@ -35,6 +35,10 @@
 #include <tao/json/forward.hpp>
 #include <tao/json/value.hpp>
 
+#ifdef ANDROID
+struct AAssetManager;
+#endif
+
  /**
   * Namespace for OFIQ implementations.
   */
@@ -49,6 +53,14 @@ namespace OFIQ_LIB
     class Configuration
     {
     public:
+#ifdef ANDROID
+        /**
+         * @brief Constructor. 
+         * @param assetManager from the android application
+         * @param configFilename Name of the JAXN configuration file in <code>configDir</code>.
+         */
+        Configuration(struct ::AAssetManager* assetManager, const std::string& configDir, const std::string& configFilename);
+#else
         /**
          * @brief Constructor. 
          * @param configDir Directory from which a JAXN configuration is read. The path
@@ -56,7 +68,7 @@ namespace OFIQ_LIB
          * @param configFilename Name of the JAXN configuration file in <code>configDir</code>.
          */
         Configuration(const std::string& configDir, const std::string& configFilename);
-
+#endif
         /**
          * @brief Accesses a boolean configuration.
          * @param key Key of the configuration.

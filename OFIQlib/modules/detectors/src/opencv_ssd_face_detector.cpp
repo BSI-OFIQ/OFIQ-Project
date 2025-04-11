@@ -31,6 +31,9 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <cmath>
+#include <iterator>
+
+#include "data_source.h"
 
 using namespace OFIQ;
 using namespace cv;
@@ -59,8 +62,13 @@ namespace OFIQ_LIB::modules::detectors
 
         try
         {
+	    data_source protostream(fileNameProtoTxt);
+	    std::vector<unsigned char> prototxt( (std::istreambuf_iterator<char>(protostream)), std::istreambuf_iterator<char>());
+	    data_source caffestream(fileNameCaffeModel);
+	    std::vector<unsigned char> caffemodel((std::istreambuf_iterator<char>(caffestream)), std::istreambuf_iterator<char>());
+
             m_dnnNet =
-                make_shared<dnn::Net>(dnn::readNetFromCaffe(fileNameProtoTxt, fileNameCaffeModel));
+                make_shared<dnn::Net>(dnn::readNetFromCaffe(prototxt, caffemodel));
         }
         catch (const std::exception&)
         {

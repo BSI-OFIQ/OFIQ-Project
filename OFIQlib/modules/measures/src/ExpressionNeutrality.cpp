@@ -27,7 +27,8 @@
 #include "ExpressionNeutrality.h"
 #include "FaceMeasures.h"
 #include "OFIQError.h"
-#include <fstream>
+#include "data_source.h"
+
 #include <opencv2/ml.hpp>
 #include <cmath>
 
@@ -51,7 +52,7 @@ namespace OFIQ_LIB::modules::measures
         
         try
         {
-            std::ifstream instream(modelPathCNN1, std::ios::in | std::ios::binary);
+            data_source instream(modelPathCNN1, std::ios::in | std::ios::binary);
 
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
@@ -67,7 +68,7 @@ namespace OFIQ_LIB::modules::measures
 
         try
         {
-            std::ifstream instream(modelPathCNN2, std::ios::in | std::ios::binary);
+            data_source instream(modelPathCNN2, std::ios::in | std::ios::binary);
 
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
@@ -83,7 +84,9 @@ namespace OFIQ_LIB::modules::measures
 
         try
         {
-            m_classifier = cv::ml::Boost::load(modelPathAdaboost);
+            data_source instream(modelPathAdaboost);
+            std::string model(std::istreambuf_iterator<char>(instream), {});
+            m_classifier = cv::ml::Boost::loadFromString<cv::ml::Boost>(cv::String(model));
         }
         catch (const std::exception&)
         {
