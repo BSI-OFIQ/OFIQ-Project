@@ -59,7 +59,15 @@ namespace OFIQ_LIB::modules::measures
 
     void Measure::SetQualityMeasure(OFIQ_LIB::Session& session, OFIQ::QualityMeasure measure, double rawScore, OFIQ::QualityMeasureReturnCode code)
     {
-        auto scalarScore = ExecuteScalarConversion(measure, rawScore);
+        double scalarScore;
+        if (code == OFIQ::QualityMeasureReturnCode::FailureToAssess)
+        {
+            scalarScore = -1.0;
+        }
+        else
+        {
+            scalarScore = ExecuteScalarConversion(measure, rawScore);
+        }
         session.assessment().qAssessments[measure] = {rawScore, scalarScore, code};
     }
 

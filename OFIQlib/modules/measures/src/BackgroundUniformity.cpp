@@ -106,7 +106,11 @@ namespace OFIQ_LIB::modules::measures
         // if B has only zeroes, i.e. the background mask is empty,
         // can break at this point
         if (int nNonZeroBg = cv::countNonZero(B); nNonZeroBg == 0)
-            return SetQualityMeasure(session, qualityMeasure, 0, OFIQ::QualityMeasureReturnCode::FailureToAssess);
+        {
+            double rawScore = 0.0;
+            SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::FailureToAssess);
+            return;
+        }
 
         // Step 8. Compute the luminance image L for image I as specified in ISO/IEC CD2 29794-5:2023 [1].
         // Each pixel value is encoded as an integer value between 0 (black) and 255 (white)

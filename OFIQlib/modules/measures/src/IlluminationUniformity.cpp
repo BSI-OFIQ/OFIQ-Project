@@ -69,6 +69,13 @@ namespace OFIQ_LIB::modules::measures
         auto leftRegion = luminanceImage(leftRegionOfInterest);
         auto rightRegion = luminanceImage(rightRegionOfInterest);
 
+        if (leftRegion.empty() || rightRegion.empty())
+        {
+            double rawScore = 0.0;
+            SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::FailureToAssess);
+            return;
+        }
+
         // Compute the normalized luminance histograms for RMZ and LMZ
         cv::Mat1f leftHistogram;
         cv::Mat1f rightHistogram;

@@ -6,8 +6,8 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/build/conan")
 
 set(CMAKE_CXX_STANDARD 17)
 
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,@executable_path")
-set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath,@loader_path")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath='$ORIGIN'")
+set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath='$ORIGIN'")
 
 # Configure built shared libraries in top-level lib directory
 set (OFIQLIB_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/OFIQlib)
@@ -18,7 +18,7 @@ list(FILTER include_modules EXCLUDE REGEX "/src$")
 include_directories (
 	${OFIQLIB_SOURCE_DIR}/include
 	${CMAKE_CURRENT_SOURCE_DIR}/extern/thirdParty
-	${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-osx-universal2-1.17.3/include
+	${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-aarch64-1.17.3/include
 	${include_modules}
 )
 
@@ -29,11 +29,11 @@ if(USE_CONAN)
 	find_package(magic_enum REQUIRED)
 
 	add_library(onnxruntime SHARED IMPORTED)
-    set_target_properties(onnxruntime PROPERTIES
-    IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-osx-universal2-1.17.3/lib/libonnxruntime.dylib
-    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-osx-universal2-1.17.3/lib/libonnxruntime.1.17.3.dylib
-    INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-osx-universal2-1.17.3/include
-    )
+	set_target_properties(onnxruntime PROPERTIES
+	IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-aarch64-1.17.3/lib/libonnxruntime.so
+	IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-aarch64-1.17.3/lib/libonnxruntime.so.1.17.3
+	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-aarch64-1.17.3/include
+	)
 else(USE_CONAN)
 	list(APPEND OFIQ_LINK_INCLUDE_LIST 
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/flatbuffers/include"
@@ -46,95 +46,66 @@ else(USE_CONAN)
 	include_directories(
         ${OFIQ_LINK_INCLUDE_LIST}
 	)
-
-    add_library(onnxruntime SHARED IMPORTED)
-    set_target_properties(onnxruntime PROPERTIES
-    IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/build/MacOS/${CMAKE_BUILD_TYPE}/libonnxruntime.dylib
-    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/build/MacOS/${CMAKE_BUILD_TYPE}/libonnxruntime.1.18.0.dylib
+	
+	add_library(onnxruntime SHARED IMPORTED)
+	set_target_properties(onnxruntime PROPERTIES
+	IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/build/Linux/${CMAKE_BUILD_TYPE}/libonnxruntime.so
+	IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/build/Linux/${CMAKE_BUILD_TYPE}/libonnxruntime.so.1.18.0
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/include/onnxruntime/core/session
 	)
-	add_library(IlmImf STATIC IMPORTED)
-	set_target_properties(IlmImf PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/libIlmImf.a
-	)
-	add_library(ittnotify STATIC IMPORTED)
-	set_target_properties(ittnotify PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/libittnotify.a
-	)
-	add_library(libjpeg-turbo STATIC IMPORTED)
-	set_target_properties(libjpeg-turbo PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/liblibjpeg-turbo.a
-	)
-	add_library(libopenjp2 STATIC IMPORTED)
-	set_target_properties(libopenjp2 PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/liblibopenjp2.a
-	)
-	add_library(libpng STATIC IMPORTED)
-	set_target_properties(libpng PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/liblibpng.a
-	)
-	add_library(libprotobuf STATIC IMPORTED)
-	set_target_properties(libprotobuf PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/liblibprotobuf.a
-	)
-	add_library(tegra_hal STATIC IMPORTED)
-	set_target_properties(tegra_hal PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/libtegra_hal.a
-	)
-	add_library(zlib STATIC IMPORTED)
-	set_target_properties(zlib PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/opencv4/3rdparty/libzlib.a
-	)
-	add_library(OpenCV::core STATIC IMPORTED)
+	add_library(OpenCV::core SHARED IMPORTED)
 	set_target_properties(OpenCV::core PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_core.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_core.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_core.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::calib3d STATIC IMPORTED)
+	add_library(OpenCV::calib3d SHARED IMPORTED)
 	set_target_properties(OpenCV::calib3d PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_calib3d.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_calib3d.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_calib3d.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::imgcodecs STATIC IMPORTED)
+	add_library(OpenCV::imgcodecs SHARED IMPORTED)
 	set_target_properties(OpenCV::imgcodecs PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgcodecs.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgcodecs.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgcodecs.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::imgproc STATIC IMPORTED)
+	add_library(OpenCV::imgproc SHARED IMPORTED)
 	set_target_properties(OpenCV::imgproc PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgproc.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgproc.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_imgproc.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::highgui STATIC IMPORTED)
+	add_library(OpenCV::highgui SHARED IMPORTED)
 	set_target_properties(OpenCV::highgui PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_highgui.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_highgui.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_highgui.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::dnn STATIC IMPORTED)
+	add_library(OpenCV::dnn SHARED IMPORTED)
 	set_target_properties(OpenCV::dnn PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_dnn.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_dnn.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_dnn.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::ml STATIC IMPORTED)
+	add_library(OpenCV::ml SHARED IMPORTED)
 	set_target_properties(OpenCV::ml PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_ml.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_ml.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_ml.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::features2d STATIC IMPORTED)
+	add_library(OpenCV::features2d SHARED IMPORTED)
 	set_target_properties(OpenCV::features2d PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_features2d.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_features2d.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_features2d.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
 	)
-	add_library(OpenCV::flann STATIC IMPORTED)
+	add_library(OpenCV::flann SHARED IMPORTED)
 	set_target_properties(OpenCV::flann PROPERTIES
-		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_flann.a
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_flann.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/lib/libopencv_flann.so.4.5.5
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/include/opencv4
-	)
-
-	add_library(OpenCV INTERFACE)
-	target_link_libraries(OpenCV INTERFACE OpenCV::calib3d OpenCV::imgcodecs OpenCV::highgui
-		OpenCV::dnn OpenCV::ml OpenCV::features2d OpenCV::flann OpenCV::imgproc OpenCV::core IlmImf ittnotify libjpeg-turbo 
-		libopenjp2 libpng libprotobuf tegra_hal zlib
 	)
 endif(USE_CONAN)
 
@@ -156,8 +127,16 @@ if(USE_CONAN)
 else(USE_CONAN)
 	list(APPEND OFIQ_LINK_LIB_LIST
 		onnxruntime
-		OpenCV
-	)
+		OpenCV::core
+		OpenCV::calib3d
+		OpenCV::imgcodecs
+		OpenCV::imgproc
+		OpenCV::highgui
+		OpenCV::dnn
+		OpenCV::ml
+		OpenCV::features2d
+		OpenCV::flann
+		)
 endif(USE_CONAN)
 
 add_library (ofiq_objlib OBJECT
@@ -169,15 +148,14 @@ add_library (ofiq_objlib OBJECT
 
 target_link_libraries(ofiq_objlib
 	PRIVATE ${OFIQ_LINK_LIB_LIST}
-)
+	)
 
 
 add_library(ofiq_lib SHARED $<TARGET_OBJECTS:ofiq_objlib>)
 
 target_link_libraries(ofiq_lib
 	PRIVATE ${OFIQ_LINK_LIB_LIST}
-)
-
+	)
 
 # add a test application
 add_executable(OFIQSampleApp ${OFIQLIB_SOURCE_DIR}/src/OFIQSampleApp.cpp)
@@ -188,8 +166,8 @@ target_link_libraries(OFIQSampleApp
 
 
 set_target_properties(ofiq_lib 
-    PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
-)
+        PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
+        )
 
 MESSAGE( STATUS "INSTALLING TARGETS ...")
 
@@ -231,7 +209,6 @@ install(TARGETS ofiq_lib
 install(TARGETS ofiq_lib
 	CONFIGURATIONS Debug
     DESTINATION Debug/bin
-    PUBLIC_HEADER DESTINATION include/
 )
 
 install(FILES "$<TARGET_FILE_DIR:ofiq_lib>/ofiq_lib.pdb" DESTINATION "Debug/bin" OPTIONAL)

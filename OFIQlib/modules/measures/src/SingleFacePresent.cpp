@@ -50,8 +50,8 @@ namespace OFIQ_LIB::modules::measures
             // This should never occur since many measures are set
             // to FailureToAssess if no face is detected and then this
             // method would not be called by OFIQ's logic.
-            session.assessment().qAssessments[qualityMeasure] =
-            { 0.0, -1.0, OFIQ::QualityMeasureReturnCode::FailureToAssess};
+            double rawScore = 0.0;
+            SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::FailureToAssess);
             return;
         }
         else if (m_detectedFaces.size() == 1)

@@ -112,6 +112,62 @@ This will create the following output.
  </tr>
 </table>
 
+### Ubuntu 24.04 (Raspberry Pi/ARMv8)
+The following has been tested on a Raspberry Pi5 with 4GB RAM.
+
+Install necessary packages.
+<pre>
+ $ sudo apt-get install build-essential python3-pip cmake python3.12-venv
+</pre>
+To install conan, a virtual Python environment needs to be generated first.
+<pre>
+ $ python3 -m venv /path/to/py_ofiq_env
+</pre>
+where <code>/path/to/py_ofiq_env</code> is the path where the python environment will be stored
+and <code>py_ofiq_env</code> is the name of the new environment.
+Then install conan as follows.
+<pre>
+ $ source /path/to/py_ofiq_env/bin/activate
+ $ pip install conan==2.0.17
+</pre>
+In order to build OFIQ and installing all required packages via conan run the following.
+<pre>
+ $ source /path/to/py_ofiq_env/bin/activate
+ $ cd /path/to/OFIQ_Project/scripts
+ $ sh build.sh --os linux-arm64
+</pre>
+where <code>/path/to/OFIQ_Project/</code> denotes the root folder of the OFIQ source files.
+<br/>
+This will create the following output.
+<table>
+ <tr>
+  <td><b>file/directory</b></td>
+  <td><b>description</b></td>
+ </tr>
+ <tr>
+  <td>build/</td>
+  <td>Folder with the Linux build including the binaries <code>OFIQSampleApp</code> and <code>libofiq_lib.so</code>.</td>
+ </tr>
+ <tr>
+  <td>build/conan/</td>
+  <td>Conan cache with packages downloaded.</td>
+ </tr>
+ <tr>
+  <td>install_arm64_linux/</td>
+  <td>Folder with the installation including the binaries <code>Release/bin/OFIQSampleApp</code>, 
+   <code>Release/lib/libofiq_lib.so</code>, <code>Release/lib/libonnxruntime.so.1.17.3</code>, and the 
+   header files in <code>Release/include/</code>. </td>
+ </tr>
+ <tr>
+  <td>data/models/</td>
+  <td>Model files downloaded from the ISO portal during build process.</td>
+ </tr>
+ <tr>
+  <td>data/tests/images/</td>
+  <td>Conformance test images downloaded from the ISO portal.</td>
+ </tr>
+</table>
+
 ## Windows
 ### Windows (x86_64)
 The following has been tested on a Windows 10 (64 bit) installation using a <b>Python installation version 3.11.5</b> 
@@ -282,6 +338,8 @@ Here, <code>/path/to/OFIQ-Project/</code> denotes the path to OFIQ's root folder
 Note, download and extraction of the external libraries can be done automatically by the cmake building process described below.
 
 ## Building without conan
+It is important to note that building without conan requires manual extraction of model files and external library dependencies (and perhaps conformance test images) before running the building scripts. Further note, the files have to be placed manually in the right directory as described above. The missing files can be downloaded along with the release archive published at [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-Release.zip).
+<br/><br/>
 To build OFIQ without conan, one can run
 <pre>
 $ cd C:\Path\To\OFIQ-Project\scripts\
@@ -292,7 +350,7 @@ on Windows or
 $ cd /path/to/OFIQ-Project/scripts/
 $ sh build.sh --no-conan
 </pre>
-on Linux and MacOS. This will download and extract the model files, conformance test images, and external libraries from the ISO portal as described above. 
+on Linux (both x86_64 and ARMv8) and MacOS. This will download and extract the model files, conformance test images, and external libraries from the ISO portal as described above. 
 <br/><br/>
 To suppress download of the dependencies (e.g., when one wants to compile without an internet connection), one can run
 <pre>
@@ -304,15 +362,15 @@ on Windows or
 $ cd /path/to/OFIQ-Project/scripts/
 $ sh build.sh --no-conan --no-download
 </pre>
-on Linux and MacOS. Note that this requires that the extraction of model files and external library dependencies (and perhaps conformance test images) 
-is done manually before running the building scripts.
+on Linux and MacOS.
 
 # Running conformance tests
 The conformance tests are executed by going to <code>/path/to/OFIQ_Project/scripts/</code> 
 and run 
  * <code>conformance_tests.cmd</code> (Windows).
- * <code>conformance_tests.sh</code> (Linux).
- * <code>conformance_tests.sh --os</code> (MacOS).
+ * <code>conformance_tests.sh</code> (Linux/x86_64).
+ * <code>conformance_tests.sh --os linux-arm64</code> (Linux/ARMv8)
+ * <code>conformance_tests.sh --os macos</code> (MacOS).
  
 # Running the sample executable
 In this section, we describe how to run the sample application of OFIQ after
@@ -396,6 +454,7 @@ have been successfully tested by the OFIQ development team.
  <tr><td><b>platform</b></td><td><b>compiler</b></td><td><b>compiles via building script?</b></td><td><b>remarks</b></td></tr>
  <tr><td>Ubuntu 22.04 (x86_64)</td><td>g++ 11.4.0</td><td>yes</td><td>-</td></tr>
  <tr><td>Ubuntu 24.04 (x86_64)</td><td>g++ 13.2.0</td><td>yes</td><td>-</td></tr>
+ <tr><td>Ubuntu 24.04 (Raspberry Pi/ARM64)</td><td>g++ 13.3.0</td><td>yes</td><td>Building script needs specification of the argument <code>--os linux-arm64</code>.</td></tr>
  <tr><td>Windows 10 (x86_64/win64)</td><td>Visual Studio 2019</td><td>yes</td><td>To compile external libraries, i.e., to run compilation without conan, an installation of Visual Studio 2022 was used which was required to build the onnxruntime depency.</td></tr>
  <tr><td>Windows 10 (x86/win32)</td><td>Visual Studio 2019</td><td>yes</td><td>Building script needs specification of the argument <code>--arch x86</code>. To compile external libraries, i.e., to run compilation without conan, an installation of Visual Studio 2022 was used which was required to build the onnxruntime depency.</td></tr>
  <tr><td>MacOS (ARM64)</td><td>clang 15.0.0</td><td>yes</td><td>Building script needs specification of the argument <code>--os macos</code>. </td></tr>

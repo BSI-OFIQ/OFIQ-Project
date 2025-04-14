@@ -44,8 +44,12 @@ namespace OFIQ_LIB::modules::measures
     {
         cv::Mat mask = session.getAlignedFaceLandmarkedRegion();
         int G = cv::countNonZero(mask);
-        if ( G == 0)
-            return SetQualityMeasure(session, qualityMeasure, 0, OFIQ::QualityMeasureReturnCode::FailureToAssess);
+        if (G == 0)
+        {
+            double rawScore = 0.0;
+            SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::FailureToAssess);
+            return;
+        }
         
         cv::Mat faceOcclusionMask = session.getFaceOcclusionSegmentationImage();
         cv::Mat occlusionMask = mask.mul(1 - faceOcclusionMask);

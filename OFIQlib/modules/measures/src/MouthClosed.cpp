@@ -51,9 +51,21 @@ namespace OFIQ_LIB::modules::measures
         auto maxMouthOpening = landmarks::FaceMeasures::GetMaxPairDistance(
             faceLandmarks, landmarks::FaceParts::MOUTH_INNER);
 
-        float t = tmetric(faceLandmarks);
-        auto rawScore = maxMouthOpening / t;
+        auto t = tmetric(faceLandmarks);
+        
+        double rawScore;
+        OFIQ::QualityMeasureReturnCode returnCode;
+        if (t == 0.0)
+        {
+            rawScore = std::nan("");
+            returnCode = OFIQ::QualityMeasureReturnCode::FailureToAssess;
+        }
+        else
+        {
+            rawScore = maxMouthOpening / t;
+            returnCode = OFIQ::QualityMeasureReturnCode::Success;
+        }
 
-        SetQualityMeasure(session, qualityMeasure, rawScore, OFIQ::QualityMeasureReturnCode::Success);
+        SetQualityMeasure(session, qualityMeasure, rawScore, returnCode);
     }
 }
