@@ -64,7 +64,7 @@ namespace OFIQ_LIB::modules::detectors
         {
 	    data_source protostream(fileNameProtoTxt);
 	    std::vector<unsigned char> prototxt( (std::istreambuf_iterator<char>(protostream)), std::istreambuf_iterator<char>());
-	    data_source caffestream(fileNameCaffeModel);
+	    data_source caffestream(fileNameCaffeModel, std::ios_base::binary);
 	    std::vector<unsigned char> caffemodel((std::istreambuf_iterator<char>(caffestream)), std::istreambuf_iterator<char>());
 
             m_dnnNet =
