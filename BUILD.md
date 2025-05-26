@@ -15,7 +15,7 @@ Install necessary packages.
 </pre>
 To install cmake (in a version 3.26 or higher) use snap (and not apt) as follows.
 <pre>
- $ sudo snap install cmake --classic
+ $ sudo snap refresh cmake --channel=3.26/stable
 </pre>
 Conan is installed via Python with 
 <pre>
