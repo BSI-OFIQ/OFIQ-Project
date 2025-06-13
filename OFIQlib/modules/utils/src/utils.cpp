@@ -188,7 +188,7 @@ namespace OFIQ_LIB
 
     OFIQ_EXPORT OFIQ::Image MakeGreyImage(uint16_t width, uint16_t height)
     {
-        std::shared_ptr<uint8_t> data{new uint8_t[width * height],std::default_delete<uint8_t[]>()};
+        std::shared_ptr<uint8_t[]> data{new uint8_t[width * height]};
         return {width, height, 8, data};
     }
 

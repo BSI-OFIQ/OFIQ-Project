@@ -58,7 +58,7 @@ namespace OFIQ
          * Either RGB color or intensity.
          * If image_depth == 24 this points to  3WH bytes  RGBRGBRGB...
          * If image_depth ==  8 this points to  WH bytes  IIIIIII */
-        std::shared_ptr<uint8_t> data;
+        std::shared_ptr<uint8_t[]> data;
 
         /** 
          * @brief Constructor 
@@ -78,7 +78,7 @@ namespace OFIQ
          * @param depth of the image
          * @param data of the image.
          */
-        Image(uint16_t width, uint16_t height, uint8_t depth, const std::shared_ptr<uint8_t>& data)
+        Image(uint16_t width, uint16_t height, uint8_t depth, const std::shared_ptr<uint8_t[]>& data)
             : width{ width },
             height{ height },
             depth{ depth },
