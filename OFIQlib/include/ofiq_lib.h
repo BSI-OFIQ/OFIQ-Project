@@ -48,6 +48,29 @@
  */
 namespace OFIQ
 {
+    enum class PreprocessingResultType
+    {
+        // Flag to request no preprocessing data
+        None = 0x0,
+
+        // Flag to request detected faces
+        Faces = 0x1,
+
+        // Flag to request landmarks
+        Landmarks = 0x2,
+
+        // Flag to request face parsing segmentation
+        Segmentation = 0x4,
+
+        // Flag to request face occlusion mask
+        OcclusionMask = 0x8,
+
+        // Flag to request landmarked region
+        LandmarkedRegion = 0x10,
+
+        // Mask to request all available pre-processing data
+        All = 0x1 + 0x2 + 0x4 + 0x8 + 0x10
+    };
 
     /**
      * @brief
@@ -97,7 +120,7 @@ namespace OFIQ
         /**
          * @brief  This function takes an image and outputs quality information.
          *
-         * @details The quality assessment should be performed on the largest detected face.
+         * @details Implementing functions should be performed on the largest detected face.
          *
          * @param[in] image
          * Single face image
@@ -116,6 +139,38 @@ namespace OFIQ
             const OFIQ::Image& image, OFIQ::FaceImageQualityAssessment& assessments) = 0;
 
         /**
+         * @brief  This function takes an image and outputs quality information and preprocessing results.
+         *
+         * @details Implementing functions should be performed on the largest detected face.
+         *
+         * @param[in] image
+         * Single face image
+         *
+         * @param[out] assessments
+         * An ImageQualityAssessments structure.
+         * The implementation should populate
+         * 1) the bounding box and
+         * 2) those items in the QualityAssessments object that the
+         * developer chooses to implement
+         * 3) face landmarks
+         * 
+         * @param[out] preprocessingResult
+         * A container in which the preprocessing results are stored.
+         * 
+         * @param[in] resultRequestsMask
+         * A bit mask encoding the preprocessing result types to be returned.
+         *
+         * @return OFIQ::ReturnStatus
+         * 
+         * @see \link OFIQ::PreprocessingResultType PreprocessingResultType\endlink
+         */
+        virtual OFIQ::ReturnStatus vectorQualityWithPreprocessingResults(
+            const OFIQ::Image& image,
+            OFIQ::FaceImageQualityAssessment& assessments,
+            OFIQ::FaceImageQualityPreprocessingResult& preprocessingResult,
+            uint32_t resultRequestsMask) = 0;
+
+        /**
          * @brief
          * Factory method to return a shared pointer to the Interface object.
          * @details
@@ -132,6 +187,12 @@ namespace OFIQ
          */
         OFIQ_EXPORT static std::shared_ptr<Interface> getImplementation();
 
+        /**
+         * @brief Access version information.
+         * @param major Reference to which major version is stored.
+         * @param minor Reference to which minor version is stored.
+         * @param patch Reference to which patch version is stored.
+         */
         OFIQ_EXPORT void getVersion(int& major, int& minor, int& patch) const;
 
     };
