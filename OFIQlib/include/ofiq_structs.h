@@ -29,6 +29,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <cstdint>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -498,6 +499,91 @@ namespace OFIQ
               boundingBox{boundingBox}
         {
         }
+    };
+
+    /**
+     * @brief Data structure storing the results of pre-processing computations.
+     * 
+     * @details The members can be requested using the
+     * \link OFIQ_LIB::OFIQImpl::vectorQualityAndPreprocessing OFIQImpl::vectorQualityAndPreprocessing\endlink 
+     * function. Non-requested members are empty by default.
+     */
+    struct FaceImageQualityPreprocessingResult
+    {
+        /**
+         * @brief Detected faces
+         */
+        std::vector<OFIQ::BoundingBox> m_faces;
+
+        /**
+         * @brief Landmarks 
+         */
+        FaceLandmarks m_landmarks;
+
+        /**
+         * @brief Segmentation mask
+         * @details For each pixel (y,x) of the original image of dimension (height,width)
+         * where y=0,...,height-1 and x=0,...,width-1 
+         * the value at y*width+x is a value encoding the segmentation type
+         * the pixel is assigned to. The meaning of the code is listed in the 
+         * following table.
+         * <table>
+         *  <tr><td><b>code</b></td><td><b>assignment</b></td></tr>
+         *  <tr><td>0</td><td>background</td></tr>
+         *  <tr><td>1</td><td>face skin</td></tr>
+         *  <tr><td>2</td><td>left eye brow</td></tr>
+         *  <tr><td>3</td><td>right eye brow</td></tr>
+         *  <tr><td>4</td><td>left eye</td></tr>
+         *  <tr><td>5</td><td>right eye</td></tr>
+         *  <tr><td>6</td><td>eyeglasses</td></tr>
+         *  <tr><td>7</td><td>left ear</td></tr>
+         *  <tr><td>8</td><td>right ear</td></tr>
+         *  <tr><td>9</td><td>earring</td></tr>
+         *  <tr><td>10</td><td>nose</td></tr>
+         *  <tr><td>11</td><td>mouth</td></tr>
+         *  <tr><td>12</td><td>upper lip</td></tr>
+         *  <tr><td>13</td><td>lower lip</td></tr>
+         *  <tr><td>14</td><td>neck</td></tr>
+         *  <tr><td>15</td><td>necklace</td></tr>
+         *  <tr><td>16</td><td>clothing</td></tr>
+         *  <tr><td>17</td><td>hair</td></tr>
+         *  <tr><td>18</td><td>head covering</td></tr>
+         *  <tr><td>19</td><td>undocumented</td></tr>
+         *  <tr><td>20</td><td>undocumented</td></tr>
+         *  <tr><td>21</td><td>undocumented</td></tr>
+         *  <tr><td>22</td><td>undocumented</td></tr>
+         *  <tr><td>23</td><td>undocumented</td></tr>
+         *  <tr><td>255</td><td>outside of the aligned face image</td></tr>
+         * </table>
+         * @attention Other values as listed may occur as well but are
+         * not documented.
+         */
+        std::shared_ptr<uint8_t[]> m_segmentationMaskPtr;
+
+        /**
+         * @brief Occlusion mask
+         * @details For each pixel (y,x) of the original image of dimension (height,width)
+         * where y=0,...,height-1 and x=0,...,width-1
+         * the value at y*width+x is 0 if the pixel is not assigned to 
+         * to the occlusion mask; otherwise, if the value is different
+         * from 0, the pixel is assigned to the occlusion mask.
+         */
+        std::shared_ptr<uint8_t[]> m_occlusionMaskPtr;
+
+        /**
+         * @brief Landmarked region
+         * @details For each pixel (y,x) of the original image of dimension (height,width)
+         * where y=0,...,height-1 and x=0,...,width-1
+         * the value at y*width+x is 0 if the pixel is not assigned to 
+         * to the landmarked region mask; otherwise, if the value is different
+         * from 0, the pixel is assigned to the landmarked region mask.
+         */
+        std::shared_ptr<uint8_t[]> m_landmarkedRegionPtr;
+
+        /**
+         * @brief Default contructor
+         */
+        FaceImageQualityPreprocessingResult() = default;
     };
 
 }

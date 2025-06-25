@@ -48,7 +48,7 @@ namespace OFIQ_LIB
          * @brief Constructor
          * 
          */
-        OFIQImpl();
+        OFIQImpl() = default;
 
         /**
          * @brief Destructor
@@ -66,7 +66,6 @@ namespace OFIQ_LIB
         OFIQ::ReturnStatus
             initialize(const std::string& configDir, const std::string& configValue) override;
 
-        
         /**
          * @brief Compute an overall quality score for the image provided.
          * @details The overall quality score will be equal to the measure ualityMeasure::UnifiedQualityScore if it is activated. 
@@ -76,7 +75,6 @@ namespace OFIQ_LIB
          * @return OFIQ::ReturnStatus 
          */
         OFIQ::ReturnStatus scalarQuality(const OFIQ::Image& face, double& quality) override;
-
 
         /**
          * @brief Run the computation of all measures set in the configuration.
@@ -88,31 +86,31 @@ namespace OFIQ_LIB
         OFIQ::ReturnStatus vectorQuality(
             const OFIQ::Image& image, OFIQ::FaceImageQualityAssessment& assessments) override;
 
+        /**
+         * @brief Run the computation of all measures set in the configuration 
+         * and access pre-precessing result.
+         *
+         * @param[in] image Input image.
+         * @param[out] assessments Container to store the resulting scores.
+         * @param[out] preprocessingResult Container to store preprocessing results.
+         * @param[in] resultRequestsMask
+         * Mask encoding the pre-processing data being requested.
+         * @return OFIQ::ReturnStatus
+         * 
+         * @see \link OFIQ::PreprocessingRequest PreprocessingRequest\endlink
+         */
+        OFIQ::ReturnStatus vectorQualityWithPreprocessingResults(
+            const OFIQ::Image& image,
+            OFIQ::FaceImageQualityAssessment& assessments,
+            OFIQ::FaceImageQualityPreprocessingResult& preprocessingResult,
+            uint32_t resultRequestsMask = static_cast<int>(OFIQ::PreprocessingResultType::All)) override;
+
     private:
         /**
          * @brief Pointer to the executor instance, see \link OFIQ_LIB::modules::measures::Executor \endlink.
          * 
          */
         std::unique_ptr<OFIQ_LIB::modules::measures::Executor> m_executorPtr;
-
-        /**
-         * @brief required to suit Session constructor
-         * 
-         */
-        OFIQ::FaceImageQualityAssessment dummyAssement;
-        
-        /**
-         * @brief required to suit Session constructor
-         * 
-         */
-        OFIQ::Image dummyImage;
-
-        /**
-         * @brief required to suit Session constructor
-         * 
-         */
-        OFIQ_LIB::Session m_emptySession;
-
 
         /**
          * @brief Pointer to the cinfiguration
@@ -133,7 +131,6 @@ namespace OFIQ_LIB
          */
         std::unique_ptr<OFIQ_LIB::modules::measures::Executor> CreateExecutor();
         
-        
         /**
          * @brief Create a NeuronalNetworkContainer
          * 
@@ -143,12 +140,21 @@ namespace OFIQ_LIB
         /**
          * @brief Perform the preprocessing.
          * 
-         * @param session Session object containing the original facial image and pre-processing results
-         * computed by the \link OFIQ_LIB::OFIQImpl::performPreprocessing()
-         * OFIQImpl::performPreprocessing()\endlink method
+         * @param session Session object containing the original facial image
+         * for which the preprocessing will be performed. 
+         * The pre-processing results will be stored in the passed Session object.
          */
-        void performPreprocessing(Session& session);
+        OFIQ::ReturnStatus preprocess(Session& session);
         
+        /**
+         * @brief Perform the assessment.
+         *
+         * @param session Session object containing the original facial image 
+         * and pre-processing results computed by the \link OFIQ_LIB::OFIQImpl::preprocess()
+         * OFIQImpl::preprocess()\endlink method
+         */
+        OFIQ::ReturnStatus performAssessment(Session& session);
+
         /**
          * @brief Perform the face alignment.
          * 
@@ -157,6 +163,20 @@ namespace OFIQ_LIB
          * OFIQImpl::performPreprocessing()\endlink method
          */
         void alignFaceImage(Session& session) const;
+
+        /**
+         * @brief Processes and image and outputs its quality assessment; optionally, 
+         * if requested, pre-processing data can be output by the function.
+         * @param[in] image Face image
+         * @param[out] assessments Structure in which the assessment is stored
+         * @param[out] preprocessingResult Structure in which requested pre-processing data is stored
+         * @param[in] resultRequestsMask Mask encoding the requested pre-processing results
+         * @see \link OFIQ::PreprocessingRequest PreprocessingRequest\endlink
+         */
+        OFIQ::ReturnStatus getPreprocessingResults(
+            const Session& session,
+            OFIQ::FaceImageQualityPreprocessingResult& preprocessingResult,
+            uint32_t resultRequestsMask) const;
     };
 }
 

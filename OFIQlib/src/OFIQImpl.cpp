@@ -40,8 +40,6 @@ using namespace OFIQ_LIB;
 using namespace OFIQ_LIB::modules::measures;
 
 
-OFIQImpl::OFIQImpl():m_emptySession({this->dummyImage, this->dummyAssement}) {}
-
 ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::string& configFilename)
 {
     try
@@ -54,7 +52,7 @@ ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::strin
     {
         return {ex.whatCode(), ex.what()};
     }
-    catch (const std::exception & ex)
+    catch (const std::exception& ex)
     {
         return {ReturnCode::UnknownError, ex.what()};
     }
@@ -70,8 +68,11 @@ ReturnStatus OFIQImpl::scalarQuality(const OFIQ::Image& face, double& quality)
         result.code != ReturnCode::Success)
         return result;
 
-    if(assessments.qAssessments.find(QualityMeasure::UnifiedQualityScore) != assessments.qAssessments.end())
+    if (assessments.qAssessments.find(QualityMeasure::UnifiedQualityScore) !=
+        assessments.qAssessments.end())
+    {
         quality = assessments.qAssessments[QualityMeasure::UnifiedQualityScore].scalar;
+    }
     else
     {
         // just as an example - the scalarQuality is an average of all valid scalar measurements
@@ -91,130 +92,105 @@ ReturnStatus OFIQImpl::scalarQuality(const OFIQ::Image& face, double& quality)
     return ReturnStatus(ReturnCode::Success);
 }
 
-void OFIQImpl::performPreprocessing(Session& session)
+OFIQ::ReturnStatus OFIQImpl::preprocess(Session& session)
 {
-    std::chrono::time_point<hrclock> tic;
-
-    log("\t1. detectFaces ");
-    tic = hrclock::now();
-
-    std::vector<OFIQ::BoundingBox> faces = networks->faceDetector->detectFaces(session);
-    if (faces.empty())
-    {
-        log("\n\tNo faces were detected, abort preprocessing\n");
-        throw OFIQError(ReturnCode::FaceDetectionError, "No faces were detected");
-    }
-    log(std::to_string(
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            hrclock::now() - tic).count()) + std::string(" ms "));
-
-    session.setDetectedFaces(faces);
-    log("2. estimatePose ");
-    tic = hrclock::now();
-
-    session.setPose(networks->poseEstimator->estimatePose(session));
-
-    log(std::to_string(
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            hrclock::now() - tic).count()) + std::string(" ms "));
-
-    log("3. extractLandmarks ");
-    tic = hrclock::now();
-
-    session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
-
-    log(std::to_string(
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            hrclock::now() - tic).count()) + std::string(" ms "));
-
-    log("4. alignFaceImage ");
-    tic = hrclock::now();
-    // aligned face requires the landmarks of the face thus it must come after the landmark extraction.
-    alignFaceImage(session);
-    log(std::to_string(
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            hrclock::now() - tic).count()) + std::string(" ms "));
-
-    log("5. getSegmentationMask ");
-    tic = hrclock::now();
-    // segmentation results for face_parsing
-    session.setFaceParsingImage(OFIQ_LIB::copyToCvImage(
-        networks->segmentationExtractor->GetMask(
-            session,
-            OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
-        true));
-    log(std::to_string(
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            hrclock::now() - tic).count()) + std::string(" ms "));
-
-    log("6. getFaceOcclusionMask ");
-    tic = hrclock::now();
-    session.setFaceOcclusionSegmentationImage(OFIQ_LIB::copyToCvImage(
-        networks->faceOcclusionExtractor->GetMask(
-            session,
-            OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
-        true));
-    log(std::to_string(
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            hrclock::now() - tic).count()) + std::string(" ms "));
-
-    static const std::string alphaParamPath = "params.measures.FaceRegion.alpha";
-    double alpha = 0.0f;
     try
     {
-        alpha = this->config->GetNumber(alphaParamPath);
-    }
-    catch(OFIQError&)
-    {
-        alpha = 0.0f;
-    }
+        log("performing preprocessing:\n");
 
-    log("7. getAlignedFaceMask ");
-    tic = hrclock::now();
+        std::chrono::time_point<hrclock> tic;
 
-    session.setAlignedFaceLandmarkedRegion(
-         OFIQ_LIB::modules::landmarks::FaceMeasures::GetFaceMask(
-            session.getAlignedFaceLandmarks(),
-            session.getAlignedFace().rows,
-            session.getAlignedFace().cols,
-            (float)alpha
-         )
-    );
-    log(std::to_string(
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            hrclock::now() - tic).count()) + std::string(" ms "));
+        log("\t1. detectFaces ");
+        tic = hrclock::now();
 
-    log("\npreprocessing finished\n");
-}
+        std::vector<OFIQ::BoundingBox> faces = networks->faceDetector->detectFaces(session);
+        if (faces.empty())
+        {
+            log("\n\tNo faces were detected, abort preprocessing\n");
+            throw OFIQError(ReturnCode::FaceDetectionError, "No faces were detected");
+        }
+        log(std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                hrclock::now() - tic).count()) + std::string(" ms "));
 
-void OFIQImpl::alignFaceImage(Session& session) const
-{
-    auto landmarks = session.getLandmarks();
-    OFIQ::FaceLandmarks alignedFaceLandmarks;
-    alignedFaceLandmarks.type = landmarks.type;
-    cv::Mat transformationMatrix;
-    cv::Mat alignedBGRimage = alignImage(session.image(), landmarks, alignedFaceLandmarks, transformationMatrix);
+        session.setDetectedFaces(faces);
+        log("2. estimatePose ");
+        tic = hrclock::now();
 
-    session.setAlignedFace(alignedBGRimage);
-    session.setAlignedFaceLandmarks(alignedFaceLandmarks);
-    session.setAlignedFaceTransformationMatrix(transformationMatrix);
+        session.setPose(networks->poseEstimator->estimatePose(session));
 
-}
+        log(std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                hrclock::now() - tic).count()) + std::string(" ms "));
 
-ReturnStatus OFIQImpl::vectorQuality(
-    const OFIQ::Image& image, OFIQ::FaceImageQualityAssessment& assessments)
-{
-    auto session = Session(image, assessments);
+        log("3. extractLandmarks ");
+        tic = hrclock::now();
 
-    try
-    {
-        log("perform preprocessing:\n");
-        performPreprocessing(session);
+        session.setLandmarks(networks->landmarkExtractor->extractLandmarks(session));
+
+        log(std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                hrclock::now() - tic).count()) + std::string(" ms "));
+
+        log("4. alignFaceImage ");
+        tic = hrclock::now();
+        // aligned face requires the landmarks of the face thus it must come after the landmark extraction.
+        alignFaceImage(session);
+        log(std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                hrclock::now() - tic).count()) + std::string(" ms "));
+
+        log("5. getSegmentationMask ");
+        tic = hrclock::now();
+        // segmentation results for face_parsing
+        session.setFaceParsingImage(OFIQ_LIB::copyToCvImage(
+            networks->segmentationExtractor->GetMask(
+                session,
+                OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
+            true));
+        log(std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                hrclock::now() - tic).count()) + std::string(" ms "));
+
+        log("6. getFaceOcclusionMask ");
+        tic = hrclock::now();
+        session.setFaceOcclusionSegmentationImage(OFIQ_LIB::copyToCvImage(
+            networks->faceOcclusionExtractor->GetMask(
+                session,
+                OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
+            true));
+        log(std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                hrclock::now() - tic).count()) + std::string(" ms "));
+
+        static const std::string alphaParamPath = "params.measures.FaceRegion.alpha";
+        double alpha = 0.0f;
+        if( !this->config->GetNumber(alphaParamPath, alpha))
+            alpha = 0.0f;
+
+        log("7. getAlignedFaceMask ");
+        tic = hrclock::now();
+
+        session.setAlignedFaceLandmarkedRegion(
+            OFIQ_LIB::modules::landmarks::FaceMeasures::GetFaceMask(
+                session.getAlignedFaceLandmarks(),
+                session.getAlignedFace().rows,
+                session.getAlignedFace().cols,
+                (float)alpha
+            )
+        );
+        log(std::to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                hrclock::now() - tic).count()) + std::string(" ms "));
+
+        log("\npreprocessing finished\n");
     }
     catch (const OFIQError& e)
     {
         log("OFIQError: " + std::string(e.what()) + "\n");
-        for (const auto& measure : m_executorPtr->GetMeasures() )
+        // for some (compound) measurements we need to manually set 
+        // the return code to FailureToAssess 
+        for (const auto& measure : m_executorPtr->GetMeasures())
         {
             auto qualityMeasure = measure->GetQualityMeasure();
             switch (qualityMeasure)
@@ -249,12 +225,133 @@ ReturnStatus OFIQImpl::vectorQuality(
                 break;
             }
         }
-
         return { e.whatCode(), e.what() };
     }
 
+    return ReturnStatus(ReturnCode::Success);
+}
+
+void OFIQImpl::alignFaceImage(Session& session) const
+{
+    auto landmarks = session.getLandmarks();
+    OFIQ::FaceLandmarks alignedFaceLandmarks;
+    alignedFaceLandmarks.type = landmarks.type;
+    cv::Mat transformationMatrix;
+    cv::Mat alignedBGRimage = alignImage(session.image(), landmarks, alignedFaceLandmarks, transformationMatrix);
+
+    session.setAlignedFace(alignedBGRimage);
+    session.setAlignedFaceLandmarks(alignedFaceLandmarks);
+    session.setAlignedFaceTransformationMatrix(transformationMatrix);
+}
+
+ReturnStatus OFIQImpl::performAssessment(Session& session)
+{
+    ReturnStatus retStatus = preprocess(session);
+    if (retStatus.code != ReturnCode::Success)
+        return retStatus;
+
     log("execute assessments:\n");
     m_executorPtr->ExecuteAll(session);
+
+    if (retStatus.code != ReturnCode::Success)
+        return retStatus;
+
+    return ReturnStatus(ReturnCode::Success);
+}
+
+ReturnStatus OFIQImpl::vectorQuality(
+    const OFIQ::Image& image,
+    OFIQ::FaceImageQualityAssessment& assessments)
+{
+    auto session = Session(image, assessments);
+    return performAssessment(session);
+}
+
+ReturnStatus OFIQImpl::vectorQualityWithPreprocessingResults(
+    const OFIQ::Image& image,
+    FaceImageQualityAssessment& assessments,
+    FaceImageQualityPreprocessingResult& preprocessingResult,
+    uint32_t resultRequestsMask)
+{
+    auto session = Session(image, assessments);
+    if (ReturnStatus retStatus = performAssessment(session);
+        retStatus.code != ReturnCode::Success)
+        return retStatus;
+    return getPreprocessingResults(session, preprocessingResult, resultRequestsMask);
+}
+
+ReturnStatus OFIQImpl::getPreprocessingResults(
+    const Session& session,
+    FaceImageQualityPreprocessingResult& preprocessing,
+    uint32_t resultRequestsMask) const
+{
+    if (resultRequestsMask== static_cast<uint32_t>(PreprocessingResultType::None))
+        return ReturnStatus(ReturnCode::Success);
+
+    int width = session.image().width;
+    int height = session.image().height;
+    int area = width * height;
+    auto originalTransform = session.getAlignedFaceTransformationMatrix().clone();
+    auto alignedToOriginalTransform = originalTransform.clone();
+    cv::invertAffineTransform(alignedToOriginalTransform, alignedToOriginalTransform);
+
+    // Access faces
+    if (resultRequestsMask & static_cast<uint32_t>(PreprocessingResultType::Faces))
+    {
+        preprocessing.m_faces = session.getDetectedFaces();
+    }
+
+    // Acess landmarks
+    if (resultRequestsMask & static_cast<uint32_t>(PreprocessingResultType::Landmarks))
+    {
+        preprocessing.m_landmarks = session.getLandmarks();
+    }
+
+    // Access face parsing aligned to the original image
+    if (resultRequestsMask & static_cast<uint32_t>(PreprocessingResultType::Segmentation))
+    {
+        auto alignedToParsedTransform = originalTransform.clone();
+        alignedToParsedTransform.at<double>(0, 2) -= 30;
+        alignedToParsedTransform /= 1.39;
+        cv::invertAffineTransform(alignedToParsedTransform, alignedToParsedTransform);
+        const auto& alignedFaceParsingImage = session.getFaceParsingImage();
+        auto faceParsingImage = cv::Mat();
+        cv::warpAffine(
+            alignedFaceParsingImage,
+            faceParsingImage,
+            alignedToParsedTransform,
+            cv::Size(width, height), 1, 0, 255);
+        preprocessing.m_segmentationMaskPtr = std::shared_ptr<uint8_t[]>(new uint8_t[area]);
+        memcpy(preprocessing.m_segmentationMaskPtr.get(), faceParsingImage.data, area);
+    }
+
+    // Access face occlusion segmentation mask aligned to the original image
+    if (resultRequestsMask & static_cast<uint32_t>(PreprocessingResultType::OcclusionMask))
+    {
+        const auto& alignedFaceOcclusionSegmentationImage = session.getFaceOcclusionSegmentationImage();
+        auto faceOcclusionSegmentationImage = cv::Mat();
+        cv::warpAffine(
+            alignedFaceOcclusionSegmentationImage,
+            faceOcclusionSegmentationImage,
+            alignedToOriginalTransform,
+            cv::Size(width, height));
+        preprocessing.m_occlusionMaskPtr = std::shared_ptr<uint8_t[]>(new uint8_t[area]);
+        memcpy(preprocessing.m_occlusionMaskPtr.get(), faceOcclusionSegmentationImage.data, area);
+    }
+
+    // Access landmarked region aligned to the original image
+    if (resultRequestsMask & static_cast<uint32_t>(PreprocessingResultType::LandmarkedRegion))
+    {
+        const auto& alignedLandmarkedRegionImage = session.getAlignedFaceLandmarkedRegion();
+        auto landmarkedRegionImage = cv::Mat();
+        cv::warpAffine(
+            alignedLandmarkedRegionImage,
+            landmarkedRegionImage,
+            alignedToOriginalTransform,
+            cv::Size(width, height));
+        preprocessing.m_landmarkedRegionPtr = std::shared_ptr<uint8_t[]>(new uint8_t[area]);
+        memcpy(preprocessing.m_landmarkedRegionPtr.get(), landmarkedRegionImage.data, area);
+    }
 
     return ReturnStatus(ReturnCode::Success);
 }
