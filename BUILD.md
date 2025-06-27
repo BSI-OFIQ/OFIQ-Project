@@ -10,24 +10,45 @@ To build OFIQ you need to install Python with pip, cmake and conan.
 ## Linux
 ### Ubuntu 22.04 (x86_64)
 Install necessary packages.
-<pre>
- $ sudo apt-get install build-essential python3-pip
-</pre>
-To install cmake (in a version 3.26 or higher) use snap (and not apt) as follows.
-<pre>
- $ sudo snap install cmake --classic
-</pre>
-Conan is installed via Python with 
-<pre>
- pip install conan==2.0.17
-</pre>
+
+``` bash
+sudo apt-get install build-essential python3-pip
+```
+
+To install cmake (in a version 3.26) use snap (and not apt) as follows.
+
+``` bash
+sudo snap install cmake --channel=3.26/stable --classic
+```
+
+Conan can be installed via Python with
+
+``` bash
+pip install conan==2.0.17
+```
+
+In some cases the command above shows a warning *"Defaulting to user installation because normal site-packages is not writeable"*, to avoid this you can pass a `--user` argument:
+
+``` bash
+pip install --user conan==2.0.17
+```
+
+The conan binary will be installed in `$HOME/.local/bin` and this path will be added to your `~/.profile` file. You'll need to relogin or rload the `.profile` with
+
+``` bash
+source ~/.profile
+```
+
 In order to build OFIQ and installing all required packages via conan run the following.
-<pre>
- $ cd /path/to/OFIQ_Project/scripts
- $ sh build.sh
-</pre>
-where <code>/path/to/OFIQ_Project/</code> denotes the root folder of the OFIQ source files.
-<br/>
+
+``` bash
+cd path/to/OFIQ_Project/scripts
+sh build.sh
+```
+
+where `path/to/OFIQ_Project/` denotes the root folder of the OFIQ source files.
+
+
 This will create the following output.
 <table>
  <tr>
@@ -44,8 +65,8 @@ This will create the following output.
  </tr>
  <tr>
   <td>install_x86_64_linux/</td>
-  <td>Folder with the installation including the binaries <code>Release/bin/OFIQSampleApp</code>, 
-   <code>Release/lib/libofiq_lib.so</code>, <code>Release/lib/libonnxruntime.so.1.17.3</code>, and the 
+  <td>Folder with the installation including the binaries <code>Release/bin/OFIQSampleApp</code>,
+   <code>Release/lib/libofiq_lib.so</code>, <code>Release/lib/libonnxruntime.so.1.17.3</code>, and the
    header files in <code>Release/include/</code>. </td>
  </tr>
  <tr>
@@ -59,29 +80,40 @@ This will create the following output.
 </table>
 
 ### Ubuntu 24.04 (x86_64)
+
 Install necessary packages.
-<pre>
- $ sudo apt-get install build-essential python3-pip cmake python3.12-venv
-</pre>
+
+``` bash
+sudo apt-get install build-essential python3-pip cmake python3.12-venv
+```
+
 To install conan, a virtual Python environment needs to be generated first.
-<pre>
- $ python3 -m venv /path/to/py_ofiq_env
-</pre>
-where <code>/path/to/py_ofiq_env</code> is the path where the python environment will be stored
-and <code>py_ofiq_env</code> is the name of the new environment.
+
+``` bash
+python3 -m venv path/to/py_ofiq_env
+```
+
+where `path/to/py_ofiq_env` is the path where the python environment will be stored
+and `py_ofiq_env` is the name of the new environment.
+
 Then install conan as follows.
-<pre>
- $ source /path/to/py_ofiq_env/bin/activate
- $ pip install conan==2.0.17
-</pre>
+
+``` bash
+source path/to/py_ofiq_env/bin/activate
+pip install conan==2.0.17
+```
+
 In order to build OFIQ and installing all required packages via conan run the following.
-<pre>
- $ source /path/to/py_ofiq_env/bin/activate
- $ cd /path/to/OFIQ_Project/scripts
- $ sh build.sh
-</pre>
-where <code>/path/to/OFIQ_Project/</code> denotes the root folder of the OFIQ source files.
-<br/>
+
+``` bash
+source path/to/py_ofiq_env/bin/activate
+cd path/to/OFIQ_Project/scripts
+sh build.sh
+```
+
+where `path/to/OFIQ_Project/` denotes the root folder of the OFIQ source files.
+
+
 This will create the following output.
 <table>
  <tr>
@@ -98,8 +130,8 @@ This will create the following output.
  </tr>
  <tr>
   <td>install_x86_64_linux/</td>
-  <td>Folder with the installation including the binaries <code>Release/bin/OFIQSampleApp</code>, 
-   <code>Release/lib/libofiq_lib.so</code>, <code>Release/lib/libonnxruntime.so.1.17.3</code>, and the 
+  <td>Folder with the installation including the binaries <code>Release/bin/OFIQSampleApp</code>,
+   <code>Release/lib/libofiq_lib.so</code>, <code>Release/lib/libonnxruntime.so.1.17.3</code>, and the
    header files in <code>Release/include/</code>. </td>
  </tr>
  <tr>
@@ -113,32 +145,43 @@ This will create the following output.
 </table>
 
 ### Ubuntu 24.04 (Raspberry Pi/ARMv8)
+
 The following has been tested on a Raspberry Pi5 with 4GB RAM.
 
 Install necessary packages.
-<pre>
- $ sudo apt-get install build-essential python3-pip cmake python3.12-venv
-</pre>
+
+``` bash
+sudo apt-get install build-essential python3-pip cmake python3.12-venv
+```
+
 To install conan, a virtual Python environment needs to be generated first.
-<pre>
- $ python3 -m venv /path/to/py_ofiq_env
-</pre>
-where <code>/path/to/py_ofiq_env</code> is the path where the python environment will be stored
-and <code>py_ofiq_env</code> is the name of the new environment.
+
+``` bash
+python3 -m venv /path/to/py_ofiq_env
+```
+
+where `path/to/py_ofiq_env` is the path where the python environment will be stored
+and `py_ofiq_env` is the name of the new environment.
+
 Then install conan as follows.
-<pre>
- $ source /path/to/py_ofiq_env/bin/activate
- $ pip install conan==2.0.17
-</pre>
+
+``` bash
+source /path/to/py_ofiq_env/bin/activate
+pip install conan==2.0.17
+```
+
 In order to build OFIQ and installing all required packages via conan run the following.
-<pre>
- $ source /path/to/py_ofiq_env/bin/activate
- $ cd /path/to/OFIQ_Project/scripts
- $ sh build.sh --os linux-arm64
-</pre>
-where <code>/path/to/OFIQ_Project/</code> denotes the root folder of the OFIQ source files.
-<br/>
+
+``` bash
+source /path/to/py_ofiq_env/bin/activate
+cd /path/to/OFIQ_Project/scripts
+sh build.sh --os linux-arm64
+```
+
+where `path/to/OFIQ_Project/` denotes the root folder of the OFIQ source files.
+
 This will create the following output.
+
 <table>
  <tr>
   <td><b>file/directory</b></td>
@@ -154,8 +197,8 @@ This will create the following output.
  </tr>
  <tr>
   <td>install_arm64_linux/</td>
-  <td>Folder with the installation including the binaries <code>Release/bin/OFIQSampleApp</code>, 
-   <code>Release/lib/libofiq_lib.so</code>, <code>Release/lib/libonnxruntime.so.1.17.3</code>, and the 
+  <td>Folder with the installation including the binaries <code>Release/bin/OFIQSampleApp</code>,
+   <code>Release/lib/libofiq_lib.so</code>, <code>Release/lib/libonnxruntime.so.1.17.3</code>, and the
    header files in <code>Release/include/</code>. </td>
  </tr>
  <tr>
@@ -169,8 +212,10 @@ This will create the following output.
 </table>
 
 ## Windows
+
 ### Windows (x86_64)
-The following has been tested on a Windows 10 (64 bit) installation using a <b>Python installation version 3.11.5</b> 
+
+The following has been tested on a Windows 10 (64 bit) installation using a <b>Python installation version 3.11.5</b>
 with pip package such that the <code>pip</code> command can be executed from the command prompt. Furthermore, an installation
 of <b>cmake version 3.29</b> has been used. As the compiler, <b>Microsoft's Visual Studio 2019</b> was used.
 <br/>
@@ -183,54 +228,60 @@ from the command prompt.
 <br/>
 <br/>
 In order to build OFIQ and install all required packages run the following.
-<pre>
- $ cd C:\\Path\To\OFIQ_Project\\scripts\\
- $ .\build.cmd
-</pre>
-where <code>C:\\Path\To\OFIQ-Project\\</code> denotes the root folder of the OFIQ source files.
-<br/>
+
+``` cmd
+cd C:\Path\To\OFIQ_Project\scripts
+build.cmd
+```
+
+where `C:\Path\To\OFIQ-Project` denotes the root folder of the OFIQ source files.
+
 This will create the following output.
 <table>
  <tr>
-  <td><b>file/directory</b></td>
+  <td><b>directory</b></td>
   <td><b>description</b></td>
  </tr>
  <tr>
-  <td>build\\build_win\\</td>
+  <td>build\build_win\</td>
   <td>Folder with the Visual Studio solution files placed and pre-compilation.</td>
  </tr>
  <tr>
-  <td>build\\conan\\</td>
+  <td>build\conan\</td>
   <td>Conan cache with packages downloaded.</td>
  </tr>
  <tr>
-  <td>install_x86_64\\</td>
-  <td>Folder with the OFIQ installation files. This includes the binaries <code>Release\\bin\\OFIQSampleApp</code>, 
-   <code>Release\\bin\\libofiq_lib.so</code>, <code>Release\\bin\\libonnxruntime.so.1.17.3</code>, and the 
-   header files in <code>Release\\include\\</code>.</td>
+  <td>install_x86_64\</td>
+  <td>Folder with the OFIQ installation files. This includes the binaries <code>Release\bin\OFIQSampleApp</code>,
+   <code>Release\bin\libofiq_lib.so</code>, <code>Release\bin\libonnxruntime.so.1.17.3</code>, and the
+   header files in <code>Release\include\</code>.</td>
  </tr>
  <tr>
-  <td>data\\models\\</td>
+  <td>data\models\</td>
   <td>Model files downloaded from the ISO portal during build process.</td>
  </tr>
  <tr>
-  <td>data\\tests\\images\\</td>
+  <td>data\tests\images\</td>
   <td>Conformance test images downloaded from the ISO portal.</td>
  </tr>
 </table>
 
 ### Windows (x86)
+
 To compile Win32 binaries, one proceeds in the same way as for x86_64 described above. But the building script
-is run with the <code>--arch x86</code> argument:
-<pre>
- $ cd C:\\Path\To\OFIQ_Project\\scripts\\
- $ .\build.cmd --arch x86
-</pre>
+is run with the `--arch x86` argument:
+
+``` cmd
+cd C:\Path\To\OFIQ_Project\scripts\
+build.cmd --arch x86
+```
 
 ## MacOS
+
 ### MacOS (ARM64)
-The following has been tested on <code>macOS Sonoma Version 14.4.1</code> with ARM64 processor.
-<br/><br/>
+
+The following has been tested on `macOS Sonoma Version 14.4.1` with ARM64 processor.
+
 Install Homebrew
 <pre>
 $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -257,7 +308,7 @@ $ rm -rf /path/to/miniconda3/miniconda.sh
 $ /path/to/miniconda3/bin/conda init bash
 $ /path/to/miniconda3/bin/conda init zsh
 </pre>
-where <code>/path/to/miniconda3</code> can be replaced by the path where Miniconda is installed. 
+where <code>/path/to/miniconda3</code> can be replaced by the path where Miniconda is installed.
 <br/><br/>
 Install conan.
 <pre>
@@ -270,8 +321,8 @@ Finally, to build OFIQ run the following.
 </pre>
 
 ### MacOS (x86_64)
-To compile OFIQ on MacOS x86_64 one needs to 
-edit <code>/path/to/OFIQ_Project/conan/conan_profile_release_macos.txt</code> 
+To compile OFIQ on MacOS x86_64 one needs to
+edit <code>/path/to/OFIQ_Project/conan/conan_profile_release_macos.txt</code>
 and <code>/path/to/OFIQ_Project/conan/conan_profile_debug_macos.txt</code> first. In both files replace the line
 <pre>
 arch=armv8
@@ -283,7 +334,7 @@ arch=x86_64
 Then apply the same actions as for MacOS compilation on ARM64.
 
 ## Download model files
-To run OFIQ, the model files from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-MODELS.zip) 
+To run OFIQ, the model files from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-MODELS.zip)
 need to be downloaded and be placed in the <code>./data/models/</code> directory so that the file structure matches the following.
 <table>
  <tr><td>/path/to/OFIQ-Project/data/models/expression_neutrality/*</td></td>
@@ -300,11 +351,11 @@ need to be downloaded and be placed in the <code>./data/models/</code> directory
 Here, <code>/path/to/OFIQ-Project/</code> denotes the path to OFIQ's root folder.
 <br/><br/>
 This step is integrated in the cmake building process.
- 
+
 ## Download conformance test images
 To run conformance tests, the conformance test
-images need to be downloaded from 
-[the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-IMAGES.zip) 
+images need to be downloaded from
+[the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-IMAGES.zip)
 and be placed in the <code>./data/tests/images/</code> directory so that the file structure matches the following.
 <table>
  <tr><td>/path/to/OFIQ-Project/data/tests/images/b-01-smile.png</td></td>
@@ -315,8 +366,8 @@ and be placed in the <code>./data/tests/images/</code> directory so that the fil
 Here, <code>/path/to/OFIQ-Project/</code> denotes the path to OFIQ's root folder. Download and extraction of conformance test images can be performed when running the cmake building process.
 
 ## Download of external libraries
-The source of the external libraries that are used by OFIQ can be downloaded 
-along with a full OFIQ relase from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-Release.zip). 
+The source of the external libraries that are used by OFIQ can be downloaded
+along with a full OFIQ relase from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-Release.zip).
 <br/><br/>
 NOTE: At the date of publication, the link to the full OFIQ release were not available.
 <br/><br>
@@ -350,7 +401,7 @@ on Windows or
 $ cd /path/to/OFIQ-Project/scripts/
 $ sh build.sh --no-conan
 </pre>
-on Linux (both x86_64 and ARMv8) and MacOS. This will download and extract the model files, conformance test images, and external libraries from the ISO portal as described above. 
+on Linux (both x86_64 and ARMv8) and MacOS. This will download and extract the model files, conformance test images, and external libraries from the ISO portal as described above.
 <br/><br/>
 To suppress download of the dependencies (e.g., when one wants to compile without an internet connection), one can run
 <pre>
@@ -365,32 +416,32 @@ $ sh build.sh --no-conan --no-download
 on Linux and MacOS.
 
 # Running conformance tests
-The conformance tests are executed by going to <code>/path/to/OFIQ_Project/scripts/</code> 
-and run 
+The conformance tests are executed by going to <code>/path/to/OFIQ_Project/scripts/</code>
+and run
  * <code>conformance_tests.cmd</code> (Windows).
  * <code>conformance_tests.sh</code> (Linux/x86_64).
  * <code>conformance_tests.sh --os linux-arm64</code> (Linux/ARMv8)
  * <code>conformance_tests.sh --os macos</code> (MacOS).
- 
+
 # Running the sample executable
 In this section, we describe how to run the sample application of OFIQ after
 compilation.
- 
+
 ## Quality assessment for a single facial image
-The sample application takes an images and outputs the computed 
-quality assessments. For example, to output the quality 
+The sample application takes an images and outputs the computed
+quality assessments. For example, to output the quality
 assessments for one of the conformance test images using OFIQ's configuration (in
 <code>./data</code>), run the following commands on Linux.
 <pre>
  $ cd /path/to/OFIQ-Project/install_x86_64_linux/Release/bin/
- $ ./OFIQSampleApp -c ../../../data/ofiq_config.jaxn -i 
+ $ ./OFIQSampleApp -c ../../../data/ofiq_config.jaxn -i
         ../../../data/tests/images/b-01-smile.png
 </pre>
 On Windows run the following commands.
 <pre>
- $ cd C:\\Path\\To\\OFIQ-Project\\install_x86_64\\Release\\bin
- $ .\OFIQSampleApp -c ..\\..\\..\\data\\ofiq_config.jaxn -i 
-         ..\\..\\..\\data\\tests\\images\\b-01-smile.png
+ $ cd C:\Path\To\OFIQ-Project\install_x86_64\Release\bin
+ $ .\OFIQSampleApp -c ..\..\..\data\ofiq_config.jaxn -i
+         ..\..\..\data\tests\images\b-01-smile.png
 </pre>
 
 
@@ -399,28 +450,28 @@ To reproduce the conformance test table given in Annex A of the ISO/IEC 29794-5
 international standard for all conformance test images, run the following commands on Linux.
 <pre>
  $ cd /path/to/OFIQ-Project/install_x86_64_linux/Release/bin/
- $ ./OFIQSampleApp -c ../../../data/ofiq_config.jaxn -i 
+ $ ./OFIQSampleApp -c ../../../data/ofiq_config.jaxn -i
          ../../../data/tests/images/ -o table.csv
 </pre>
-The result will be written in the file 
-<code>/path/to/OFIQ_Project/install_x86_64_linux/Release/bin/table.csv</code>. 
+The result will be written in the file
+<code>/path/to/OFIQ_Project/install_x86_64_linux/Release/bin/table.csv</code>.
 <br/><br/>
 On Windows run the following commands.
 <pre>
- $ cd C:\\Path\\To\\OFIQ-Project\\install_x86_64\\Release\\bin\\
- $ .\\OFIQSampleApp -c ..\\..\\..\\data\\ -i 
-          ..\\..\\..\\data\\tests\\images\\ -o table.csv
-</pre> 
-The result will be written in the file 
-<code>C:\\Path\\To\\OFIQ-Project\\install_x86_64\\Release\\bin\\table.csv</code>. 
- 
+ $ cd C:\Path\To\OFIQ-Project\install_x86_64\Release\bin\
+ $ .\OFIQSampleApp -c ..\..\..\data\ -i
+          ..\..\..\data\tests\images\ -o table.csv
+</pre>
+The result will be written in the file
+<code>C:\Path\To\OFIQ-Project\install_x86_64\Release\bin\table.csv</code>.
+
 ## Arguments
 The usage pattern of the sample application is the following.
 <pre>
- OFIQSampleApp 
-    -c <directory or file path> 
-    [-cf <config file name>] 
-    -i <directory or image file path> 
+ OFIQSampleApp
+    -c <directory or file path>
+    [-cf <config file name>]
+    -i <directory or image file path>
     [-o <csv file path>]
 </pre>
 The following table documents the usage of the sample application.
