@@ -1,0 +1,8 @@
+.vscode/
+build/
+data/models/
+!data/models/README.md
+data/tests/images/
+!data/tests/images/README.md
+extern/
+install_*/
