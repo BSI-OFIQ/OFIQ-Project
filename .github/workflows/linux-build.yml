@@ -1,0 +1,48 @@
+name: Linux Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        configuration: [Release, Debug]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential python3-pip
+
+    - name: Install CMake
+      uses: lukka/get-cmake@latest
+
+    - name: Install Conan
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install conan==2.18.1
+
+    - name: Build OFIQ
+      run: |
+        cd scripts
+        sh build.sh ${{ matrix.configuration == 'Debug' && '--debug' || '' }}
+
+    - name: Run Conformance Tests
+      run: |
+        cd scripts
+        sh conformance_tests.sh ${{ matrix.configuration == 'Debug' && '--debug' || '' }}
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ofiq-ubuntu-${{ matrix.configuration }}
+        path: ./*
