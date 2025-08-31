@@ -31,6 +31,7 @@
 #include "FaceMeasures.h"
 #include "utils.h"
 #include "image_io.h"
+#include "logging.h"
 #include <chrono>
 using hrclock = std::chrono::high_resolution_clock;
 
@@ -45,6 +46,36 @@ ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::strin
     try
     {
         this->config = std::make_unique<Configuration>(configDir, configFilename);
+        // Configure logging from config/env (optional)
+        using OFIQ_LIB::logging::LogLevel;
+        using OFIQ_LIB::logging::parseLevel;
+        using OFIQ_LIB::logging::setLevel;
+        using OFIQ_LIB::logging::setCategories;
+        // Config value takes precedence
+        std::string lvlStr;
+        if (this->config->GetString("logging.level", lvlStr)) {
+            LogLevel lvl; if (parseLevel(lvlStr, lvl)) setLevel(lvl);
+        } else {
+            // Fallback to env var
+            const char* envLvl = std::getenv("OFIQ_LOG_LEVEL");
+            if (envLvl) { LogLevel lvl; if (parseLevel(envLvl, lvl)) setLevel(lvl); }
+        }
+        std::vector<std::string> cats;
+        if (this->config->GetStringList("logging.categories", cats)) {
+            setCategories(cats);
+        } else {
+            const char* envCats = std::getenv("OFIQ_LOG_CATEGORIES");
+            if (envCats && *envCats) {
+                std::vector<std::string> v; v.reserve(8);
+                std::string s(envCats); size_t pos=0; while (true) {
+                    size_t comma = s.find(',', pos);
+                    std::string token = s.substr(pos, comma==std::string::npos?std::string::npos:comma-pos);
+                    if (!token.empty()) v.emplace_back(token);
+                    if (comma==std::string::npos) break; pos = comma+1;
+                }
+                setCategories(v);
+            }
+        }
         CreateNetworks();
         m_executorPtr = CreateExecutor();
     }
@@ -114,14 +145,14 @@ OFIQ::ReturnStatus OFIQImpl::preprocess(Session& session)
                 hrclock::now() - tic).count()) + std::string(" ms "));
 
         session.setDetectedFaces(faces);
-        log("2. estimatePose ");
-        tic = hrclock::now();
-
-        session.setPose(networks->poseEstimator->estimatePose(session));
-
-        log(std::to_string(
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                hrclock::now() - tic).count()) + std::string(" ms "));
+        if (networks->poseEstimator) {
+            log("2. estimatePose ");
+            tic = hrclock::now();
+            session.setPose(networks->poseEstimator->estimatePose(session));
+            log(std::to_string(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    hrclock::now() - tic).count()) + std::string(" ms "));
+        }
 
         log("3. extractLandmarks ");
         tic = hrclock::now();
@@ -140,28 +171,32 @@ OFIQ::ReturnStatus OFIQImpl::preprocess(Session& session)
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 hrclock::now() - tic).count()) + std::string(" ms "));
 
-        log("5. getSegmentationMask ");
-        tic = hrclock::now();
-        // segmentation results for face_parsing
-        session.setFaceParsingImage(OFIQ_LIB::copyToCvImage(
-            networks->segmentationExtractor->GetMask(
-                session,
-                OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
-            true));
-        log(std::to_string(
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                hrclock::now() - tic).count()) + std::string(" ms "));
+        if (networks->segmentationExtractor) {
+            log("5. getSegmentationMask ");
+            tic = hrclock::now();
+            // segmentation results for face_parsing
+            session.setFaceParsingImage(OFIQ_LIB::copyToCvImage(
+                networks->segmentationExtractor->GetMask(
+                    session,
+                    OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
+                true));
+            log(std::to_string(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    hrclock::now() - tic).count()) + std::string(" ms "));
+        }
 
-        log("6. getFaceOcclusionMask ");
-        tic = hrclock::now();
-        session.setFaceOcclusionSegmentationImage(OFIQ_LIB::copyToCvImage(
-            networks->faceOcclusionExtractor->GetMask(
-                session,
-                OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
-            true));
-        log(std::to_string(
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                hrclock::now() - tic).count()) + std::string(" ms "));
+        if (networks->faceOcclusionExtractor) {
+            log("6. getFaceOcclusionMask ");
+            tic = hrclock::now();
+            session.setFaceOcclusionSegmentationImage(OFIQ_LIB::copyToCvImage(
+                networks->faceOcclusionExtractor->GetMask(
+                    session,
+                    OFIQ_LIB::modules::segmentations::SegmentClassLabels::face),
+                true));
+            log(std::to_string(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    hrclock::now() - tic).count()) + std::string(" ms "));
+        }
 
         static const std::string alphaParamPath = "params.measures.FaceRegion.alpha";
         double alpha = 0.0f;

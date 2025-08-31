@@ -33,6 +33,7 @@
 #include "OFIQError.h"
 #include "NeuronalNetworkContainer.h"
 #include <magic_enum.hpp>
+#include "modules/utils/logging.h"
 
 namespace OFIQ_LIB
 {
@@ -104,6 +105,45 @@ namespace OFIQ_LIB
 
     void OFIQImpl::CreateNetworks()
     {
+        // Parse requested measures from config to determine dependencies
+        std::vector<std::string> requested_measures_str;
+        bool has_measures = config->GetStringList("measures", requested_measures_str) && !requested_measures_str.empty();
+        // Info log active measures (configurable)
+        {
+            std::string msg = "OFIQ init: measures=";
+            if (has_measures) {
+                for (size_t i=0;i<requested_measures_str.size();++i) {
+                    if (i) msg += ",";
+                    msg += requested_measures_str[i];
+                }
+            } else {
+                msg += "<none>";
+            }
+            OFIQ_LIB::logging::log(OFIQ_LIB::logging::LogLevel::Info, msg, "init");
+        }
+
+        auto has_any = [&](const std::initializer_list<const char*>& names) -> bool {
+            if (!has_measures) return true; // if not specified, be conservative and enable
+            for (const auto& n : names) {
+                for (const auto& m : requested_measures_str) {
+                    if (m == n) return true;
+                }
+            }
+            return false;
+        };
+
+        // Dependencies by measure name
+        bool need_pose = has_any({
+            "HeadPose", "HeadPoseYaw", "HeadPosePitch", "HeadPoseRoll",
+            "InterEyeDistance", "EyesVisible"
+        });
+        bool need_face_parsing = has_any({
+            "BackgroundUniformity", "NoHeadCoverings"
+        });
+        bool need_face_occlusion = has_any({
+            "FaceOcclusionPrevention", "MouthOcclusionPrevention", "EyesVisible"
+        });
+
         auto getFaceDetector =
             [&]() -> std::shared_ptr<FaceDetectorInterface>
         {
@@ -119,19 +159,25 @@ namespace OFIQ_LIB
         auto getSegmentationExtractor =
             [&]() -> std::shared_ptr<SegmentationExtractorInterface>
         {
-            return std::make_shared<FaceParsing>(*config);
+            if (need_face_parsing)
+                return std::make_shared<FaceParsing>(*config);
+            return std::shared_ptr<SegmentationExtractorInterface>{};
         };
 
         auto getFaceOcclusionExtractor =
             [&]() -> std::shared_ptr<SegmentationExtractorInterface>
         {
-            return std::make_shared<FaceOcclusionSegmentation>(*config);
+            if (need_face_occlusion)
+                return std::make_shared<FaceOcclusionSegmentation>(*config);
+            return std::shared_ptr<SegmentationExtractorInterface>{};
         };
 
         auto getPoseEstimator =
             [&]() -> std::shared_ptr<PoseEstimatorInterface>
         {
-            return std::make_shared < HeadPose3DDFAV2 > (*config);
+            if (need_pose)
+                return std::make_shared < HeadPose3DDFAV2 > (*config);
+            return std::shared_ptr<PoseEstimatorInterface>{};
         };
 
         networks.release();

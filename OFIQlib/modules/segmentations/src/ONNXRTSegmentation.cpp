@@ -26,6 +26,12 @@
 
 #include <ONNXRTSegmentation.h>
 #include "OFIQError.h"
+#include <iostream>
+#include <fstream>
+#ifdef __aarch64__
+// For Jetson GPU support - using proper C++ API
+#include <onnxruntime_cxx_api.h>
+#endif
 
 void ONNXRuntimeSegmentation::initialize(
     const std::vector<uint8_t>& i_modelData, int64_t i_imageWidth, int64_t i_imageHeight)
@@ -94,11 +100,49 @@ void ONNXRuntimeSegmentation::init_session(
     int64_t i_imageHeight)
 {
     m_ortenv = Ort::Env(ORT_LOGGING_LEVEL_ERROR);
+
+    // Create session options
+    Ort::SessionOptions session_options;
+    session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+
+#ifdef __aarch64__
+    // Jetson-specific GPU provider initialization
+    bool gpu_initialized = false;
+
+    // Check if this is a Jetson platform
+    std::ifstream tegra_release("/etc/nv_tegra_release");
+    bool is_jetson = tegra_release.good();
+    tegra_release.close();
+
+    if (is_jetson) {
+        // Use CUDA directly - TensorRT optimization takes too long on Jetson
+        // TensorRT engine building can take 30-60+ minutes for OFIQ's models
+        try {
+            OrtCUDAProviderOptions cuda_options{};
+            cuda_options.device_id = 0;
+            cuda_options.arena_extend_strategy = 0; // kNextPowerOfTwo
+            cuda_options.gpu_mem_limit = SIZE_MAX; // No limit
+            cuda_options.cudnn_conv_algo_search = OrtCudnnConvAlgoSearchDefault; // Faster init than Exhaustive
+            cuda_options.do_copy_in_default_stream = 1;
+
+            session_options.AppendExecutionProvider_CUDA(cuda_options);
+            gpu_initialized = true;
+            std::cout << "OFIQ ADNet: CUDA execution provider enabled with optimizations for Jetson" << std::endl;
+        } catch (const Ort::Exception& e) {
+            std::cerr << "OFIQ: CUDA initialization failed: " << e.what() << std::endl;
+        }
+
+        if (!gpu_initialized) {
+            std::cerr << "OFIQ: Warning - GPU providers not available on Jetson, falling back to CPU" << std::endl;
+        }
+    }
+#endif
+    
     m_ortSession = std::make_unique<Ort::Session>(
         m_ortenv,
         i_model_data.data(),
         i_model_data.size(),
-        Ort::SessionOptions{nullptr});
+        session_options);
 
 
     auto type_info = m_ortSession->GetInputTypeInfo(0);

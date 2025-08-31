@@ -32,6 +32,7 @@
 #include "AllPoseEstimators.h"
 #include "utils.h"
 #include <fstream>
+// GPU providers enabled via generic AppendExecutionProvider API; no provider headers required
 
 namespace OFIQ_LIB::modules::poseEstimators
 {
@@ -54,7 +55,41 @@ namespace OFIQ_LIB::modules::poseEstimators
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
 
-            m_ortSession = std::make_unique<Ort::Session>(m_ortenv, modelData.data(), modelData.size(), Ort::SessionOptions{ nullptr });
+            // Create session options with GPU support
+            Ort::SessionOptions session_options;
+            session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+            
+            // Enable TensorRT execution provider for best performance on Jetson
+            try {
+                session_options.AppendExecutionProvider(
+                    "TensorrtExecutionProvider",
+                    {
+                        {"device_id", "0"},
+                        {"trt_max_workspace_size", "2147483648"},
+                        {"trt_fp16_enable", "1"}
+                    }
+                );
+            } catch (const Ort::Exception& e) {
+                // TensorRT not available, will fallback to CUDA
+            }
+            
+            // Enable CUDA execution provider as fallback
+            try {
+                session_options.AppendExecutionProvider(
+                    "CUDAExecutionProvider",
+                    {
+                        {"device_id", "0"},
+                        {"arena_extend_strategy", "kNextPowerOfTwo"},
+                        {"gpu_mem_limit", "0"},
+                        {"cudnn_conv_algo_search", "EXHAUSTIVE"},
+                        {"do_copy_in_default_stream", "1"}
+                    }
+                );
+            } catch (const Ort::Exception& e) {
+                // CUDA not available, will fallback to CPU
+            }
+            
+            m_ortSession = std::make_unique<Ort::Session>(m_ortenv, modelData.data(), modelData.size(), session_options);
 
             auto type_info = m_ortSession->GetInputTypeInfo(0);
             auto tensor_info = type_info.GetTensorTypeAndShapeInfo();

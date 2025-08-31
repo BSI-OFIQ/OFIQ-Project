@@ -34,6 +34,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
+// GPU providers enabled via generic AppendExecutionProvider API; no provider headers required
 
 namespace OFIQ_LIB::modules::landmarks
 {
@@ -67,11 +68,45 @@ namespace OFIQ_LIB::modules::landmarks
         // init onnx session
         void init_session(const std::vector<uint8_t>& i_model_data)
         {
+            // Create session options with GPU support
+            Ort::SessionOptions session_options;
+            session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+            
+            // Enable TensorRT execution provider for best performance on Jetson
+            try {
+                session_options.AppendExecutionProvider(
+                    "TensorrtExecutionProvider",
+                    {
+                        {"device_id", "0"},
+                        {"trt_max_workspace_size", "2147483648"},
+                        {"trt_fp16_enable", "1"}
+                    }
+                );
+            } catch (const Ort::Exception& e) {
+                // TensorRT not available, will fallback to CUDA
+            }
+            
+            // Enable CUDA execution provider as fallback
+            try {
+                session_options.AppendExecutionProvider(
+                    "CUDAExecutionProvider",
+                    {
+                        {"device_id", "0"},
+                        {"arena_extend_strategy", "kNextPowerOfTwo"},
+                        {"gpu_mem_limit", "0"},
+                        {"cudnn_conv_algo_search", "EXHAUSTIVE"},
+                        {"do_copy_in_default_stream", "1"}
+                    }
+                );
+            } catch (const Ort::Exception& e) {
+                // CUDA not available, will fallback to CPU
+            }
+            
             m_ort_session = std::make_unique<Ort::Session>(
                 m_ortenv,
                 i_model_data.data(), 
                 i_model_data.size(),
-                Ort::SessionOptions{nullptr});
+                session_options);
 
 
             get_parameter_from_model(

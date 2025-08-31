@@ -25,14 +25,15 @@
  */
 
 #include "Executor.h"
+#include "modules/utils/logging.h"
 
 namespace OFIQ_LIB::modules::measures
 {
 
     void log(const std::string_view& msg)
     {
-        if (ExecutorLogActive)
-            std::cout << msg;
+        // Route executor debug logs through central logger
+        OFIQ_LIB::logging::log(OFIQ_LIB::logging::LogLevel::Debug, msg, "executor");
     }
 
     void Executor::ExecuteAll(Session & i_currentSession) const

@@ -17,6 +17,10 @@ A full documentation of __OFIQ__ including compilation, configuration and a comp
 the C/C++ API is contained in the reference manual:
 see [doc/refman.pdf](doc/refman.pdf).
 
+## Fast inference and logging
+For guidance on reducing inference latency by selecting only the measures you need, Jetson CUDA defaults, and runtime‑configurable logging (levels and categories), see:
+- [doc/fast_inference_and_logging.md](doc/fast_inference_and_logging.md)
+
 ## Known issues
 For a list of known issues, see [here](ISSUES.md)
 

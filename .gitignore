@@ -1,0 +1,26 @@
+# Build directories
+build/
+install_*/
+
+# External dependencies (downloaded)
+extern/
+!extern/onnxruntime-linux-aarch64-1.17.3/
+!extern/onnxruntime-linux-x64-1.17.3/
+
+# Conan generated files
+conan/
+
+# Downloaded data
+data/models/*/
+data/tests/images/
+*.zip
+
+# Backup files
+*.backup
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
