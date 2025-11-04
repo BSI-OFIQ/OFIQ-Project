@@ -47,7 +47,7 @@ IF %set_compiler%==16 (
   set "compiler="
 ) else if %set_compiler%==17 (
   set generator="Visual Studio 17 2022"
-  set compiler=-s:a compiler.version=193
+  set compiler=-s:a compiler.version=194
   set vs_version="vc17"
 ) else (
   echo Building on Windows with %set_compiler% is not supported
