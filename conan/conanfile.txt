@@ -4,6 +4,7 @@ opencv/4.5.5
 taocpp-json/1.0.0-beta.13
 magic_enum/0.8.1
 gzip-hpp/0.1.0
+libwebp/1.2.4
 [options]
 opencv/*:gapi=False
 opencv/*:objdetect=False
