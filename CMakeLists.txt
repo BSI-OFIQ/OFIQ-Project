@@ -25,10 +25,6 @@ add_compile_definitions(OFIQ_VERSION=${FULL_PROJECT_VERSION})
 
 option(DOWNLOAD_ONNX "Whether ONNX must be downloaded" ON)
 option(DOWNLOAD_MODELS_AND_IMAGES "Whether model and image files must be downloaded" OFF)
-option(BUILD_FRVT "Whether to build for frvt" OFF)
-if(BUILD_FRVT)
-  add_compile_definitions(OFIQ_FRVT)
-endif()
 
 SET(USE_CONAN ON CACHE BOOL "If conan should be used or not")
 SET(ARCHITECTURE x64 CACHE STRING "x64 or Win32 for Windows")

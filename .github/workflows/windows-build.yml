@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-2022
     strategy:
       matrix:
-        architecture: [x64, x86]
+        architecture: [x64]
         configuration: [Release, Debug]
 
     steps:
