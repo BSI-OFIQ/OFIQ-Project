@@ -37,6 +37,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install conan==2.18.1
 
+    - name: Conan info graph
+      run: |
+        conan graph info -f dot conan/conanfile.txt --profile:build conan/conan_profile_release.txt --profile:host conan/conan_profile_release.txt -s:a compiler.version=194
+      shell: cmd
+
     - name: Build OFIQ
       run: |
         cd scripts
