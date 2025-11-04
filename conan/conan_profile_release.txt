@@ -7,3 +7,5 @@ compiler.runtime=dynamic
 compiler.cppstd=17
 os=Windows
 [options]
+[platform_tool_requires]
+cmake/3.*
