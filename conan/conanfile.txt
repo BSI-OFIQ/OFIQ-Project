@@ -12,14 +12,12 @@ opencv/*:stitching=False
 opencv/*:video=False
 opencv/*:videoio=False
 opencv/*:with_ffmpeg=False
-opencv/*:with_flatbuffers=False
 opencv/*:with_gtk=False
 opencv/*:with_jpeg2000=openjpeg
 opencv/*:with_jpeg=libjpeg-turbo
 opencv/*:with_openexr=False
 opencv/*:with_qt=False
 opencv/*:with_tiff=False
-opencv/*:with_wayland=False
 opencv/*:with_webp=False
 [generators]
 CMakeDeps
