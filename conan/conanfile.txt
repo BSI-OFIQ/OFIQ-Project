@@ -1,6 +1,6 @@
 [requires]
 gtest/1.14.0
-opencv/4.5.5
+opencv/4.12.0
 taocpp-json/1.0.0-beta.13
 magic_enum/0.8.1
 gzip-hpp/0.1.0
@@ -12,15 +12,11 @@ opencv/*:stitching=False
 opencv/*:video=False
 opencv/*:videoio=False
 opencv/*:with_ffmpeg=False
-opencv/*:with_flatbuffers=False
 opencv/*:with_gtk=False
 opencv/*:with_jpeg2000=openjpeg
 opencv/*:with_jpeg=libjpeg-turbo
 opencv/*:with_openexr=False
 opencv/*:with_qt=False
-opencv/*:with_tiff=False
-opencv/*:with_wayland=False
-opencv/*:with_webp=False
 [generators]
 CMakeDeps
 CMakeToolchain
