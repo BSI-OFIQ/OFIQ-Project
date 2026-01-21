@@ -55,7 +55,7 @@ then
     rm -rf ../build/conan
 
     export OFIQLIB_CONAN_DIR=../conan
-    export CONAN_FILE=conanfile.txt
+    export CONAN_FILE=conanfile.py
 
     echo using conan file ${CONAN_FILE}
 

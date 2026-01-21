@@ -58,13 +58,13 @@ IF %set_compiler%==16 (
 if %use_conan%==ON (
   erase /Q ..\build\conan\*.*
   if %config%==Release (
-    conan install ../conan/conanfile.txt --build missing ^
+    conan install ../conan/conanfile.py --build missing ^
     --profile:build ../conan/conan_profile_release.txt ^
     --profile:host ../conan/conan_profile_release.txt ^
       %compiler% %conan_set_arch% ^
     --output-folder=../build/conan || goto end
   ) else (
-    conan install ../conan/conanfile.txt --build missing ^
+    conan install ../conan/conanfile.py --build missing ^
     --profile:build ../conan/conan_profile_debug.txt ^
     --profile:host ../conan/conan_profile_debug.txt ^
       %compiler% %conan_set_arch% ^
