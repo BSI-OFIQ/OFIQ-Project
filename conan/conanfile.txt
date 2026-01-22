@@ -17,6 +17,7 @@ opencv/*:with_jpeg2000=openjpeg
 opencv/*:with_jpeg=libjpeg-turbo
 opencv/*:with_openexr=False
 opencv/*:with_qt=False
+opencv/*:with_tiff=False
 [generators]
 CMakeDeps
 CMakeToolchain
