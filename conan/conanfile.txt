@@ -18,6 +18,7 @@ opencv/*:with_jpeg=libjpeg-turbo
 opencv/*:with_openexr=False
 opencv/*:with_qt=False
 opencv/*:with_tiff=False
+opencv/*:with_webp=False
 [generators]
 CMakeDeps
 CMakeToolchain
