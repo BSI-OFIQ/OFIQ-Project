@@ -24,16 +24,20 @@
  * @author OFIQ development team
  */
 
+#include "ONNXSessionOptions.h"
 #include "OFIQError.h"
 #include <ONNXRTSegmentation.h>
 
 void ONNXRuntimeEnv::initialize(
-    const std::vector<uint8_t>& i_modelData, int64_t i_imageWidth, int64_t i_imageHeight)
+    const std::vector<uint8_t>& i_modelData,
+    int64_t i_imageWidth,
+    int64_t i_imageHeight,
+    const OFIQ_LIB::Configuration& config)
 {
 
     try
     {
-        init_session(i_modelData, i_imageWidth, i_imageHeight);
+        init_session(i_modelData, i_imageWidth, i_imageHeight, config);
     }
     catch (const std::exception&)
     {
@@ -90,14 +94,17 @@ std::vector<Ort::Value> ONNXRuntimeEnv::run(std::vector<float>& i_netInput)
 }
 
 void ONNXRuntimeEnv::init_session(
-    const std::vector<uint8_t>& i_model_data, int64_t i_imageWidth, int64_t i_imageHeight)
+    const std::vector<uint8_t>& i_model_data,
+    int64_t i_imageWidth,
+    int64_t i_imageHeight,
+    const OFIQ_LIB::Configuration& config)
 {
     m_ortenv = Ort::Env(ORT_LOGGING_LEVEL_ERROR);
     m_ortSession = std::make_unique<Ort::Session>(
         m_ortenv,
         i_model_data.data(),
         i_model_data.size(),
-        Ort::SessionOptions{nullptr});
+        OFIQ_LIB::CreateONNXSessionOptions(config));
 
 
     auto type_info = m_ortSession->GetInputTypeInfo(0);

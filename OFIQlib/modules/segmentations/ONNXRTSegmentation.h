@@ -26,6 +26,8 @@
  */
 #pragma once
 
+#include "Configuration.h"
+
 #include <vector>
 
 #include <opencv2/opencv.hpp>
@@ -70,8 +72,14 @@ private:
      * @param i_model_data Model data loaded from file.
      * @param i_imageWidth Width of the input image as expected by the model.
      * @param i_imageHeight Height of the input image as expected by the model.
+     * @param config Configuration object used to apply ONNX Runtime thread
+     * limits for this session.
      */
-    void init_session(const std::vector<uint8_t>& i_model_data, int64_t i_imageWidth, int64_t i_imageHeight);
+    void init_session(
+        const std::vector<uint8_t>& i_model_data,
+        int64_t i_imageWidth,
+        int64_t i_imageHeight,
+        const OFIQ_LIB::Configuration& config);
  
 
 public:
@@ -93,9 +101,14 @@ public:
      * @param i_modelData Model data loaded from file.
      * @param i_imageWidth Width of the input image as expected by the model.
      * @param i_imageHeight Height of the input image as expected by the model.
+     * @param config Configuration object used to apply ONNX Runtime thread
+     * limits for this session.
      */
     void initialize(
-        const std::vector<uint8_t>& i_modelData, int64_t i_imageWidth, int64_t i_imageHeight);
+        const std::vector<uint8_t>& i_modelData,
+        int64_t i_imageWidth,
+        int64_t i_imageHeight,
+        const OFIQ_LIB::Configuration& config);
     
     /**
      * @brief Get the number of output nodes (results) based on the loaded model.

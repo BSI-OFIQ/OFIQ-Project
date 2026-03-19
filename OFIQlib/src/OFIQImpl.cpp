@@ -28,6 +28,7 @@
 #include "Executor.h"
 #include "FaceMeasures.h"
 #include "OFIQError.h"
+#include "RuntimeThreadSettings.h"
 #include "image_io.h"
 #include "image_utils.h"
 #include "ofiq_lib_impl.h"
@@ -46,6 +47,7 @@ ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::strin
     try
     {
         this->config = std::make_unique<Configuration>(configDir, configFilename);
+        RuntimeThreadSettings::ApplyThreadLimit(*this->config);
         CreateNetworks();
         m_executorPtr = CreateExecutor();
     }
