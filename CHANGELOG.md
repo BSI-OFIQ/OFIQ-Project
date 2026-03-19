@@ -1,5 +1,12 @@
 # Changes
 
+## Version 1.1.2 (2026-02-05)
+- In v1.0.3 using ```OFIQ::Image::deepcopy```, the pixel data was interpreted as RGB. In v1.1.0 and v1.1.1 the pixel data has been interpreted as BGR which is a change in the API. To patch this, an argument ```bool isRgb``` has been added to the argument list of ```OFIQ::Image::deepcopy``` and which is ```true``` by default. When ```true``` the method ```OFIQ::Image::deepcopy``` interprets the
+specified data as RGB; otherwise, if ```false```, ```OFIQ::Image::deepcopy``` interprets the specified pixel data as BGR.
+- In v1.1.0 a new return code ```OFIQ::ReturnCode::MissingConfigFileError``` has been inserted in the enum. Consequently, integer casts of v1.1.0 and v1.1.1 were not compatible with integer casts of v1.0.3. In v1.1.2, the return code has been moved to the end of the enum so that integer casts of return codes from v1.0.3 match with integers casts of return codes from v1.1.2.
+- Fixes compilation without conan for linux-arm64.
+- Fixes of typos in documentation.
+
 ## Version 1.1.1 (2026-01-21)
 - Updates URL to external library dependency hosted by eu-LISA
 - Adds a CONTRIBUTING.md

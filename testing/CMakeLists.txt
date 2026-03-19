@@ -54,6 +54,8 @@ else(USE_CONAN)
                 IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/extern/googletest/build/lib/libgtest_main.1.14.0.dylib
                 INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/extern/googletest/googletest/include
                 )
+        else()
+                message(FATAL_ERROR "Unknown os: ${OS}")
         endif(${OS} STREQUAL "windows")
 endif(USE_CONAN)
 

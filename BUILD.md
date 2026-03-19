@@ -387,7 +387,7 @@ Here, <code>/path/to/OFIQ-Project/</code> denotes the path to OFIQ's root folder
 ## Download of external libraries
 
 The source of the external libraries that are used by OFIQ can be downloaded
-along with a full OFIQ relase from [eu-LISA](https://resources.eulisa.europa.eu/research/OFIQ-ExternalLibraryDependencies-v1.1.1.zip).
+along with a full OFIQ release from [eu-LISA](https://resources.eulisa.europa.eu/research/OFIQ-ExternalLibraryDependencies-v1.1.1.zip).
 <br/><br>
 To build OFIQ without conan (described below), we need to extract the archive so that file structure
 matches the following:
