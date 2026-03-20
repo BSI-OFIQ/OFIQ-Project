@@ -1,5 +1,5 @@
 /**
- * @file test_conformance_table.cpp
+ * @file test_conformance_table_inmemoryconfig.cpp
  *
  * @copyright Copyright (c) 2024, 2025, 2026 Federal Office for Information Security, Germany
  *
@@ -20,10 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
- * @author OFIQ development team
  */
 
+#include <ofiq_config.h>
 #include <ofiq_lib.h>
 #include "image_io.h"
 
@@ -40,25 +39,7 @@ namespace fs = std::filesystem;
 
 using namespace OFIQ;
 
-// required helper functions
-// - load CSV file
-// - parse CSV file and create a list of quality assessment results
-//   for each row (face image file) in the table.
-//   Results should be stored in OFIQ::QualityAssessments,
-//   defined as std::map<QualityMeasure, QualityMeasureResult>;
-// - TEST: compare the list of measurements defined in the config file
-//   (will be ised for quality assessment computation) with the list
-//   of measuremente parsed from CSV file
-// - for each list entry (face image):
-//    - compute quality assessment results i.e. call
-//      OFIQ::vectorQuality(... OFIQ::FaceImageQualityAssessment& assessments)
-//      the assessment results are then stored in assessments.qAssessments
-//    - for each QualityMeasureResult compare (ASSERT_EQ)
-//      rawScore and scalar with conformance table results (from CSV)
-//
-
 static std::string OFIQ_LIB_CONFIG_DIR{"../../../data"};
-static std::string OFIQ_LIB_CONFIG_FILE{"ofiq_config.jaxn"};
 static std::string CONFORMANCE_TABLE_CSV{
     "../../../data/tests/expected_results/expected_results.csv"};
 
@@ -73,8 +54,7 @@ struct FaceImageAssessments
     OFIQ::QualityAssessments qAssessments;
 };
 
-std::shared_ptr<OFIQ::Interface>
-    getOfiqImplInstance(const std::string& configDir, const std::string& configFile);
+std::shared_ptr<OFIQ::Interface> getOfiqImplInstanceFromConfig(const std::string& configDir);
 std::vector<FaceImageAssessments> loadConformanceTable(const std::string& conformanceTableCSV);
 
 std::vector<std::string> getNextLineAndSplitIntoTokens(std::istream& str, const char delim = ';');
@@ -105,17 +85,17 @@ std::vector<std::tuple<std::string, OFIQ::QualityMeasure, double, double>>
 static std::vector<FaceImageAssessments> imageAssessments =
     loadConformanceTable(CONFORMANCE_TABLE_CSV);
 
-std::shared_ptr<OFIQ::Interface>
-    getOfiqImplInstance(const std::string& configDir, const std::string& configFile)
+std::shared_ptr<OFIQ::Interface> getOfiqImplInstanceFromConfig(const std::string& configDir)
 {
     if (!ofiqImplInstance)
     {
         ofiqImplInstance = OFIQ::Interface::getImplementation();
+        OFIQ::Configuration config = OFIQ::Configuration::getDefault();
+        config.modelsBasePath = (fs::path(configDir) / "models").string();
         printf(
-            "Initializing OFIQ using config directory %s and config file %s\n",
-            configDir.c_str(),
-            configFile.c_str());
-        ofiqInitResult = ofiqImplInstance->initialize(configDir, configFile);
+            "Initializing OFIQ using Configuration API with models base path %s\n",
+            config.modelsBasePath.c_str());
+        ofiqInitResult = ofiqImplInstance->initialize(config);
     }
     else
         printf("Reusing existing OFIQ instance\n");
@@ -131,23 +111,12 @@ std::vector<FaceImageAssessments> loadConformanceTable(const std::string& confor
     std::map<OFIQ::QualityMeasure, int> colIdxMeasureRaw;
     std::map<OFIQ::QualityMeasure, int> colIdxMeasureScalar;
 
-    std::vector<std::string> invalid_column_names =
-        parseConformanceTableHeader(ifs, colIdxMeasureRaw, colIdxMeasureScalar);
-
-    // if (!invalid_column_names.empty())
-    //{
-    //	printf("Invalid column names detected:\n");
-    //	for (const auto& invalid_column : invalid_column_names)
-    //	{
-    //		printf("\t'%s'\n", invalid_column.c_str());
-    //	}
-    //}
+    parseConformanceTableHeader(ifs, colIdxMeasureRaw, colIdxMeasureScalar);
 
     return parseConformanceTableCSV(ifs, colIdxMeasureRaw, colIdxMeasureScalar);
 }
 
-
-TEST(TestDataValidity, ConfigDirValid)
+TEST(TestDataValidityConfigApi, ConfigDirValid)
 {
     fs::path configDirPath = fs::weakly_canonical(fs::path(OFIQ_LIB_CONFIG_DIR));
     ASSERT_TRUE(fs::exists(configDirPath))
@@ -155,20 +124,7 @@ TEST(TestDataValidity, ConfigDirValid)
         << ", originally: " << OFIQ_LIB_CONFIG_DIR << std::endl;
 }
 
-TEST(TestDataValidity, ConfigFileValid)
-{
-    fs::path configDirPath(OFIQ_LIB_CONFIG_DIR);
-    fs::path fullConfPath = fs::weakly_canonical(configDirPath / fs::path(OFIQ_LIB_CONFIG_FILE));
-    ASSERT_TRUE(fs::exists(fullConfPath))
-        << "Config file '" << OFIQ_LIB_CONFIG_FILE
-        << "' not found in the directory: " << OFIQ_LIB_CONFIG_DIR << std::endl;
-
-    std::ifstream istream(fullConfPath.string());
-    ASSERT_TRUE(istream.good()) << "Can't read the config file: " << fullConfPath.string()
-                                << std::endl;
-}
-
-TEST(TestDataValidity, ConformanceTableValid)
+TEST(TestDataValidityConfigApi, ConformanceTableValid)
 {
     fs::path fullConfTablePath = fs::weakly_canonical(fs::path(CONFORMANCE_TABLE_CSV));
     ASSERT_TRUE(fs::exists(fullConfTablePath))
@@ -183,24 +139,23 @@ TEST(TestDataValidity, ConformanceTableValid)
     }
 }
 
-class ConformanceTest
-    : public ::testing::TestWithParam<std::tuple<std::string, OFIQ::QualityMeasure, double, double>>
+class ConformanceTestConfigApi
+    : public ::testing::TestWithParam<
+          std::tuple<std::string, OFIQ::QualityMeasure, double, double>>
 {
 protected:
     static std::shared_ptr<OFIQ::Interface> ofiqImpl;
 
     static void SetUpTestSuite()
     {
-        ofiqImpl = getOfiqImplInstance(OFIQ_LIB_CONFIG_DIR, OFIQ_LIB_CONFIG_FILE);
-
+        ofiqImpl = getOfiqImplInstanceFromConfig(OFIQ_LIB_CONFIG_DIR);
         ASSERT_EQ(ofiqInitResult.code, OFIQ::ReturnCode::Success);
     }
 };
 
+std::shared_ptr<OFIQ::Interface> ConformanceTestConfigApi::ofiqImpl;
 
-std::shared_ptr<OFIQ::Interface> ConformanceTest::ofiqImpl;
-
-TEST_P(ConformanceTest, ValidateScores)
+TEST_P(ConformanceTestConfigApi, ValidateScores)
 {
     std::string imageFile = std::get<0>(GetParam());
     OFIQ::QualityMeasure measure = std::get<1>(GetParam());
@@ -226,14 +181,14 @@ TEST_P(ConformanceTest, ValidateScores)
     ASSERT_TRUE(iter != assessments.qAssessments.end());
     QualityMeasureResult measureResult = iter->second;
 
-    // EXPECT_NEAR(measureResult.rawScore, rawScore, 1e-3);
     ASSERT_NEAR(measureResult.scalar, scalarScore, 1.0)
         << "scalar scores deviate by more than 1" << std::endl;
     ASSERT_EQ(measureResult.scalar, round(measureResult.scalar))
         << "scalar scores have to be integer" << std::endl;
 }
 
-std::string generateTestname(const testing::TestParamInfo<ConformanceTest::ParamType>& info)
+std::string generateTestnameConfigApi(
+    const testing::TestParamInfo<ConformanceTestConfigApi::ParamType>& info)
 {
     std::string imageFile = std::get<0>(info.param);
     OFIQ::QualityMeasure measure = std::get<1>(info.param);
@@ -250,13 +205,9 @@ std::string generateTestname(const testing::TestParamInfo<ConformanceTest::Param
 
 INSTANTIATE_TEST_SUITE_P(
     ConformanceTableTests,
-    ConformanceTest,
+    ConformanceTestConfigApi,
     ::testing::ValuesIn(splitToSingleResults(imageAssessments)),
-    generateTestname);
-
-//
-// Helper functions for parsing conformance table
-//
+    generateTestnameConfigApi);
 
 std::vector<std::tuple<std::string, OFIQ::QualityMeasure, double, double>>
     splitToSingleResults(const std::vector<FaceImageAssessments>& faceimageAssessments)
@@ -289,10 +240,8 @@ std::vector<std::string> getNextLineAndSplitIntoTokens(std::istream& istr, const
     {
         result.emplace_back(cell);
     }
-    // This checks for a trailing comma with no data after it.
     if (!lineStream && cell.empty())
     {
-        // If there was a trailing comma then add an empty element.
         result.emplace_back("");
     }
     return result;
@@ -352,18 +301,13 @@ FaceImageAssessments faceImageAssessmentFromStrings(
     return assessments;
 }
 
-
 std::vector<std::string> parseConformanceTableHeader(
     std::istream& istr,
     std::map<OFIQ::QualityMeasure, int>& colIdxMeasureRaw,
     std::map<OFIQ::QualityMeasure, int>& colIdxMeasureScalar)
 {
     std::vector<std::string> tokens = getNextLineAndSplitIntoTokens(istr);
-
-    std::vector<std::string> invalid_column_names =
-        parseCSVColumnNames(tokens, colIdxMeasureRaw, colIdxMeasureScalar);
-
-    return invalid_column_names;
+    return parseCSVColumnNames(tokens, colIdxMeasureRaw, colIdxMeasureScalar);
 }
 
 std::vector<FaceImageAssessments> parseConformanceTableCSV(
@@ -373,14 +317,13 @@ std::vector<FaceImageAssessments> parseConformanceTableCSV(
 {
     std::vector<FaceImageAssessments> assessments;
 
-    int takeFirstN = INT32_MAX; // 3
+    int takeFirstN = INT32_MAX;
     while (istr && takeFirstN > 0)
     {
         takeFirstN--;
         std::vector<std::string> tokens = getNextLineAndSplitIntoTokens(istr);
         if (tokens.size() < colIdxMeasureRaw.size() + colIdxMeasureScalar.size())
         {
-            // we have an invalid number of tokens
             continue;
         }
 
@@ -398,8 +341,6 @@ int main(int argc, char* args[])
     {
         if (strcmp(args[i], "-c") == 0 && i + 1 < argc)
             OFIQ_LIB_CONFIG_DIR = args[++i];
-        else if (strcmp(args[i], "-cf") == 0 && i + 1 < argc)
-            OFIQ_LIB_CONFIG_FILE = args[++i];
         else if (strcmp(args[i], "-r") == 0 && i + 1 < argc)
             CONFORMANCE_TABLE_CSV = args[++i];
     }

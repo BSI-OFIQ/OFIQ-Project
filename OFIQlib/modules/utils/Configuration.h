@@ -28,12 +28,9 @@
 
 #pragma once
 
-#include <map>
 #include <string>
-#include <filesystem>
-
-#include <tao/json/forward.hpp>
-#include <tao/json/value.hpp>
+#include <string_view>
+#include <vector>
 
  /**
   * Namespace for OFIQ implementations.
@@ -41,21 +38,12 @@
 namespace OFIQ_LIB
 {
     /**
-     * @brief Configuration class 
-     * @details The class consumes the [taoJSON](https://github.com/taocpp/json)
-     * library. A configuration is read from a
-     * [JAXN](https://github.com/stand-art/jaxn)-formatted file.
+     * @brief Abstract configuration interface used by the OFIQ implementation.
      */
     class Configuration
     {
     public:
-        /**
-         * @brief Constructor. 
-         * @param configDir Directory from which a JAXN configuration is read. The path
-         * can be absolute or relative to the path of the current working directory.
-         * @param configFilename Name of the JAXN configuration file in <code>configDir</code>.
-         */
-        Configuration(const std::string& configDir, const std::string& configFilename);
+        virtual ~Configuration() = default;
 
         /**
          * @brief Accesses a boolean configuration.
@@ -65,7 +53,7 @@ namespace OFIQ_LIB
          * otherwise, if the configuration was not successfully accessed, the function
          * returns <code>false</code>.
          */
-        bool GetBool(const std::string& key, bool& value) const;
+        virtual bool GetBool(const std::string& key, bool& value) const = 0;
 
         /**
          * @brief Accesses a string configuration.
@@ -75,7 +63,7 @@ namespace OFIQ_LIB
          * otherwise, if the configuration was not successfully accessed, the function
          * returns <code>false</code>.
          */
-        bool GetString(const std::string& key, std::string& value) const;
+        virtual bool GetString(const std::string& key, std::string& value) const = 0;
 
         /**
          * @brief Accesses a double configuration.
@@ -86,7 +74,7 @@ namespace OFIQ_LIB
          * otherwise, if the configuration was not successfully accessed, the function
          * returns <code>false</code>.
          */
-        bool GetNumber(const std::string& key, double& value) const;
+        virtual bool GetNumber(const std::string& key, double& value) const = 0;
 
         /**
          * @brief Accesses an array of strings configured.
@@ -99,7 +87,7 @@ namespace OFIQ_LIB
          * otherwise, if the configuration was not successfully accessed, the function
          * returns <code>false</code>.
          */
-        bool GetStringList(const std::string& key, std::vector<std::string>& value) const;
+        virtual bool GetStringList(const std::string& key, std::vector<std::string>& value) const = 0;
 
         /**
          * @brief Accesses a boolean configuration.
@@ -107,7 +95,7 @@ namespace OFIQ_LIB
          * @return The accessed boolean configuration.
          * @throws OFIQ_LIB::OFIQError if the configuration was not successfully accessed.
          */
-        bool GetBool(const std::string& key) const;
+        virtual bool GetBool(const std::string& key) const = 0;
 
         /**
          * @brief Accesses a string configuration.
@@ -115,7 +103,7 @@ namespace OFIQ_LIB
          * @return The accessed string configuration.
          * @throws OFIQ_LIB::OFIQError if the configuration was not successfully accessed.
          */
-        std::string GetString(const std::string& key) const;
+        virtual std::string GetString(const std::string& key) const = 0;
 
         /**
          * @brief Accesses a double configuration.
@@ -123,7 +111,7 @@ namespace OFIQ_LIB
          * @return The accessed double configuration.
          * @throws OFIQ_LIB::OFIQError if the configuration was not successfully accessed.
          */
-        double GetNumber(const std::string& key) const;
+        virtual double GetNumber(const std::string& key) const = 0;
 
         /**
          * @brief Access configuration directory.
@@ -132,7 +120,7 @@ namespace OFIQ_LIB
          * method.
          * @return String representation of the configuration directory.
          */
-        std::string getDataDir() const;
+        virtual std::string getDataDir() const = 0;
 
         /**
          * @brief Sets the configuration directory.
@@ -140,7 +128,7 @@ namespace OFIQ_LIB
          * @attention The configurations will not be updated when this method is called;
          * it causes only an update of an internal private path member.
          */
-        void SetDataDir(std::string_view dataDir);
+        virtual void SetDataDir(std::string_view dataDir) = 0;
 
         /**
          * @brief Accesses a full path of a string configuration.
@@ -148,19 +136,6 @@ namespace OFIQ_LIB
          * @return The combined path of the configuration directory and accessed string configuration.
          * @throws OFIQ_LIB::OFIQError if the configuration was not successfully accessed.
          */
-        std::string GetFullPath(const std::string& key) const;
-
-    private:
-        /**
-         * @brief Map holding all configuration that can be accessed using a string key. 
-         */
-        std::map<std::string, tao::json::value, std::less<>> parameters;
-
-        /**
-         * @brief Path to the configuration directory.
-         * @details The member is set either by the constructor or by the
-         * \link OFIQ_LIB::Configuration::SetDataDir() SetDataDir()\endlink method.
-         */
-        std::filesystem::path m_dataDir;
+        virtual std::string GetFullPath(const std::string& key) const = 0;
     };
 }

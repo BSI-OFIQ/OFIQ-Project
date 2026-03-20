@@ -24,9 +24,10 @@
  * @author OFIQ development team
  */
 
-#include "Configuration.h"
 #include "Executor.h"
 #include "FaceMeasures.h"
+#include "InMemoryConfiguration.h"
+#include "JaxnConfiguration.h"
 #include "OFIQError.h"
 #include "image_io.h"
 #include "image_utils.h"
@@ -45,7 +46,27 @@ ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::strin
 {
     try
     {
-        this->config = std::make_unique<Configuration>(configDir, configFilename);
+        this->config = std::make_unique<JaxnConfiguration>(configDir, configFilename);
+        CreateNetworks();
+        m_executorPtr = CreateExecutor();
+    }
+    catch (const OFIQError& ex)
+    {
+        return {ex.whatCode(), ex.what()};
+    }
+    catch (const std::exception& ex)
+    {
+        return {ReturnCode::UnknownError, ex.what()};
+    }
+
+    return ReturnStatus(ReturnCode::Success);
+}
+
+ReturnStatus OFIQImpl::initialize(const OFIQ::Configuration& apiConfig)
+{
+    try
+    {
+        this->config = std::make_unique<InMemoryConfiguration>(apiConfig);
         CreateNetworks();
         m_executorPtr = CreateExecutor();
     }
