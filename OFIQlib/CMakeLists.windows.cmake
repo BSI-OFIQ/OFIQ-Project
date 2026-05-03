@@ -42,7 +42,7 @@ if(USE_CONAN)
 		)
 	endif()
 else(USE_CONAN)
-	list(APPEND OFIQ_LINK_INCLUDE_LIST 
+	list(APPEND OFIQ_LINK_INCLUDE_LIST
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/flatbuffers/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/json/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/magic_enum/include/magic_enum"
@@ -139,7 +139,7 @@ add_definitions(-DOFIQ_EXPORTS)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SourceDefinition.cmake)
 
 if(USE_CONAN)
-	list(APPEND OFIQ_LINK_LIB_LIST 
+	list(APPEND OFIQ_LINK_LIB_LIST
 		opencv::opencv
 		taocpp::json
 		magic_enum::magic_enum
@@ -170,24 +170,41 @@ add_library (ofiq_objlib OBJECT
 	${module_sources}
 	${module_headers}
 	${thirdParty_sources}
-	${libImplementationSources})
-
-
+	${libImplementationSources}
+)
 
 target_link_libraries(ofiq_objlib
 	PRIVATE ${OFIQ_LINK_LIB_LIST}
-	)
+)
 
 
 add_library(ofiq_lib SHARED $<TARGET_OBJECTS:ofiq_objlib>)
 
 target_link_libraries(ofiq_lib
 	PRIVATE ${OFIQ_LINK_LIB_LIST}
-	)
+)
 
+set_target_properties(ofiq_lib
+    PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
+)
 
 # Ignore Linker warning for missing PDB Files
 set_target_properties(ofiq_lib PROPERTIES LINK_FLAGS "/ignore:4099")
+
+add_library(ofiq_c SHARED
+    ${PUBLIC_HEADER_LIST_C_API}
+    ${libImplementationSources_clib}
+)
+
+target_link_libraries(ofiq_c
+	PRIVATE ofiq_lib
+	PRIVATE ${OFIQ_LINK_LIB_LIST}
+)
+
+set_target_properties(ofiq_c
+    PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST_C_API}"
+)
+
 
 # add a test application
 add_executable(OFIQSampleApp ${OFIQLIB_SOURCE_DIR}/src/OFIQSampleApp.cpp)
@@ -196,23 +213,20 @@ target_link_libraries(OFIQSampleApp
 	PRIVATE ${OFIQ_LINK_LIB_LIST}
 )
 
-
-set_target_properties(ofiq_lib 
-        PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
-        )
-
 MESSAGE( STATUS "INSTALLING TARGETS ...")
 
-
-install(TARGETS OFIQSampleApp
-        RUNTIME DESTINATION $<CONFIG>/bin
-)
-
+install(TARGETS OFIQSampleApp RUNTIME DESTINATION $<CONFIG>/bin)
 
 get_property(IMPORTED_LIB_LOCATION TARGET onnxruntime PROPERTY IMPORTED_LOCATION)
 install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION "$<CONFIG>/bin")
 
 install(TARGETS ofiq_lib
+        RUNTIME DESTINATION $<CONFIG>/bin
+        ARCHIVE DESTINATION $<CONFIG>/lib
+        PUBLIC_HEADER DESTINATION $<CONFIG>/include/
+)
+
+install(TARGETS ofiq_c
         RUNTIME DESTINATION $<CONFIG>/bin
         ARCHIVE DESTINATION $<CONFIG>/lib
         PUBLIC_HEADER DESTINATION $<CONFIG>/include/

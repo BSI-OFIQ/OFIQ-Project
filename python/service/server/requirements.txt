@@ -1,0 +1,5 @@
+connexion[flask,swagger-ui,uvicorn] >= 2.6.0
+setuptools >= 21.0.0
+six >= 1.10
+swagger-ui-bundle >= 0.0.2
+gunicorn >= 22.0.0

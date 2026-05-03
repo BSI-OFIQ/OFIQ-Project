@@ -32,6 +32,7 @@
 #include "image_utils.h"
 #include "ofiq_lib_impl.h"
 #include "utils.h"
+#include <opencv2/core/utils/logger.hpp>
 #include <chrono>
 using hrclock = std::chrono::high_resolution_clock;
 
@@ -43,6 +44,8 @@ using namespace OFIQ_LIB::modules::measures;
 
 ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::string& configFilename)
 {
+    cv::utils::logging::setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_ERROR);
+
     try
     {
         this->config = std::make_unique<Configuration>(configDir, configFilename);
@@ -357,8 +360,8 @@ ReturnStatus OFIQImpl::getPreprocessingResults(
             faceParsingImage,
             alignedToParsedTransform,
             cv::Size(width, height),
-            1,
-            0,
+            cv::INTER_NEAREST,
+            cv::BORDER_CONSTANT,
             255);
         preprocessing.m_segmentationMaskPtr = std::shared_ptr<uint8_t[]>(new uint8_t[area]);
         memcpy(preprocessing.m_segmentationMaskPtr.get(), faceParsingImage.data, area);
@@ -374,7 +377,8 @@ ReturnStatus OFIQImpl::getPreprocessingResults(
             alignedFaceOcclusionSegmentationImage,
             faceOcclusionSegmentationImage,
             alignedToOriginalTransform,
-            cv::Size(width, height));
+            cv::Size(width, height),
+            cv::INTER_NEAREST);
         preprocessing.m_occlusionMaskPtr = std::shared_ptr<uint8_t[]>(new uint8_t[area]);
         memcpy(preprocessing.m_occlusionMaskPtr.get(), faceOcclusionSegmentationImage.data, area);
     }
@@ -388,7 +392,8 @@ ReturnStatus OFIQImpl::getPreprocessingResults(
             alignedLandmarkedRegionImage,
             landmarkedRegionImage,
             alignedToOriginalTransform,
-            cv::Size(width, height));
+            cv::Size(width, height),
+            cv::INTER_NEAREST);
         preprocessing.m_landmarkedRegionPtr = std::shared_ptr<uint8_t[]>(new uint8_t[area]);
         memcpy(preprocessing.m_landmarkedRegionPtr.get(), landmarkedRegionImage.data, area);
     }
