@@ -45,4 +45,4 @@ jobs:
       if: always()
       with:
         name: ofiq-ubuntu-${{ matrix.configuration }}
-        path: ./*
+        path: ./install_x86_64_linux/*

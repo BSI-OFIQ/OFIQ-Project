@@ -162,7 +162,7 @@ then
     cp $install_dir/Release/lib/* ./python/ofiq/
     cd python
     python -m venv .venv
-    source .venv/bin/activate
+    . .venv/bin/activate
     pip install poetry
     poetry build --clean
     cp -pv dist/*  ../$install_dir/Release/
