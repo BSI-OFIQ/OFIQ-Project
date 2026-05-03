@@ -71,11 +71,11 @@ This will create the following output.
  </tr>
  <tr>
   <td>data/models/</td>
-  <td>Model files downloaded from the ISO portal during build process.</td>
+  <td>Model files downloaded from the ISO portal or eu-LISA during build process.</td>
  </tr>
  <tr>
   <td>data/tests/images/</td>
-  <td>Conformance test images downloaded from the ISO portal.</td>
+  <td>Conformance test images downloaded from the ISO portal or eu-LISA.</td>
  </tr>
 </table>
 
@@ -350,7 +350,7 @@ Then apply the same actions as for MacOS compilation on ARM64.
 
 ## Download model files
 
-To run OFIQ, the model files from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-MODELS.zip)
+To run OFIQ, the model files from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-MODELS.zip) (or  alternatively from the [eu-LISA](https://resources.eulisa.europa.eu/research/OFIQ-Models.zip)
 need to be downloaded and be placed in the <code>./data/models/</code> directory so that the file structure matches the following.
 <table>
  <tr><td>/path/to/OFIQ-Project/data/models/expression_neutrality/*</td></td>
@@ -372,7 +372,7 @@ This step is integrated in the cmake building process.
 
 To run conformance tests, the conformance test
 images need to be downloaded from
-[the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-IMAGES.zip)
+[the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-IMAGES.zip) or (alternative from the [eu-LISA](https://resources.eulisa.europa.eu/research/OFIQ-ImagesConformanceTest+TargetValues.zip))
 and be placed in the <code>./data/tests/images/</code> directory so that the file structure matches the following.
 <table>
  <tr><td>/path/to/OFIQ-Project/data/tests/images/b-01-smile.png</td></td>
@@ -385,9 +385,7 @@ Here, <code>/path/to/OFIQ-Project/</code> denotes the path to OFIQ's root folder
 ## Download of external libraries
 
 The source of the external libraries that are used by OFIQ can be downloaded
-along with a full OFIQ relase from [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-Release.zip).
-<br/><br/>
-NOTE: At the date of publication, the link to the full OFIQ release were not available.
+along with a full OFIQ release from [eu-LISA](https://resources.eulisa.europa.eu/research/OFIQ-ExternalLibraryDependencies-v1.1.1.zip).
 <br/><br>
 To build OFIQ without conan (described below), we need to extract the archive so that file structure
 matches the following:
@@ -439,7 +437,7 @@ sh build.sh --no-conan --no-download
 
 on Linux and MacOS. 
 <br /><br />
-It is important to note that building without conan while suppressing download requires manual extraction of model files and external library dependencies (and perhaps conformance test images) before running the building scripts. Further note, the files have to be placed manually in the right directory as described above. The missing files can be downloaded along with the release archive published at [the ISO portal](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/OFIQ-Release.zip).
+It is important to note that building without conan while suppressing download requires manual extraction of model files and external library dependencies (and perhaps conformance test images) before running the building scripts. Further note, the files have to be placed manually in the right directory as described above. The missing files can be downloaded along with the release archive available from [eu-LISA](https://resources.eulisa.europa.eu/research/OFIQ-PrecompiledBinaries.zip).
 <br/><br/>
 
 # Running conformance tests
@@ -558,4 +556,4 @@ OFIQ may compile on other configurations that have not been tested by the OFIQ d
 
 # Precompiled binaries
 
-A set of pre-compiled library binaries and the OFIQSampleApp will be made available on the ISO portal: [https://standards.iso.org/iso-iec/29794/-5/ed-1/en/](https://standards.iso.org/iso-iec/29794/-5/ed-1/en/)
+Pre-compiled library binaries are available from [eu-LISA](https://resources.eulisa.europa.eu/research/OFIQ-PrecompiledBinaries.zip).

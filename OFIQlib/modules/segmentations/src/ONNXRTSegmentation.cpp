@@ -58,15 +58,14 @@ std::vector<Ort::Value> ONNXRuntimeEnv::run(std::vector<float>& i_netInput)
     Ort::AllocatedStringPtr inputName = m_ortSession->GetInputNameAllocated(0, ort_alloc);
     std::array<const char*, 1> inputNames = {inputName.get()};
     std::vector<const char*> outputNames;
+    std::vector<Ort::AllocatedStringPtr> outputNamePtrs;
     const size_t num_output_nodes = m_ortSession->GetOutputCount();
-    for (int i = 0; i < num_output_nodes; i++)
+    outputNamePtrs.reserve(num_output_nodes);
+    for (size_t i = 0; i < num_output_nodes; i++)
     {
-        Ort::AllocatedStringPtr outputName = m_ortSession->GetOutputNameAllocated(i, ort_alloc);
-        outputNames.push_back(outputName.get());
-        outputName.release();
+        outputNamePtrs.push_back(m_ortSession->GetOutputNameAllocated(i, ort_alloc));
+        outputNames.push_back(outputNamePtrs.back().get());
     }
-
-    inputName.release();
 
     // define Tensor
     auto inputTensor = Ort::Value::CreateTensor<float>(

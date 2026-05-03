@@ -1,7 +1,7 @@
 /**
  * @file test_conformance_table.cpp
  *
- * @copyright Copyright (c) 2024  Federal Office for Information Security, Germany
+ * @copyright Copyright (c) 2024, 2025, 2026 Federal Office for Information Security, Germany
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,10 @@
  */
 
 #include <ofiq_lib.h>
-//#include "test_constants.h"
 #include "image_io.h"
 
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
-//#include <utils.h>
 #include <filesystem>
 #include <fstream>
 #include <iostream>

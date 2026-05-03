@@ -177,7 +177,7 @@ int runQuality(
             for (const auto& [measure, measure_result] : faceImageQAs[0].qAssessments)
             {
                 auto mName = static_cast<std::string>(magic_enum::enum_name(measure));
-                measureNames.push_back(mName);
+                measureNames.push_back(mName+string(".native"));
                 measureNamesScalar.push_back(mName + string(".scalar"));
             }
 

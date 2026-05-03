@@ -11,11 +11,12 @@ on OFIQ's license and the license of its dependencies: [LICENSE.md](LICENSE.md)
   
 ## Getting started
 For a tutorial on how to compile and operate OFIQ, see [here](BUILD.md).
-For a tutorial on how to compile and operatate OFIQ on mobile platforms, see [here](mobile/BUILD.md).
+For a tutorial on how to compile and operate OFIQ on mobile platforms, 
+see [here](mobile/BUILD.md).
 
 ## Reference manual
-A full documentation of __OFIQ__ including compilation, configuration and a comprehensive doxygen documentation of 
-the C/C++ API is contained in the reference manual:
+A full documentation of __OFIQ__ including compilation, configuration and a comprehensive doxygen 
+documentation of the C/C++ API is contained in the reference manual: 
 see [doc/refman.pdf](doc/refman.pdf).
 
 ## Known issues

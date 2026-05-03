@@ -170,16 +170,15 @@ namespace OFIQ_LIB::modules::landmarks
             Ort::AllocatedStringPtr inputName = m_ort_session->GetInputNameAllocated(0, ort_alloc);
             const std::array<const char*, 1> inputNames = {inputName.get()};
             std::vector<const char*> outputNames;
+            std::vector<Ort::AllocatedStringPtr> outputNamePtrs;
             const size_t num_output_nodes = m_ort_session->GetOutputCount();
-            for (int i = 0; i < num_output_nodes; i++)
+            outputNamePtrs.reserve(num_output_nodes);
+            for (size_t i = 0; i < num_output_nodes; i++)
             {
-                Ort::AllocatedStringPtr outputName =
-                    m_ort_session->GetOutputNameAllocated(i, ort_alloc);
-                outputNames.push_back(outputName.get());
-                outputName.release();
+                outputNamePtrs.push_back(
+                    m_ort_session->GetOutputNameAllocated(i, ort_alloc));
+                outputNames.push_back(outputNamePtrs.back().get());
             }
-
-            inputName.release();
 
             // run inference
             try
