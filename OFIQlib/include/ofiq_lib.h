@@ -31,17 +31,9 @@
 #include <string>
 #include <vector>
 
+#include <ofiq_export.h>
+#include <ofiq_config.h>
 #include <ofiq_structs.h>
-
-#ifdef _WIN32
-#    ifdef OFIQ_EXPORTS
-#        define OFIQ_EXPORT __declspec(dllexport)
-#    else
-#        define OFIQ_EXPORT __declspec(dllimport)
-#    endif
-#else
-#    define OFIQ_EXPORT
-#endif
 
 /**
  * @brief Namespace for OFIQ API.
@@ -124,6 +116,16 @@ namespace OFIQ
          */
         virtual OFIQ::ReturnStatus
             initialize(const std::string& configDir, const std::string& configFileName) = 0;
+
+        /**
+         * @brief This function initializes the implementation under test.
+         * The implementation under test should set all parameters.
+         *
+         * @param[in] config
+         * Configuration values used to initialize the implementation under test.
+         * @return OFIQ::ReturnStatus indicating if the initialization was successful.
+         */
+        virtual OFIQ::ReturnStatus initialize(const OFIQ::Configuration& config) = 0;
 
         /**
          * @brief This function takes an image and outputs a quality scalar.

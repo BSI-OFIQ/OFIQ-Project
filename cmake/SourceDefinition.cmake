@@ -1,5 +1,7 @@
 list(APPEND PUBLIC_HEADER_LIST
 	${OFIQLIB_SOURCE_DIR}/include/ofiq_lib.h
+	${OFIQLIB_SOURCE_DIR}/include/ofiq_export.h
+	${OFIQLIB_SOURCE_DIR}/include/ofiq_config.h
 	${OFIQLIB_SOURCE_DIR}/include/ofiq_structs.h
 )
 
@@ -12,6 +14,7 @@ list(APPEND PUBLIC_HEADER_LIST_C_API
 list(APPEND libImplementationSources
 	${OFIQLIB_SOURCE_DIR}/src/OFIQImpl.cpp
 	${OFIQLIB_SOURCE_DIR}/src/OFIQInitialization.cpp
+	${OFIQLIB_SOURCE_DIR}/src/ofiq_config.cpp
 )
 
 list(APPEND libImplementationSources_clib
@@ -58,7 +61,8 @@ list(APPEND module_sources
 	${OFIQLIB_SOURCE_DIR}/modules/segmentations/src/FaceParsing.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/segmentations/src/FaceOcclusionSegmentation.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/segmentations/src/segmentations.cpp
-	${OFIQLIB_SOURCE_DIR}/modules/utils/src/Configuration.cpp
+	${OFIQLIB_SOURCE_DIR}/modules/utils/src/InMemoryConfiguration.cpp
+	${OFIQLIB_SOURCE_DIR}/modules/utils/src/JaxnConfiguration.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/DataStreamAndroid.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/OFIQError.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/utils/src/image_io.cpp
@@ -114,6 +118,8 @@ list(APPEND module_headers
 	${OFIQLIB_SOURCE_DIR}/modules/segmentations/FaceOcclusionSegmentation.h
 	${OFIQLIB_SOURCE_DIR}/modules/segmentations/segmentations.h
 	${OFIQLIB_SOURCE_DIR}/modules/utils/Configuration.h
+	${OFIQLIB_SOURCE_DIR}/modules/utils/InMemoryConfiguration.h
+	${OFIQLIB_SOURCE_DIR}/modules/utils/JaxnConfiguration.h
 	${OFIQLIB_SOURCE_DIR}/modules/utils/DataStream.h
 	${OFIQLIB_SOURCE_DIR}/modules/utils/DataStreamAndroid.h
 	${OFIQLIB_SOURCE_DIR}/modules/utils/DataStreamIOS.h

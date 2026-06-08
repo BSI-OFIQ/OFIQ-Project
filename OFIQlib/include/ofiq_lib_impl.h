@@ -67,6 +67,14 @@ namespace OFIQ_LIB
             initialize(const std::string& configDir, const std::string& configValue) override;
 
         /**
+         * @brief Initialize the lib using an in-memory configuration.
+         *
+         * @param config Typed configuration values.
+         * @return OFIQ::ReturnStatus
+         */
+        OFIQ::ReturnStatus initialize(const OFIQ::Configuration& config) override;
+
+        /**
          * @brief Compute an overall quality score for the image provided.
          * @details The overall quality score will be equal to the measure ualityMeasure::UnifiedQualityScore if it is activated. 
          * Otherwise, the overall quality score will be the mean of all active measure scores.
@@ -113,7 +121,7 @@ namespace OFIQ_LIB
         std::unique_ptr<OFIQ_LIB::modules::measures::Executor> m_executorPtr;
 
         /**
-         * @brief Pointer to the cinfiguration
+         * @brief Pointer to the configuration
          * 
          */
         std::unique_ptr<Configuration> config;

@@ -449,6 +449,11 @@ and run
  * <code>conformance_tests.sh --os linux-arm64</code> (Linux/ARMv8)
  * <code>conformance_tests.sh --os macos</code> (MacOS).
 
+These scripts execute the following test binaries:
+ * <code>test_config_defaults_jaxn</code>
+ * <code>test_conformance_table_jaxnconfig</code>
+ * <code>test_conformance_table_inmemoryconfig</code>
+
 # Running the sample executable
 
 In this section, we describe how to run the sample application of OFIQ after
