@@ -32,11 +32,15 @@
 namespace OFIQ_LIB
 {
     /**
-     * @brief Utility for reading thread limits from the JAXN configuration.
-     * @details The following optional top-level configuration keys are supported:
-     * <code>opencv_threads</code>, <code>ort_intra_threads</code>, and
-     * <code>ort_inter_threads</code>. A value of <code>0</code> keeps the
-     * corresponding backend default behavior.
+     * @brief Utility for reading thread limits and the ONNX Runtime execution
+     * mode from the JAXN configuration.
+     * @details The following optional configuration keys are supported:
+     * <code>opencv_threads</code>, <code>ort_intra_threads</code>,
+     * <code>ort_inter_threads</code>, and <code>ort_run_parallel</code>.
+     * For the thread limits, a value of <code>0</code> keeps the corresponding
+     * backend default behavior. The boolean <code>ort_run_parallel</code>
+     * selects the ONNX Runtime execution mode and defaults to <code>false</code>
+     * (sequential execution).
      */
     class RuntimeThreadSettings
     {
@@ -50,17 +54,22 @@ namespace OFIQ_LIB
         /**
          * @brief JAXN key for the OpenCV thread limit.
          */
-        inline static constexpr const char* OpenCVThreadsConfigKey = "opencv_threads";
+        inline static constexpr const char* OpenCVThreadsConfigKey = "params.threading.opencv_threads";
 
         /**
          * @brief JAXN key for the ONNX Runtime intra-op thread limit.
          */
-        inline static constexpr const char* OrtIntraThreadsConfigKey = "ort_intra_threads";
+        inline static constexpr const char* OrtIntraThreadsConfigKey = "params.threading.ort_intra_threads";
 
         /**
          * @brief JAXN key for the ONNX Runtime inter-op thread limit.
          */
-        inline static constexpr const char* OrtInterThreadsConfigKey = "ort_inter_threads";
+        inline static constexpr const char* OrtInterThreadsConfigKey = "params.threading.ort_inter_threads";
+        
+        /**
+         * @brief JAXN key for the ONNX Runtime execution mode.
+         */
+        inline static constexpr const char* OrtRunParallelConfigKey = "params.threading.ort_run_parallel";
 
         /**
          * @brief Reads a configured thread limit from the JAXN configuration.
@@ -93,6 +102,14 @@ namespace OFIQ_LIB
          * @return Configured inter-op thread limit, or <code>0</code> if not set.
          */
         static unsigned int GetOrtInterThreadCount(const Configuration& config);
+        
+        /**
+         * @brief Reads the ONNX Runtime execution mode.
+         * @param config Configuration instance.
+         * @return <code>true</code> for parallel execution mode
+         * and <code>false</code> for sequential execution or if the key is not set.
+         */
+        static bool GetOrtRunParallel(const Configuration& config);
 
         /**
          * @brief Applies the configured OpenCV thread limit globally.
