@@ -1,0 +1,9 @@
+server:
+  port: 8088
+  # the level is one of the predefined levels (CRITICAL, ERROR, WARNING, INFO, DEBUG)
+  loglevel: WARNING
+ofiq:
+  # relative path from the server directory to the data directory in repository root folder,
+  # which contains the config file and other resources
+  data_dir: ../../../data
+  cfg_file: ofiq_config.jaxn

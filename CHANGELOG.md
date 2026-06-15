@@ -1,5 +1,12 @@
 # Changes
 
+## Version 1.2.0 (2026-03-03)
+
+- Implemented a C interface for OFIQ library [OFIQlib\include\ofiq_libc.h](OFIQlib\include\ofiq_libc.h).
+- Implemented a python wrapper for OFIQ library. See the corresponding [README.md](python\README.md).
+- Implemented a web service and corresponding client web application using the python wrapper.
+
+
 ## Version 1.1.2 (2026-02-05)
 - In v1.0.3 using ```OFIQ::Image::deepcopy```, the pixel data was interpreted as RGB. In v1.1.0 and v1.1.1 the pixel data has been interpreted as BGR which is a change in the API. To patch this, an argument ```bool isRgb``` has been added to the argument list of ```OFIQ::Image::deepcopy``` and which is ```true``` by default. When ```true``` the method ```OFIQ::Image::deepcopy``` interprets the
 specified data as RGB; otherwise, if ```false```, ```OFIQ::Image::deepcopy``` interprets the specified pixel data as BGR.

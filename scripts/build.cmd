@@ -44,7 +44,7 @@ IF %architecture%==x86 (
 @REM  switch to compiler.version 17 based on parameter provided
 IF %set_compiler%==16 (
   set generator="Visual Studio 16 2019"
-  set "compiler="
+  set compiler=-s:a compiler.version=192
 ) else if %set_compiler%==17 (
   set generator="Visual Studio 17 2022"
   set compiler=-s:a compiler.version=194

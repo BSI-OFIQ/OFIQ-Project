@@ -33,7 +33,7 @@ jobs:
     - name: Build OFIQ
       run: |
         cd scripts
-        sh build.sh ${{ matrix.configuration == 'Debug' && '--debug' || '' }}
+        sh build.sh ${{ matrix.configuration == 'Debug' && '--debug' || '' }} --build-python
 
     - name: Run Conformance Tests
       run: |
@@ -45,4 +45,4 @@ jobs:
       if: always()
       with:
         name: ofiq-ubuntu-${{ matrix.configuration }}
-        path: ./*
+        path: ./install_x86_64_linux/*

@@ -1,4 +1,4 @@
-list(APPEND CMAKE_MODULE_PATH 
+list(APPEND CMAKE_MODULE_PATH
 	"${CMAKE_CURRENT_SOURCE_DIR}/build/conan"
 	"${CMAKE_SOURCE_DIR}/cmake"
 )
@@ -30,12 +30,12 @@ if(USE_CONAN)
 
 	add_library(onnxruntime SHARED IMPORTED)
 	set_target_properties(onnxruntime PROPERTIES
-	IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-x64-1.18.1/lib/libonnxruntime.so
-	IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-x64-1.18.1/lib/libonnxruntime.so.1.18.1
-	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-x64-1.18.1/include
+		IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-x64-1.18.1/lib/libonnxruntime.so
+		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-x64-1.18.1/lib/libonnxruntime.so.1.18.1
+		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime-linux-x64-1.18.1/include
 	)
 else(USE_CONAN)
-	list(APPEND OFIQ_LINK_INCLUDE_LIST 
+	list(APPEND OFIQ_LINK_INCLUDE_LIST
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/flatbuffers/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/json/include"
 		"${CMAKE_CURRENT_SOURCE_DIR}/extern/magic_enum/include/magic_enum"
@@ -121,7 +121,7 @@ else(USE_CONAN)
 
 	add_library(OpenCV INTERFACE)
 	target_link_libraries(OpenCV INTERFACE OpenCV::calib3d OpenCV::imgcodecs
-		OpenCV::dnn OpenCV::ml OpenCV::features2d OpenCV::flann OpenCV::imgproc OpenCV::core ittnotify 
+		OpenCV::dnn OpenCV::ml OpenCV::features2d OpenCV::flann OpenCV::imgproc OpenCV::core ittnotify
 		libjpeg-turbo libopenjp2 zlib libpng libprotobuf ${CMAKE_DL_LIBS} -lpthread)
 endif(USE_CONAN)
 
@@ -134,34 +134,54 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SourceDefinition.cmake)
 
 if(USE_CONAN)
-	list(APPEND OFIQ_LINK_LIB_LIST 
-			opencv::opencv
-			taocpp::json
-			magic_enum::magic_enum
-			onnxruntime
-			gzip-hpp::gzip-hpp
+	list(APPEND OFIQ_LINK_LIB_LIST
+		opencv::opencv
+		taocpp::json
+		magic_enum::magic_enum
+		onnxruntime
+		gzip-hpp::gzip-hpp
 	)
 else(USE_CONAN)
-        list(APPEND OFIQ_LINK_LIB_LIST
-                onnxruntime
-                OpenCV
-        )
+	list(APPEND OFIQ_LINK_LIB_LIST
+		onnxruntime
+		OpenCV
+	)
 endif(USE_CONAN)
 
 add_library (ofiq_objlib OBJECT
-        ${module_sources}
-        ${thirdParty_sources}
-        ${libImplementationSources}
- )
+	${module_sources}
+	${thirdParty_sources}
+	${libImplementationSources}
+)
 
 target_link_libraries(ofiq_objlib
         PRIVATE ${OFIQ_LINK_LIB_LIST}
 )
 
+# OFIQ library
 add_library(ofiq_lib SHARED $<TARGET_OBJECTS:ofiq_objlib>)
 
 target_link_libraries(ofiq_lib
         PRIVATE ${OFIQ_LINK_LIB_LIST}
+)
+
+set_target_properties(ofiq_lib
+        PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
+)
+
+# C API library
+add_library(ofiq_c SHARED
+    ${PUBLIC_HEADER_LIST_C_API}
+    ${libImplementationSources_clib}
+)
+
+target_link_libraries(ofiq_c
+	PRIVATE ofiq_lib
+	PRIVATE ${OFIQ_LINK_LIB_LIST}
+)
+
+set_target_properties(ofiq_c
+    PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST_C_API}"
 )
 
 # add a test application
@@ -171,67 +191,30 @@ target_link_libraries(OFIQSampleApp
 	PRIVATE ${OFIQ_LINK_LIB_LIST}
 )
 
-
-set_target_properties(ofiq_lib 
-        PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
-)
-
 MESSAGE( STATUS "INSTALLING TARGETS ...")
 
+install(TARGETS OFIQSampleApp RUNTIME DESTINATION $<CONFIG>/bin)
+
 get_property(IMPORTED_LIB_LOCATION TARGET onnxruntime PROPERTY IMPORTED_LOCATION)
-
-install(FILES "${IMPORTED_LIB_LOCATION}" 
-        CONFIGURATIONS Release 
-        DESTINATION Release/bin
-)
-
-install(FILES "${IMPORTED_LIB_LOCATION}" 
-        CONFIGURATIONS Release
-        DESTINATION Release/lib
-)
-
-install(FILES "${IMPORTED_LIB_LOCATION}" 
-        CONFIGURATIONS Debug 
-        DESTINATION Debug/bin
-)
-
-install(FILES "${IMPORTED_LIB_LOCATION}" 
-        CONFIGURATIONS Debug 
-        DESTINATION Debug/lib
-)
-
-install(TARGETS OFIQSampleApp
-	CONFIGURATIONS Release
-	DESTINATION Release/bin
-)
+install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION "$<CONFIG>/bin")
+install(FILES "${IMPORTED_LIB_LOCATION}" DESTINATION "$<CONFIG>/lib")
 
 install(TARGETS ofiq_lib
-	CONFIGURATIONS Release
-        DESTINATION Release/lib
-        PUBLIC_HEADER DESTINATION include/
+        RUNTIME DESTINATION $<CONFIG>/bin
+        LIBRARY DESTINATION $<CONFIG>/lib
+        ARCHIVE DESTINATION $<CONFIG>
+        PUBLIC_HEADER DESTINATION $<CONFIG>/include/
 )
-
-install(TARGETS ofiq_lib 
-	CONFIGURATIONS Release
-	DESTINATION Release/bin
-	PUBLIC_HEADER DESTINATION include/
-)
-
-install(TARGETS OFIQSampleApp
-	CONFIGURATIONS Debug
-	DESTINATION Debug/bin
-)
-
 install(TARGETS ofiq_lib
-	CONFIGURATIONS Debug
-        DESTINATION Debug/lib
-        PUBLIC_HEADER DESTINATION include/
+         LIBRARY DESTINATION $<CONFIG>/bin
 )
 
-install(TARGETS ofiq_lib
-	CONFIGURATIONS Debug
-        DESTINATION Debug/bin
-	PUBLIC_HEADER DESTINATION include/
+install(TARGETS ofiq_c
+        RUNTIME DESTINATION $<CONFIG>/bin
+        LIBRARY DESTINATION $<CONFIG>/lib
+        ARCHIVE DESTINATION $<CONFIG>
+        PUBLIC_HEADER DESTINATION $<CONFIG>/include/
 )
-
-install(FILES "$<TARGET_FILE_DIR:ofiq_lib>/ofiq_lib.pdb" DESTINATION "Debug/bin" OPTIONAL)
+install(TARGETS ofiq_c
+        LIBRARY DESTINATION $<CONFIG>/bin
+)

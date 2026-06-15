@@ -1,0 +1,401 @@
+openapi: 3.0.3
+info:
+  title: OFIQ API
+  description: API for perfoming requests against the Open Face Image Quality service.
+  version: 0.1.0
+servers:
+- url: http://127.0.0.1:8088/
+paths:
+  /scalar_quality:
+    post:
+      summary: Returns an overall image quality core
+      description: |-
+        Performs an overall image quality analysis.
+        Returns an object that contains the unified quality score for the face image provided.
+      operationId: scalar_quality
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisRequestData"
+        required: true
+      responses:
+        "200":
+          description: The analysis was performed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScalarQualityResponseData"
+        "400":
+          description: The analysis failed because of invalid input data.
+        "404":
+          description: The analysis failed because no face found in provided image.
+        "500":
+          description: The analysis failed because of an internal server error.
+      x-openapi-router-controller: ofiq_server.controllers.default_controller
+  /vector_quality:
+    post:
+      summary: Returns quality scores for different face quality measurements
+      description: |-
+        Perform image quality analysis based on different face quality measurements.
+        Returns an object that contains native and scalar scores for each image quality measurement.
+      operationId: vector_quality
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisRequestData"
+        required: true
+      responses:
+        "200":
+          description: The analysis was performed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VectorQualityResponseData"
+        "400":
+          description: The analysis failed because of invalid input data.
+        "404":
+          description: The analysis failed because no face found in provided image.
+        "500":
+          description: The analysis failed because of an internal server error.
+      x-openapi-router-controller: ofiq_server.controllers.default_controller
+  /face_image_quality:
+    post:
+      summary: Returns face image quality analysis results including preprocessing
+        results
+      description: |-
+        Perform face image quality analysis, includes assessment results for face quality measurements and preprocessing results like face region bounding box, face landmarks and face region masks
+        image quality analysis based on different face quality measurements.
+        Returns an object that contains native and scalar scores for each image quality measurement.
+      operationId: face_image_quality
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisRequestData"
+        required: true
+      responses:
+        "200":
+          description: The analysis was performed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResponseData"
+        "400":
+          description: The analysis failed because of invalid input data.
+        "404":
+          description: The analysis failed because no face found in provided image.
+        "500":
+          description: The analysis failed because of an internal server error.
+      x-openapi-router-controller: ofiq_server.controllers.default_controller
+  /health:
+    get:
+      summary: Service Health Information
+      description: Returns the current state of the service.
+      operationId: health
+      responses:
+        "200":
+          description: The service runs as expected.
+        "500":
+          description: The service is currently not ready to process requests.
+      x-openapi-router-controller: ofiq_server.controllers.default_controller
+components:
+  schemas:
+    Image:
+      required:
+      - base64_data
+      type: object
+      properties:
+        base64_data:
+          type: string
+          description: Base64 encoded representation of the image data.
+          format: byte
+          # example: !!binary |-
+          #   Wm05dlltRnlDZz09
+      description: Base64 encoded representation of an image and the appropriate MIME
+        type.
+      example:
+        # base64_data: !!binary |-
+        #   Wm05dlltRnlDZz09
+    BoundingBox:
+      required:
+      - height
+      - width
+      - x
+      - "y"
+      type: object
+      properties:
+        x:
+          type: integer
+          description: x-coordinate of the top left corner of the face region in the
+            image
+          example: 100
+        "y":
+          type: integer
+          description: y-coordinate of the top left corner of the face region in the
+            image
+          example: 200
+        width:
+          type: integer
+          description: Width of the face region in the image
+          example: 200
+        height:
+          type: integer
+          description: Height of the face region in the image
+          example: 200
+      description: Coordinates of the top left corner and dimensions of a face region
+        detected in the image
+      example:
+        x: 100
+        width: 200
+        "y": 200
+        height: 200
+    Point:
+      required:
+      - x
+      - "y"
+      type: object
+      properties:
+        x:
+          type: integer
+          description: x-coordinate of the point
+          example: 100
+        "y":
+          type: integer
+          description: y-coordinate of the point
+          example: 200
+      description: Coordinates of a point in the image
+      example:
+        x: 100
+        "y": 200
+    Landmarks:
+      required:
+      - points
+      type: object
+      properties:
+        points:
+          type: array
+          items:
+            $ref: "#/components/schemas/Point"
+      description: Face landmark points
+      example:
+        points:
+        - x: 100
+          "y": 200
+        - x: 100
+          "y": 200
+    QualityAssessmentResult:
+      required:
+      - measure
+      - native_score
+      - scalar_score
+      type: object
+      properties:
+        measure:
+          type: string
+          description: "Name of a face quality measurement, e.g. one of \\'UnifiedQualityScore\\\
+            ', \\'BackgroundUniformity\\', \\'Sharpness\\' etc."
+          example: BackgroundUniformity
+        native_score:
+          type: number
+          description: Score value as computed by the quality measure implementation
+          example: 76.54
+        scalar_score:
+          type: integer
+          description: "A scalar value from the interval [0,100]. Higher values mean\
+            \ higher quality. A value of -1.0 indicates a failed attempt to calculate\
+            \ a quality score or the value is unassigned"
+          example: 90
+      description: Result of a face quality assessment
+      example:
+        measure: BackgroundUniformity
+        scalar_score: 90
+        native_score: 76.54
+    QualityAssessmentResults:
+      required:
+      - results
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/QualityAssessmentResult"
+      description: A collection of all face quality assessment results
+      example:
+        results:
+        - measure: BackgroundUniformity
+          scalar_score: 90
+          native_score: 76.54
+        - measure: BackgroundUniformity
+          scalar_score: 90
+          native_score: 76.54
+    ScalarQualityAnalysisResult:
+      required:
+      - score
+      type: object
+      properties:
+        score:
+          type: integer
+          description: "A scalar value from the interval [0,100]. Higher values mean\
+            \ higher quality. A value of -1.0 indicates a failed attempt to calculate\
+            \ a quality score or the value is unassigned"
+          example: 90
+      description: Result of an overall quality score analysis for the image provided.
+      example:
+        score: 90
+    VectorQualityAnalysisResult:
+      required:
+      - assessments
+      type: object
+      properties:
+        assessments:
+          $ref: "#/components/schemas/QualityAssessmentResults"
+      description: "Results of face image quality analysis, includes assessment results\
+        \ for face quality measurements"
+      example:
+        assessments:
+          results:
+          - measure: BackgroundUniformity
+            scalar_score: 90
+            native_score: 76.54
+          - measure: BackgroundUniformity
+            scalar_score: 90
+            native_score: 76.54
+    FaceImageAnalysisResult:
+      required:
+      - assessments
+      type: object
+      properties:
+        assessments:
+          $ref: "#/components/schemas/QualityAssessmentResults"
+        bounding_box:
+          $ref: "#/components/schemas/BoundingBox"
+        landmarks:
+          $ref: "#/components/schemas/Landmarks"
+        mask_segmentation:
+          $ref: "#/components/schemas/Image"
+        mask_occlusion:
+          $ref: "#/components/schemas/Image"
+        mask_landmarked_region:
+          $ref: "#/components/schemas/Image"
+      description: "Results of face image quality analysis, includes assessment results\
+        \ for face quality measurements and preprocessing results like face region\
+        \ bounding box, face landmarks and face region masks."
+      example:
+        assessments:
+          results:
+          - measure: BackgroundUniformity
+            scalar_score: 90
+            native_score: 76.54
+          - measure: BackgroundUniformity
+            scalar_score: 90
+            native_score: 76.54
+        mask_segmentation:
+          # base64_data: !!binary |-
+          #   Wm05dlltRnlDZz09
+        bounding_box:
+          x: 100
+          width: 200
+          "y": 200
+          height: 200
+        mask_landmarked_region: null
+        landmarks:
+          points:
+          - x: 100
+            "y": 200
+          - x: 100
+            "y": 200
+        mask_occlusion: null
+    AnalysisRequestData:
+      required:
+      - image
+      type: object
+      properties:
+        image:
+          $ref: "#/components/schemas/Image"
+      description: Request data for performing a face image quality analysis. Contains
+        only a face image to be analyzed.
+    AnalysisResponseData:
+      required:
+      - results
+      type: object
+      properties:
+        error:
+          type: string
+          description: A string containing an error desciption if any error occured.
+            A value 'ok' means no errors occured.
+        results:
+          $ref: "#/components/schemas/FaceImageAnalysisResult"
+      description: Response data for a face image quality analysis. Contains an error
+        descriptionand all analysis results.
+      example:
+        error: error
+        results:
+          assessments:
+            results:
+            - measure: BackgroundUniformity
+              scalar_score: 90
+              native_score: 76.54
+            - measure: BackgroundUniformity
+              scalar_score: 90
+              native_score: 76.54
+          mask_segmentation:
+            # base64_data: !!binary |-
+            #   Wm05dlltRnlDZz09
+          bounding_box:
+            x: 100
+            width: 200
+            "y": 200
+            height: 200
+          mask_landmarked_region: null
+          landmarks:
+            points:
+            - x: 100
+              "y": 200
+            - x: 100
+              "y": 200
+          mask_occlusion: null
+    ScalarQualityResponseData:
+      required:
+      - results
+      type: object
+      properties:
+        error:
+          type: string
+          description: A string containing an error desciption if any error occured.
+            A value 'ok' means no errors occured.
+        results:
+          $ref: "#/components/schemas/ScalarQualityAnalysisResult"
+      description: Response data for an overall quality analysis for the image provided.
+        Contains an error description and all analysis results.
+      example:
+        error: error
+        results:
+          score: 90
+    VectorQualityResponseData:
+      required:
+      - results
+      type: object
+      properties:
+        error:
+          type: string
+          description: A string containing an error desciption if any error occured.
+            A value 'ok' means no errors occured.
+        results:
+          $ref: "#/components/schemas/VectorQualityAnalysisResult"
+      description: Response data for an image quality analysis based on different
+        face quality measurements. Contains an error description and all analysis
+        results.
+      example:
+        error: error
+        results:
+          assessments:
+            results:
+            - measure: BackgroundUniformity
+              scalar_score: 90
+              native_score: 76.54
+            - measure: BackgroundUniformity
+              scalar_score: 90
+              native_score: 76.54
+

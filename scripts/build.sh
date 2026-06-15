@@ -5,6 +5,7 @@ set -e  # Exit immediately if a command exits with a non-zero status
 build_dir=build/build_linux
 install_dir=install_x86_64_linux
 use_conan=ON
+build_python=OFF
 download=ON
 config=Release
 os=linux
@@ -12,9 +13,11 @@ useSonarWrapper=false
 sonarWrapper="${SONARQUBE_WRAPPER_PATH:-.sonar}/build-wrapper-linux-x86-64"
 
 while [ -n "$1" ]
-do  
+do
 if [ "$1" = "--no-conan" ]; then
     use_conan=OFF
+elif [ "$1" = "--build-python" ]; then
+    build_python=ON
 elif [ "$1" = "--no-download" ]; then
     download=OFF
 elif [ "$1" = "--debug" ]; then
@@ -42,6 +45,12 @@ else
 fi
 shift
 done
+
+if [ "$build_python" = "ON" ] && [ "$config" = "Debug" ];
+then
+    echo "--build-python can only be used with the Release config"
+    echo "please remove either --build-python or --debug"
+fi
 
 download_onnx=OFF
 if [ "$use_conan" = "ON" ]; then
@@ -88,7 +97,7 @@ else
     cd ../extern/opencv-4.5.5
     cmake -S ./ -B build -DBUILD_LIST=core,calib3d,imgcodecs,improc,dnn,ml \
     -DBUILD_opencv_apps=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_python=OFF -DWITH_FFMPEG=OFF -DWITH_TIFF=OFF -DWITH_WEBP=OFF -DWITH_IPP=OFF \
-    -DWITH_OPENCL=OFF -DWITH_LAPACK=OFF -DWITH_QUIRC=OFF \
+    -DWITH_OPENCL=OFF -DWITH_LAPACK=OFF -DWITH_QUIRC=OFF -DWITH_EIGEN=OFF \
     -DBUILD_ZLIB=ON -DWITH_ZLIB=ON \
     -DBUILD_PNG=ON -DWITH_PNG=ON \
     -DBUILD_JPEG=ON -DWITH_JPEG=ON \
@@ -139,11 +148,24 @@ cmake -S ./ -B $build_dir -DCMAKE_INSTALL_PREFIX=$install_dir -DCMAKE_VERBOSE_MA
     -DDOWNLOAD_ONNX=$download_onnx -DUSE_CONAN=$use_conan -DOS=$os -DCMAKE_BUILD_TYPE=$config -DDOWNLOAD_MODELS_AND_IMAGES=$download -DUSE_GCOV_CODECOVERAGE=$useSonarWrapper
 
 cmakeBuildCommand="cmake --build $build_dir --target install -j 8"
+
 if [ "$useSonarWrapper" = "true" ]
 then
     $sonarWrapper --out-dir bw-output $cmakeBuildCommand
 else
     $cmakeBuildCommand
+fi
+
+if [ "$build_python" = "ON" ] && [ "$config" = "Release" ]
+then
+    echo "Building the python wheel"
+    cp $install_dir/Release/lib/* ./python/ofiq/
+    cd python
+    python -m venv .venv
+    . .venv/bin/activate
+    pip install poetry
+    poetry build --clean
+    cp -pv dist/*  ../$install_dir/Release/
 fi
 
 echo "Building finished"

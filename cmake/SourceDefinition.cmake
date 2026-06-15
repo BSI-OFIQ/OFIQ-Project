@@ -1,14 +1,25 @@
-list(APPEND PUBLIC_HEADER_LIST 
+list(APPEND PUBLIC_HEADER_LIST
 	${OFIQLIB_SOURCE_DIR}/include/ofiq_lib.h
 	${OFIQLIB_SOURCE_DIR}/include/ofiq_structs.h
 )
 
-list(APPEND libImplementationSources 
+list(APPEND PUBLIC_HEADER_LIST_C_API
+	${OFIQLIB_SOURCE_DIR}/include/ofiq_libc.h
+	${OFIQLIB_SOURCE_DIR}/include/ofiq_structs_c.h
+	${OFIQLIB_SOURCE_DIR}/include/ofiq_libc_utils.h
+)
+
+list(APPEND libImplementationSources
 	${OFIQLIB_SOURCE_DIR}/src/OFIQImpl.cpp
 	${OFIQLIB_SOURCE_DIR}/src/OFIQInitialization.cpp
 )
 
-list(APPEND module_sources 
+list(APPEND libImplementationSources_clib
+	${OFIQLIB_SOURCE_DIR}/src/ofiq_libc_impl.cpp
+	${OFIQLIB_SOURCE_DIR}/src/ofiq_libc_utils.cpp
+)
+
+list(APPEND module_sources
 	${libImplementationSources}
 	${OFIQLIB_SOURCE_DIR}/modules/detectors/src/detectors.cpp
 	${OFIQLIB_SOURCE_DIR}/modules/detectors/src/opencv_ssd_face_detector.cpp

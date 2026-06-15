@@ -116,7 +116,6 @@ namespace OFIQ_LIB
             return std::make_shared<HeadPose3DDFAV2>(*config);
         };
 
-        networks.release();
         networks = std::make_unique<NeuronalNetworkContainer>(
             getFaceDetector(),
             getLandmarkExtractor(),

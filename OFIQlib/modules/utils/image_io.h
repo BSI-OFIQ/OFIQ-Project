@@ -52,8 +52,7 @@ namespace OFIQ_LIB {
 	 * @return OFIQ::ReturnStatus
 	 */
     OFIQ_EXPORT OFIQ::ReturnStatus
-    readImageFromByteArray(const std::vector<unsigned char>& buffer, OFIQ::Image& image);
-
+		readImageFromByteArray(const std::vector<unsigned char>& buffer, OFIQ::Image& image);
 }
 
 #endif

@@ -79,7 +79,7 @@ namespace OFIQ
          * @param depth of the image
          * @param data of the image.
          */
-        Image(uint16_t width, uint16_t height, uint8_t depth, const std::shared_ptr<uint8_t[]>& data)
+        Image(const uint16_t width, const uint16_t height, const uint8_t depth, const std::shared_ptr<uint8_t[]>& data)
             : width{ width },
             height{ height },
             depth{ depth },
@@ -229,7 +229,7 @@ namespace OFIQ
         /** IlluminationUniformity*/
         IlluminationUniformity = 0x43,
         /** the common measure implementation for LuminanceMean, LuminanceVariance */
-        Luminance = -0x44 ,
+        Luminance = -0x44,
         /** LuminanceMean*/
         LuminanceMean = 0x44,
         /** LuminanceVariance*/
@@ -243,13 +243,13 @@ namespace OFIQ
         /** Sharpness*/
         Sharpness = 0x49,
         /** CompressionArtifacts*/
-        CompressionArtifacts = 0x4a ,
+        CompressionArtifacts = 0x4a,
         /** NaturalColour*/
         NaturalColour = 0x4b,
         /** SingleFacePresent */
-        SingleFacePresent = 0x4c ,
+        SingleFacePresent = 0x4c,
         /** EyesOpen*/
-        EyesOpen = 0x4d ,
+        EyesOpen = 0x4d,
         /** MouthClosed*/
         MouthClosed = 0x4e,
         /** EyesVisible*/
@@ -263,7 +263,7 @@ namespace OFIQ
         /** HeadSize*/
         HeadSize = 0x53,
         /** CropOfTheFaceImage: common measure for {Left,Right}wardCropOfTheFaceImage, MarginAbove, and MarginBelow */
-        CropOfTheFaceImage = -0x54, 
+        CropOfTheFaceImage = -0x54,
         /** LeftwardCropOfTheFaceImage*/
         LeftwardCropOfTheFaceImage = 0x54,
         /** RightwardCropOfTheFaceImage*/
@@ -575,21 +575,15 @@ namespace OFIQ
 
         /**
          * @brief Occlusion mask
-         * @details For each pixel (y,x) of the original image of dimension (height,width)
-         * where y=0,...,height-1 and x=0,...,width-1
-         * the value at y*width+x is 0 if the pixel is not assigned to 
-         * to the occlusion mask; otherwise, if the value is different
-         * from 0, the pixel is assigned to the occlusion mask.
+         * @details For each pixel at index (y * width + x) of an image of dimension (height,width),
+         * the value is 0 if the pixel is not part of the occlusion mask; otherwise, the value is 1.
          */
         std::shared_ptr<uint8_t[]> m_occlusionMaskPtr;
 
         /**
          * @brief Landmarked region
-         * @details For each pixel (y,x) of the original image of dimension (height,width)
-         * where y=0,...,height-1 and x=0,...,width-1
-         * the value at y*width+x is 0 if the pixel is not assigned to 
-         * to the landmarked region mask; otherwise, if the value is different
-         * from 0, the pixel is assigned to the landmarked region mask.
+         * @details For each pixel at index (y * width + x) of an image of dimension (height,width),
+         * the value is 0 if the pixel is not part of the landmarked region mask; otherwise, the value is 1
          */
         std::shared_ptr<uint8_t[]> m_landmarkedRegionPtr;
 
@@ -599,6 +593,54 @@ namespace OFIQ
         FaceImageQualityPreprocessingResult() = default;
     };
 
+    inline std::string QualityMeasureToString(const QualityMeasure qm)
+    {
+        switch (qm)
+        {
+        case QualityMeasure::UnifiedQualityScore:           return "UnifiedQualityScore";
+        case QualityMeasure::BackgroundUniformity:          return "BackgroundUniformity";
+        case QualityMeasure::IlluminationUniformity:        return "IlluminationUniformity";
+        case QualityMeasure::Luminance:                     return "Luminance";
+        case QualityMeasure::LuminanceMean:                 return "LuminanceMean";
+        case QualityMeasure::LuminanceVariance:             return "LuminanceVariance";
+        case QualityMeasure::UnderExposurePrevention:       return "UnderExposurePrevention";
+        case QualityMeasure::OverExposurePrevention:        return "OverExposurePrevention";
+        case QualityMeasure::DynamicRange:                  return "DynamicRange";
+        case QualityMeasure::Sharpness:                     return "Sharpness";
+        case QualityMeasure::NaturalColour:                 return "NaturalColour";
+        case QualityMeasure::SingleFacePresent:             return "SingleFacePresent";
+        case QualityMeasure::EyesOpen:                      return "EyesOpen";
+        case QualityMeasure::MouthClosed:                   return "MouthClosed";
+        case QualityMeasure::EyesVisible:                   return "EyesVisible";
+        case QualityMeasure::MouthOcclusionPrevention:      return "MouthOcclusionPrevention";
+        case QualityMeasure::FaceOcclusionPrevention:       return "FaceOcclusionPrevention";
+        case QualityMeasure::InterEyeDistance:              return "InterEyeDistance";
+        case QualityMeasure::HeadSize:                      return "HeadSize";
+        case QualityMeasure::CropOfTheFaceImage:            return "CropOfTheFaceImage";
+        case QualityMeasure::HeadPose:                      return "HeadPose";
+        case QualityMeasure::ExpressionNeutrality:          return "ExpressionNeutrality";
+        case QualityMeasure::NoHeadCoverings:               return "NoHeadCoverings";
+        case QualityMeasure::NotSet:                        return "NotSet";
+
+        // the following names were modified (they don't correspond to the enum names) to
+        // match the names used in ISO/IEC 25722 standard.
+        case QualityMeasure::CompressionArtifacts:          return "NoCompressionArtifacts";
+        case QualityMeasure::LeftwardCropOfTheFaceImage:    return "LeftwardCropOfFace";
+        case QualityMeasure::RightwardCropOfTheFaceImage:   return "RightwardCropOfFace";
+        case QualityMeasure::MarginAboveOfTheFaceImage:     return "MarginAboveTheFace";
+        case QualityMeasure::MarginBelowOfTheFaceImage:     return "MarginBelowTheFace";
+        case QualityMeasure::HeadPoseYaw:                   return "HeadPoseYawFrontal";
+        case QualityMeasure::HeadPosePitch:                 return "HeadPosePitchFrontal";
+        case QualityMeasure::HeadPoseRoll:                  return "HeadPoseRollFrontal";
+
+        default:                                            return "UnknownQualityMeasure";
+        }
+    }
+
+    inline std::ostream& operator<<(std::ostream& s, const QualityMeasure& qm)
+    {
+        return (s << QualityMeasureToString(qm));
+    }
 }
 
 #endif /* OFIQ_STRUCTS_H */

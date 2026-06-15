@@ -1,0 +1,18 @@
+# coding: utf-8
+
+# flake8: noqa
+from __future__ import absolute_import
+# import models into model package
+from ofiq_server.models.analysis_request_data import AnalysisRequestData
+from ofiq_server.models.analysis_response_data import AnalysisResponseData
+from ofiq_server.models.bounding_box import BoundingBox
+from ofiq_server.models.face_image_analysis_result import FaceImageAnalysisResult
+from ofiq_server.models.image import Image
+from ofiq_server.models.landmarks import Landmarks
+from ofiq_server.models.point import Point
+from ofiq_server.models.quality_assessment_result import QualityAssessmentResult
+from ofiq_server.models.quality_assessment_results import QualityAssessmentResults
+from ofiq_server.models.scalar_quality_analysis_result import ScalarQualityAnalysisResult
+from ofiq_server.models.scalar_quality_response_data import ScalarQualityResponseData
+from ofiq_server.models.vector_quality_analysis_result import VectorQualityAnalysisResult
+from ofiq_server.models.vector_quality_response_data import VectorQualityResponseData

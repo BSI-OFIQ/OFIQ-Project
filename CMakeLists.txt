@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.18)
 
 file(READ "Version.txt" ver)
 
@@ -87,7 +87,7 @@ if(DOWNLOAD_MODELS_AND_IMAGES)
     message("Downloading models from ${MODEL_URL}")
     file(DOWNLOAD ${MODEL_URL}  ${MODEL_FILE} SHOW_PROGRESS)
     message("Extracting models to ${PROJECT_SOURCE_DIR}/data")
-    file(ARCHIVE_EXTRACT 
+    file(ARCHIVE_EXTRACT
         INPUT ${MODEL_FILE}
         DESTINATION ${PROJECT_SOURCE_DIR}/data
         VERBOSE
@@ -99,7 +99,7 @@ if(DOWNLOAD_MODELS_AND_IMAGES)
     message("Downloading images from ${IMAGES_URL}")
     file(DOWNLOAD ${IMAGES_URL}  ${IMAGES_FILE} SHOW_PROGRESS)
     message("Extracting images to ${PROJECT_SOURCE_DIR}/data/tests")
-    file(ARCHIVE_EXTRACT 
+    file(ARCHIVE_EXTRACT
         INPUT ${IMAGES_FILE}
         DESTINATION ${PROJECT_SOURCE_DIR}/data/tests
         VERBOSE

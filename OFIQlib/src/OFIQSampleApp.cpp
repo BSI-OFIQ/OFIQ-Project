@@ -40,7 +40,6 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
-#include <magic_enum.hpp>
 #include <sstream>
 
 constexpr int SUCCESS = 0;
@@ -170,13 +169,13 @@ int runQuality(
         {
             // print the header. the format is the following
             // "Filename", MeasurementName1, ..., MeasurementNameN, MeasurementName1.scalar, ...,
-            // MeasurementNameN.scalar Filename,      Measurement1.raw, ..., MeasurementN.raw,
+            // MeasurementNameN.scalar Filename,      Measurement1.native, ..., MeasurementN.native,
             // Measurement1.scalar, ..., MeasurementN.scalar
             vector<string> measureNames;
             vector<string> measureNamesScalar;
             for (const auto& [measure, measure_result] : faceImageQAs[0].qAssessments)
             {
-                auto mName = static_cast<std::string>(magic_enum::enum_name(measure));
+                auto mName = QualityMeasureToString(measure);
                 measureNames.push_back(mName+string(".native"));
                 measureNamesScalar.push_back(mName + string(".scalar"));
             }
@@ -200,12 +199,12 @@ int runQuality(
             std::cout << "Image file: '" << imageFile << "' has attributes:" << std::endl;
             for (const auto& [measure, measure_result] : assessmentResult.qAssessments)
             {
-                auto mName = static_cast<std::string>(magic_enum::enum_name(measure));
+                auto mName = QualityMeasureToString(measure);
                 auto rawScore = measure_result.rawScore;
                 auto scalarScore = measure_result.scalar;
                 if (measure_result.code != QualityMeasureReturnCode::Success)
                     scalarScore = -1;
-                std::cout << mName << "-> rawScore:  " << rawScore << "   scalar: " << scalarScore
+                std::cout << mName << "-> nativeScore:  " << rawScore << "   scalar: " << scalarScore
                           << std::endl;
             }
             std::cout << "-------------------------------------------------------" << std::endl;
