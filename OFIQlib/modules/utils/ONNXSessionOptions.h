@@ -39,13 +39,19 @@ namespace OFIQ_LIB
      * @param config Configuration instance.
      * @return Session options configured with
      * <code>ort_intra_threads</code> and <code>ort_inter_threads</code> when
-     * those keys are present and non-zero.
+     * those keys are present and non-zero. The execution mode is set according
+     * to <code>ort_run_parallel</code> (defaulting to sequential execution).
      */
     inline Ort::SessionOptions CreateONNXSessionOptions(const Configuration& config)
     {
         Ort::SessionOptions options;
         const unsigned int intraThreadCount = RuntimeThreadSettings::GetOrtIntraThreadCount(config);
         const unsigned int interThreadCount = RuntimeThreadSettings::GetOrtInterThreadCount(config);
+        if (const bool runParallel = RuntimeThreadSettings::GetOrtRunParallel(config))
+            options.SetExecutionMode(ExecutionMode::ORT_PARALLEL);
+        else
+            options.SetExecutionMode(ExecutionMode::ORT_SEQUENTIAL);
+        
         if (intraThreadCount > 0)
             options.SetIntraOpNumThreads(static_cast<int>(intraThreadCount));
         if (interThreadCount > 0)

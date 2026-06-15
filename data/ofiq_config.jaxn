@@ -35,12 +35,6 @@
       "Luminance",
       "HeadSize"
     ],
-    // Optional OpenCV thread limit. 0 keeps backend defaults.
-    "opencv_threads": 0,
-    // Optional ONNX Runtime intra-op thread limit. 0 keeps backend defaults.
-    "ort_intra_threads": 0,
-    // Optional ONNX Runtime inter-op thread limit. 0 keeps backend defaults.
-    "ort_inter_threads": 0,
     "params": {
       "detector": {
         "ssd": {
@@ -55,6 +49,18 @@
         "ADNet": {
           "model_path": "models/face_landmark_estimation/ADNet.onnx"
         }
+      },
+      "threading": {
+        // Optional OpenCV thread limit. 0 keeps backend defaults.
+        "opencv_threads": 0,
+        // Optional ONNX Runtime intra-op thread limit. 0 keeps backend defaults.
+        "ort_intra_threads": 0,
+        // Optional ONNX Runtime inter-op thread limit. 0 keeps backend defaults.
+        "ort_inter_threads": 0,
+        // Use ONNX Runtime sequential or parallel execution mode. 
+        // Controls how multiple operators in the graph (across nodes) are run. Default is sequential.
+        // Must be set to true if inter_op_num_threads is > 0.
+        "ort_run_parallel": false,
       },
       "measures": {
         "BackgroundUniformity": {

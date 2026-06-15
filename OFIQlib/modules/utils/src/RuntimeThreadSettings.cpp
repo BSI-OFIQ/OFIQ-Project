@@ -34,15 +34,6 @@
 
 namespace OFIQ_LIB
 {
-    namespace
-    {
-        int GetDefaultCvThreadCount()
-        {
-            static const int defaultCvThreadCount = cv::getNumThreads();
-            return defaultCvThreadCount;
-        }
-    }
-
     unsigned int RuntimeThreadSettings::GetConfiguredThreadCount(
         const Configuration& config,
         const char* key)
@@ -56,7 +47,7 @@ namespace OFIQ_LIB
             configuredValue > static_cast<double>(std::numeric_limits<unsigned int>::max()))
         {
             throw OFIQError(
-                OFIQ::ReturnCode::UnknownConfigParamError,
+                OFIQ::ReturnCode::MissingConfigParamError,
                 std::string(key) + " must be a non-negative integer");
         }
 
@@ -76,6 +67,13 @@ namespace OFIQ_LIB
     unsigned int RuntimeThreadSettings::GetOrtInterThreadCount(const Configuration& config)
     {
         return GetConfiguredThreadCount(config, OrtInterThreadsConfigKey);
+    }
+
+    bool RuntimeThreadSettings::GetOrtRunParallel(const Configuration& config)
+    {
+        bool runParallel = false;
+        config.GetBool(OrtRunParallelConfigKey, runParallel);
+        return runParallel;
     }
 
     void RuntimeThreadSettings::ApplyThreadLimit(const Configuration& config)

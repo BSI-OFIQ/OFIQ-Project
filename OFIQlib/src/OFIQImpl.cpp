@@ -50,7 +50,12 @@ ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::strin
     try
     {
         this->config = std::make_unique<Configuration>(configDir, configFilename);
+        // validate onnxruntime thread limit parameters
+        RuntimeThreadSettings::GetOrtIntraThreadCount(*this->config);
+        RuntimeThreadSettings::GetOrtInterThreadCount(*this->config);
+        // apply opencv thread limit
         RuntimeThreadSettings::ApplyThreadLimit(*this->config);
+
         CreateNetworks();
         m_executorPtr = CreateExecutor();
     }
