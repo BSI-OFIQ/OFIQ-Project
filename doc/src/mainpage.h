@@ -52,6 +52,9 @@
   "measures": [
    "UnifiedQualityScore"
   ],
+  "opencv_threads": 0,
+  "ort_intra_threads": 0,
+  "ort_inter_threads": 0,
   "params": {
    "detector": {
     "ssd": {
@@ -90,6 +93,17 @@
  * <br/><br/>
  * Note that the model paths are specified as paths relative to the directory of the 
  * JAXN configuration file. We assume that the file above is stored in <OFIQ-SOURCE>/data.
+ *
+ * @subsection sec_runtime_threading Runtime threading configuration
+ * OFIQ allows runtime thread limits to be configured in the top-level
+ * <code>"config"</code> object of the JAXN file:
+ * <ul>
+ *  <li><code>opencv_threads</code>: maximum number of OpenCV threads</li>
+ *  <li><code>ort_intra_threads</code>: maximum number of ONNX Runtime intra-op threads</li>
+ *  <li><code>ort_inter_threads</code>: maximum number of ONNX Runtime inter-op threads</li>
+ * </ul>
+ * All three values are optional non-negative integers. A value of <code>0</code>
+ * keeps the backend default behavior.
  * 
  * @subsection sec_facedetect_cfg Configuration of the face detector
  * The face detector (SSD) must
@@ -248,6 +262,23 @@
  *  <td><b>supports quality mapping config? - see details @ref sec_quality_config "here"</b></td>
  *  </tr>
  *  
+ *  <tr>
+ *  <td>-</td>
+ *  <td>Runtime threading</td>
+ *  <td>"config".<br/>"opencv_threads"<br/>"config".<br/>"ort_intra_threads"<br/>"config".<br/>"ort_inter_threads"</td>
+ *  <td>-</td>
+ *  <td>
+ *   <code>opencv_threads</code>: OpenCV thread limit
+ *   <br/><br/>
+ *   <code>ort_intra_threads</code>: ONNX Runtime intra-op thread limit
+ *   <br/><br/>
+ *   <code>ort_inter_threads</code>: ONNX Runtime inter-op thread limit
+ *   <br/><br/>
+ *   Set any of these values to <code>0</code> to keep the corresponding backend default.
+ *  </td>
+ *  <td>-</td>
+ *  </tr>
+ *
  *  <tr>
  *  <td>-</td>
  *  <td>Face detector</td>
@@ -1026,7 +1057,7 @@
  * supported in the same way as they are supported by the linked OpenCV compilation.
  *
  * @section sec_release_notes Release notes
- * This is OFIQ v1.2.0. 
+ * This is OFIQ v1.1.2. 
  * The following table lists all measures and its implementation provided by this release of OFIQ. Details on the 
  * configuration and on requesting measures can be found
  * @ref sec_default_config "here". Note, the QAA identifiers listed in the table are defined in ISO/IEC 29794-5.

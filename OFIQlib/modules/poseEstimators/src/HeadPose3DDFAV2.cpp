@@ -30,6 +30,7 @@
 #include "DataStream.h"
 #include "FaceMeasures.h"
 #include "OFIQError.h"
+#include "ONNXSessionOptions.h"
 #include "utils.h"
 #include <cmath>
 
@@ -70,7 +71,7 @@ namespace OFIQ_LIB::modules::poseEstimators
                 m_ortenv,
                 modelData.data(),
                 modelData.size(),
-                Ort::SessionOptions{nullptr});
+                OFIQ_LIB::CreateONNXSessionOptions(config));
 
             auto type_info = m_ortSession->GetInputTypeInfo(0);
             auto tensor_info = type_info.GetTensorTypeAndShapeInfo();

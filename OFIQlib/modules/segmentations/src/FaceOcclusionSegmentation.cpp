@@ -44,7 +44,7 @@ namespace OFIQ_LIB::modules::segmentations
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
-            m_onnxRuntimeEnv.initialize(modelData, m_scaledWidth, m_scaledHeight);
+            m_onnxRuntimeEnv.initialize(modelData, m_scaledWidth, m_scaledHeight, config);
         }
         catch (const std::exception&)
         {

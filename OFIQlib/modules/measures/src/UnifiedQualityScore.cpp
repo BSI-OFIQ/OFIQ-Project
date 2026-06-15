@@ -63,7 +63,7 @@ namespace OFIQ_LIB::modules::measures
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
-            m_onnxRuntimeEnv.initialize(modelData, imageSize, imageSize);
+            m_onnxRuntimeEnv.initialize(modelData, imageSize, imageSize, configuration);
         }
         catch (std::exception&)
         {
