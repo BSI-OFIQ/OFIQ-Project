@@ -56,6 +56,19 @@ namespace OFIQ_LIB::modules::measures
          */
         void Execute(OFIQ_LIB::Session & session) override;
 
+        /**
+         * @brief Indicates whether this measure implements a visualization.
+         * @return false; this measure does not implement a visualization.
+         */
+        bool ImplementsVisualization() const override { return false; }
+
+        /**
+         * @brief Writes a visualization of this measure into an ARGB buffer.
+         * @details This measure does not implement a visualization; the method
+         * does nothing.
+         */
+        void Visualize(OFIQ_LIB::Session&, std::vector<uint32_t>&) override {}
+
     private:
 
         /**

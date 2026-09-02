@@ -28,6 +28,8 @@
 #define OFIQ_LIB_H
 
 #include <cstdint>
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -191,6 +193,65 @@ namespace OFIQ
             OFIQ::FaceImageQualityAssessment& assessments,
             OFIQ::FaceImageQualityPreprocessingResult& preprocessingResult,
             uint32_t resultRequestsMask) = 0;
+
+        /**
+         * @brief This function takes an image and outputs quality information,
+         * preprocessing results and, for the requested measures, visualizations.
+         *
+         * @details Implementing functions should be performed on the largest
+         * detected face. For each measure in <code>resultRequestsVisualizations</code>
+         * whose \link OFIQ_LIB::modules::measures::Measure::ImplementsVisualization
+         * ImplementsVisualization()\endlink returns <code>true</code>, its
+         * \link OFIQ_LIB::modules::measures::Measure::Visualize Visualize()\endlink
+         * method is invoked and the resulting ARGB image is stored in
+         * <code>visualizationResult</code> under the corresponding measure key.
+         *
+         * @param[in] image
+         * Single face image
+         *
+         * @param[out] assessments
+         * An ImageQualityAssessments structure.
+         *
+         * @param[out] preprocessingResult
+         * A container in which the preprocessing results are stored.
+         *
+         * @param[out] visualizationResult
+         * A map associating each requested measure that implements a
+         * visualization with its ARGB visualization image.
+         *
+         * @param[in] resultRequestsPreprocessingMask
+         * A bit mask encoding the preprocessing result types to be returned.
+         *
+         * @param[in] resultRequestsVisualizations
+         * The set of measures for which a visualization is requested.
+         *
+         * @return OFIQ::ReturnStatus
+         *
+         * @see \link OFIQ::FaceImageQualityPreprocessingResult FaceImageQualityPreprocessingResult\endlink
+         */
+        virtual OFIQ::ReturnStatus vectorQualityWithVisualization(
+            const OFIQ::Image& image,
+            OFIQ::FaceImageQualityAssessment& assessments,
+            OFIQ::FaceImageQualityPreprocessingResult& preprocessingResult,
+            std::map<OFIQ::QualityMeasure, std::vector<uint32_t>>& visualizationResult,
+            uint32_t resultRequestsPreprocessingMask,
+            const std::set<OFIQ::QualityMeasure>& resultRequestsVisualizations) = 0;
+
+        /**
+         * @brief Indicates whether the specified measure implements a visualization.
+         *
+         * @details The query is forwarded to the measure that matches
+         * <code>measure</code>; the result is the return value of that measure's
+         * \link OFIQ_LIB::modules::measures::Measure::ImplementsVisualization
+         * ImplementsVisualization()\endlink method. If no matching measure is
+         * active (e.g., the implementation has not been initialized or the measure
+         * is not configured), <code>false</code> is returned.
+         *
+         * @param[in] measure The measure to be queried.
+         * @return <code>true</code> if the measure implements a visualization;
+         * otherwise <code>false</code>.
+         */
+        virtual bool ImplementsVisualization(const OFIQ::QualityMeasure& measure) = 0;
 
         /**
          * @brief

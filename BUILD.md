@@ -3,7 +3,7 @@
 To build OFIQ you need to install Python with pip, cmake and conan.
 
 - Python (version 3.10.12 or higher)
-- [Download and install cmake](https://cmake.org/) (version 3.18 or higher)
+- [Download and install cmake](https://cmake.org/) (version 3.26 or higher)
 - [Download and install conan](https://conan.io/) (version 2.18.1)
 
 ## Linux
@@ -16,13 +16,11 @@ Install necessary packages.
 sudo apt-get install build-essential python3-pip
 ```
 
-To install cmake (version 3.18 or higher):
+To install cmake (in a version 3.26) use snap (and not apt) as follows.
 
 ```
-sudo apt-get install cmake
+sudo snap install cmake --channel=3.26/stable --classic
 ```
-
-Note: For older distributions, you can use snap instead: `sudo snap install cmake --channel=3.22/stable --classic`
 
 Conan can be installed via Python with
 

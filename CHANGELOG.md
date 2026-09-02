@@ -1,5 +1,11 @@
 # Changes
 
+## Version 1.2.1 (2026-09-02)
+
+- Minor update of documentation / reference manual by explicitly mentioning that FailureToAssess are mapped to a quality component value of -1
+- Added a new interface method ```vectorQualityWithVisualization``` that works as the existing ```vectorQualityWithPreprocessingResults``` method, but additionally returns per-measure visualizations. For every measure passed in the ```resultRequestsVisualizations``` set whose ```Measure::ImplementsVisualization``` returns ```true```, its ```Measure::Visualize``` method is invoked and the resulting ARGB image is stored in the ```visualizationResult``` map under the corresponding ```OFIQ::QualityMeasure``` key.
+- Added two virtual methods ```Measure::ImplementsVisualization``` and ```Measure::Visualize``` to the measure base class.
+
 ## Version 1.2.0 (2026-03-03)
 
 - Implemented a C interface for OFIQ library [OFIQlib\include\ofiq_libc.h](OFIQlib\include\ofiq_libc.h).

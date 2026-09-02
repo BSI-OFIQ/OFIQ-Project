@@ -72,7 +72,7 @@
     "ort_intra_threads": 0,
     "ort_inter_threads": 0,
     "ort_run_parallel": false,
-   }
+   },
    "measures": {
     "UnifiedQualityScore": {
      "model_path": "models/unified_quality_score/magface_iresnet50_norm.onnx"
@@ -1068,7 +1068,7 @@
  * supported in the same way as they are supported by the linked OpenCV compilation.
  *
  * @section sec_release_notes Release notes
- * This is OFIQ v1.2.0. 
+ * This is OFIQ v1.2.1. 
  * The following table lists all measures and its implementation provided by this release of OFIQ. Details on the 
  * configuration and on requesting measures can be found
  * @ref sec_default_config "here". Note, the QAA identifiers listed in the table are defined in ISO/IEC 29794-5.

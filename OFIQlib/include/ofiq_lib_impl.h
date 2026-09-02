@@ -105,6 +105,43 @@ namespace OFIQ_LIB
             OFIQ::FaceImageQualityPreprocessingResult& preprocessingResult,
             uint32_t resultRequestsMask = static_cast<int>(OFIQ::PreprocessingResultType::All)) override;
 
+        /**
+         * @brief Run the computation of all measures set in the configuration,
+         * access pre-processing results and produce visualizations for the
+         * requested measures.
+         *
+         * @param[in] image Input image.
+         * @param[out] assessments Container to store the resulting scores.
+         * @param[out] preprocessingResult Container to store preprocessing results.
+         * @param[out] visualizationResult Container mapping each requested measure
+         * that implements a visualization to its ARGB visualization image.
+         * @param[in] resultRequestsPreprocessingMask
+         * Mask encoding the pre-processing data being requested.
+         * @param[in] resultRequestsVisualizations
+         * Set of measures for which a visualization is requested.
+         * @return OFIQ::ReturnStatus
+         *
+         * @see \link OFIQ::PreprocessingResultType PreprocessingResultType\endlink
+         */
+        OFIQ::ReturnStatus vectorQualityWithVisualization(
+            const OFIQ::Image& image,
+            OFIQ::FaceImageQualityAssessment& assessments,
+            OFIQ::FaceImageQualityPreprocessingResult& preprocessingResult,
+            std::map<OFIQ::QualityMeasure, std::vector<uint32_t>>& visualizationResult,
+            uint32_t resultRequestsPreprocessingMask = static_cast<int>(OFIQ::PreprocessingResultType::All),
+            const std::set<OFIQ::QualityMeasure>& resultRequestsVisualizations = {}) override;
+
+        /**
+         * @brief Indicates whether the specified measure implements a visualization.
+         * @details Forwards the query to the active measure matching
+         * <code>measure</code>. Returns <code>false</code> if the implementation
+         * has not been initialized or no such measure is active.
+         * @param[in] measure The measure to be queried.
+         * @return <code>true</code> if the measure implements a visualization;
+         * otherwise <code>false</code>.
+         */
+        bool ImplementsVisualization(const OFIQ::QualityMeasure& measure) override;
+
     private:
         /**
          * @brief Pointer to the executor instance, see \link OFIQ_LIB::modules::measures::Executor \endlink.
