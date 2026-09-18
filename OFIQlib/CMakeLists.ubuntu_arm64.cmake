@@ -179,6 +179,21 @@ set_target_properties(ofiq_lib
         PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST}"
         )
 
+# C API library (required by the python wrapper, which loads libofiq_c.so)
+add_library(ofiq_c SHARED
+	${PUBLIC_HEADER_LIST_C_API}
+	${libImplementationSources_clib}
+)
+
+target_link_libraries(ofiq_c
+	PRIVATE ofiq_lib
+	PRIVATE ${OFIQ_LINK_LIB_LIST}
+)
+
+set_target_properties(ofiq_c
+	PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADER_LIST_C_API}"
+)
+
 MESSAGE( STATUS "INSTALLING TARGETS ...")
 
 get_property(IMPORTED_LIB_LOCATION TARGET onnxruntime PROPERTY IMPORTED_LOCATION)
@@ -219,6 +234,30 @@ install(TARGETS ofiq_lib
 install(TARGETS ofiq_lib
 	CONFIGURATIONS Debug
     DESTINATION Debug/bin
+	PUBLIC_HEADER DESTINATION include/
+)
+
+install(TARGETS ofiq_c
+	CONFIGURATIONS Release
+	DESTINATION Release/lib
+	PUBLIC_HEADER DESTINATION include/
+)
+
+install(TARGETS ofiq_c
+	CONFIGURATIONS Release
+	DESTINATION Release/bin
+	PUBLIC_HEADER DESTINATION include/
+)
+
+install(TARGETS ofiq_c
+	CONFIGURATIONS Debug
+	DESTINATION Debug/lib
+	PUBLIC_HEADER DESTINATION include/
+)
+
+install(TARGETS ofiq_c
+	CONFIGURATIONS Debug
+	DESTINATION Debug/bin
 	PUBLIC_HEADER DESTINATION include/
 )
 

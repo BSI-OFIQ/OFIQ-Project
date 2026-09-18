@@ -2,6 +2,7 @@
 
 ## Version 1.2.1 (2026-09-02)
 
+- Fixes the python wrapper on linux-arm64: the C interface library ```ofiq_c``` (```libofiq_c.so```) was only built for linux-x86_64 and Windows, so ```import ofiq``` failed on linux-arm64 with a missing ```libofiq_c.so```. It is now built and installed by [OFIQlib/CMakeLists.ubuntu_arm64.cmake](OFIQlib/CMakeLists.ubuntu_arm64.cmake) as well.
 - Minor update of documentation / reference manual by explicitly mentioning that FailureToAssess are mapped to a quality component value of -1
 - Added a new interface method ```vectorQualityWithVisualization``` that works as the existing ```vectorQualityWithPreprocessingResults``` method, but additionally returns per-measure visualizations. For every measure passed in the ```resultRequestsVisualizations``` set whose ```Measure::ImplementsVisualization``` returns ```true```, its ```Measure::Visualize``` method is invoked and the resulting ARGB image is stored in the ```visualizationResult``` map under the corresponding ```OFIQ::QualityMeasure``` key.
 - Added two virtual methods ```Measure::ImplementsVisualization``` and ```Measure::Visualize``` to the measure base class.
