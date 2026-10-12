@@ -30,6 +30,7 @@
 #include "image_utils.h"
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+#include <array>
 
 namespace OFIQ_LIB::modules::measures
 {
@@ -84,49 +85,32 @@ namespace OFIQ_LIB::modules::measures
 
         if (!IsColoured(alignedFace))
         {
-            double D = 0.0;
-            SetQualityMeasure(session, qualityMeasure, D, OFIQ::QualityMeasureReturnCode::Success);
+            SetQualityMeasure(session, qualityMeasure, 0.0, OFIQ::QualityMeasureReturnCode::Success);
             return;
         }
 
         const auto& cvMask = session.getAlignedFaceLandmarkedRegion();
         cv::Mat faceSegmentation;
         cv::bitwise_and(alignedFace, alignedFace, faceSegmentation, cvMask);
-
         cv::Mat maskedImage = CreateMaskedImage(landmarks, faceSegmentation);
-        OFIQ::LandmarkPoint leftEyeCenter;
-        OFIQ::LandmarkPoint rightEyeCenter;
-        double interEyeDistance;
-        double eyeMouthDistance;
-        CalculateReferencePoints(
-            landmarks,
-            leftEyeCenter,
-            rightEyeCenter,
-            interEyeDistance,
-            eyeMouthDistance);
+
         cv::Rect leftRegionOfInterest;
         cv::Rect rightRegionOfInterest;
-        CalculateRegionOfInterest(
-            leftRegionOfInterest,
-            rightRegionOfInterest,
-            leftEyeCenter,
-            rightEyeCenter,
-            interEyeDistance,
-            eyeMouthDistance);
+        ComputeRegionsOfInterest(landmarks, leftRegionOfInterest, rightRegionOfInterest);
+
         cv::Mat reducedImage =
             ReduceImageToRegionOfInterest(maskedImage, leftRegionOfInterest, rightRegionOfInterest);
-        double meanChannelA;
-        double meanChannelB;
         if (reducedImage.empty())
         {
-            double D = 100.0;
             SetQualityMeasure(
                 session,
                 qualityMeasure,
-                D,
+                100.0,
                 OFIQ::QualityMeasureReturnCode::FailureToAssess);
             return;
         }
+        double meanChannelA;
+        double meanChannelB;
         ConvertBGRToCIELAB(reducedImage, meanChannelA, meanChannelB);
         double rawScore = CalculateScore(meanChannelA, meanChannelB);
         SetQualityMeasure(
@@ -136,6 +120,30 @@ namespace OFIQ_LIB::modules::measures
             OFIQ::QualityMeasureReturnCode::Success);
     }
 
+    void NaturalColour::Visualize(OFIQ_LIB::Session& session, std::vector<uint32_t>& argbImage)
+    {
+        const auto landmarks = session.getAlignedFaceLandmarks();
+
+        cv::Rect leftRegionOfInterest;
+        cv::Rect rightRegionOfInterest;
+        ComputeRegionsOfInterest(landmarks, leftRegionOfInterest, rightRegionOfInterest);
+
+        cv::Mat alignedToOriginalTransform;
+        cv::invertAffineTransform(
+            session.getAlignedFaceTransformationMatrix(), alignedToOriginalTransform);
+        const cv::Matx23d alignedToOriginal(alignedToOriginalTransform);
+
+        const int width = session.image().width;
+        const int height = session.image().height;
+        cv::Mat mask = cv::Mat::zeros(height, width, CV_8UC1);
+        cv::fillConvexPoly(
+            mask, TransformRegionToImage(leftRegionOfInterest, alignedToOriginal), cv::Scalar(255));
+        cv::fillConvexPoly(
+            mask, TransformRegionToImage(rightRegionOfInterest, alignedToOriginal), cv::Scalar(255));
+
+        BuildRegionOverlay(mask, argbImage);
+    }
+
     cv::Mat NaturalColour::CreateMaskedImage(
         const OFIQ::FaceLandmarks& landmarks, const cv::Mat& cvImage) const
     {
@@ -143,6 +151,68 @@ namespace OFIQ_LIB::modules::measures
         cv::Mat maskedImage;
         cvImage.copyTo(maskedImage, cvMask);
         return maskedImage;
+    }
+
+    void NaturalColour::ComputeRegionsOfInterest(
+        const OFIQ::FaceLandmarks& landmarks,
+        cv::Rect& leftRegionOfInterest,
+        cv::Rect& rightRegionOfInterest) const
+    {
+        OFIQ::LandmarkPoint leftEyeCenter;
+        OFIQ::LandmarkPoint rightEyeCenter;
+        double interEyeDistance;
+        double eyeMouthDistance;
+        CalculateReferencePoints(
+            landmarks, leftEyeCenter, rightEyeCenter, interEyeDistance, eyeMouthDistance);
+        CalculateRegionOfInterest(
+            leftRegionOfInterest,
+            rightRegionOfInterest,
+            leftEyeCenter,
+            rightEyeCenter,
+            interEyeDistance,
+            eyeMouthDistance);
+    }
+
+    std::vector<cv::Point> NaturalColour::TransformRegionToImage(
+        const cv::Rect& region, const cv::Matx23d& alignedToOriginal) const
+    {
+        const std::array<cv::Point2d, 4> corners = {
+            cv::Point2d(region.x, region.y),
+            cv::Point2d(region.x + region.width, region.y),
+            cv::Point2d(region.x + region.width, region.y + region.height),
+            cv::Point2d(region.x, region.y + region.height),
+        };
+
+        std::vector<cv::Point> polygon;
+        polygon.reserve(corners.size());
+        for (const auto& corner : corners)
+        {
+            const cv::Point2d mapped = alignedToOriginal * cv::Vec3d(corner.x, corner.y, 1.0);
+            polygon.emplace_back(cvRound(mapped.x), cvRound(mapped.y));
+        }
+        return polygon;
+    }
+
+    void NaturalColour::BuildRegionOverlay(
+        const cv::Mat& mask, std::vector<uint32_t>& argbImage) const
+    {
+        // Everything outside the regions of interest is dimmed with a
+        // semi-transparent colour; the regions themselves stay fully transparent.
+        constexpr uint32_t dimmed = (0x7Fu << 24)+(0xFF<<16)+(0xFF<<8)+(0xFF);
+        constexpr uint32_t transparent = 0x00000000u;
+
+        argbImage.assign(static_cast<size_t>(mask.rows) * mask.cols, dimmed);
+        for (int y = 0; y < mask.rows; y++)
+        {
+            const uchar* maskRow = mask.ptr<uchar>(y);
+            for (int x = 0; x < mask.cols; x++)
+            {
+                if (maskRow[x])
+                {
+                    argbImage[static_cast<size_t>(y) * mask.cols + x] = transparent;
+                }
+            }
+        }
     }
 
     cv::Mat NaturalColour::ReduceImageToRegionOfInterest(

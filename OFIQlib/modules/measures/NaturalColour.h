@@ -59,7 +59,60 @@ namespace OFIQ_LIB::modules::measures
          */
         void Execute(OFIQ_LIB::Session & session) override;
 
+        /**
+         * @brief Indicates whether this measure implements a visualization.
+         * @return true; this measure visualizes the regions of interest.
+         */
+        bool ImplementsVisualization() const override { return true; }
+
+        /**
+         * @brief Writes a visualization of this measure into an ARGB buffer.
+         * @details Highlights the two regions of interest (mapped back into the
+         * original image) by dimming everything outside of them.
+         * @param session Session object computed by the \link OFIQ_LIB::OFIQImpl::preprocess
+         * OFIQImpl::preprocess()\endlink method.
+         * @param argbImage Buffer receiving the row-major ARGB visualization; it is
+         * resized to the original image's dimensions.
+         */
+        void Visualize(OFIQ_LIB::Session& session, std::vector<uint32_t>& argbImage) override;
+
     private:
+        /**
+         * @brief Computes the two (left/right) regions of interest from the aligned
+         * face landmarks.
+         * @details Wraps \link OFIQ_LIB::CalculateReferencePoints() CalculateReferencePoints() \endlink
+         * and \link OFIQ_LIB::CalculateRegionOfInterest() CalculateRegionOfInterest() \endlink;
+         * shared by \ref Execute and \ref Visualize.
+         * @param[in] landmarks Aligned face landmarks.
+         * @param[out] leftRegionOfInterest Region corresponding to the left eye.
+         * @param[out] rightRegionOfInterest Region corresponding to the right eye.
+         */
+        void ComputeRegionsOfInterest(
+            const OFIQ::FaceLandmarks& landmarks,
+            cv::Rect& leftRegionOfInterest,
+            cv::Rect& rightRegionOfInterest) const;
+
+        /**
+         * @brief Maps a region of interest from the aligned face back into the
+         * original image and returns its (rounded) corner polygon.
+         * @param region Region of interest in aligned-face coordinates.
+         * @param alignedToOriginal Affine transformation from aligned-face to original
+         * image coordinates.
+         * @return The four transformed corners, ready for \c cv::fillConvexPoly.
+         */
+        std::vector<cv::Point> TransformRegionToImage(
+            const cv::Rect& region, const cv::Matx23d& alignedToOriginal) const;
+
+        /**
+         * @brief Builds the ARGB overlay from a region mask.
+         * @details Pixels inside the mask stay fully transparent; everything else is
+         * dimmed with a semi-transparent black.
+         * @param[in] mask Single-channel mask (non-zero = region of interest).
+         * @param[out] argbImage Buffer receiving the row-major ARGB image; resized to
+         * the mask's dimensions.
+         */
+        void BuildRegionOverlay(const cv::Mat& mask, std::vector<uint32_t>& argbImage) const;
+
         /**
          * @brief Creates a mask image from the convex full of the specified landmarks.
          * @param landmarks Facial landmarks.

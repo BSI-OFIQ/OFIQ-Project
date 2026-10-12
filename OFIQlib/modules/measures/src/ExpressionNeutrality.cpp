@@ -59,7 +59,7 @@ namespace OFIQ_LIB::modules::measures
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
-            m_onnxRuntimeEnvCNN1.initialize(modelData, dimCNN1, dimCNN1);
+            m_onnxRuntimeEnvCNN1.initialize(modelData, dimCNN1, dimCNN1, configuration);
         }
         catch (std::exception&)
         {
@@ -75,7 +75,7 @@ namespace OFIQ_LIB::modules::measures
             std::vector<uint8_t> modelData(
                 (std::istreambuf_iterator<char>(instream)),
                 std::istreambuf_iterator<char>());
-            m_onnxRuntimeEnvCNN2.initialize(modelData, dimCNN2, dimCNN2);
+            m_onnxRuntimeEnvCNN2.initialize(modelData, dimCNN2, dimCNN2, configuration);
         }
         catch (const std::exception&)
         {

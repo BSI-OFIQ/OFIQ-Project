@@ -60,8 +60,10 @@ else(USE_CONAN)
 		IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/build/Windows/${CMAKE_BUILD_TYPE}/${CMAKE_BUILD_TYPE}/onnxruntime.dll
 		INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/extern/onnxruntime/include/onnxruntime/core/session
 	)
-	if (VS_VERSION STREQUAL vc16)
+	if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extern/opencv-4.5.5/build/install/${ARCHITECTURE}/${VS_VERSION}/staticlib")
 		SET(OPENCV_INSTALL_PATH ${ARCHITECTURE}/${VS_VERSION}/)
+	else()
+		SET(OPENCV_INSTALL_PATH "")
 	endif()
 	if (CMAKE_BUILD_TYPE STREQUAL Debug)
 		SET(DEBUG_POSTFIX d)

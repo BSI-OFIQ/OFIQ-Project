@@ -158,7 +158,30 @@ namespace OFIQ_LIB::modules::measures
         virtual void Execute(OFIQ_LIB::Session& session) = 0;
 
         /**
-         * @brief Destructor 
+         * @brief Indicates whether this measure implements a visualization.
+         * @details If this method returns <code>true</code>, then
+         * \link OFIQ_LIB::modules::measures::Measure::Visualize Visualize()\endlink
+         * writes a visualization of the measure into the passed buffer.
+         * @return <code>true</code> if the measure implements a visualization;
+         * otherwise <code>false</code>.
+         */
+        virtual bool ImplementsVisualization() const = 0;
+
+        /**
+         * @brief Writes a visualization of this measure into an ARGB buffer.
+         * @details The method should only be invoked if
+         * \link OFIQ_LIB::modules::measures::Measure::ImplementsVisualization
+         * ImplementsVisualization()\endlink returns <code>true</code>.
+         * @param session Session object containing the original facial image and
+         * pre-processing results computed by the \link OFIQ_LIB::OFIQImpl::preprocess
+         * OFIQImpl::preprocess()\endlink method.
+         * @param argbImage Output buffer receiving the ARGB visualization.
+         */
+        virtual void Visualize
+        (OFIQ_LIB::Session& session, std::vector<uint32_t>& argbImage) = 0;
+
+        /**
+         * @brief Destructor
          */
         virtual ~Measure() = default;
 
@@ -182,6 +205,8 @@ namespace OFIQ_LIB::modules::measures
          * @details The method \link OFIQ_LIB::modules::measures::Measure::ExecuteScalarConversion(OFIQ::QualityMeasure,double) 
          * ExecuteScalarConversion()\endlink is invoked to map the native quality score to its
          * quality component value.
+         * @note If #code is \link OFIQ::QualityMeasureReturnCode::FailureToAssess FailureToAssess\endlink then the quality component value
+         * is set to -1.
          * @param session Session object containing the original facial image and pre-processing results
          * computed by the \link OFIQ_LIB::OFIQImpl::preprocess 
          * OFIQImpl::preprocess()\endlink method.

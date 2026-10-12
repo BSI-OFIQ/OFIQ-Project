@@ -5,6 +5,7 @@
 #include "ofiq_lib.h"
 #include "image_io.h"
 
+#include <memory>
 #include <sstream>
 
 
@@ -21,12 +22,15 @@ OFIQ_C_EXPORT ReturnStatus OFIQInitialize(
     const char* configDir,
     const char* configFileName)
 {
-    // yes, this is a pointer to a shared_ptr
-    auto implPtr = new std::shared_ptr<OFIQ::Interface>(OFIQ::Interface::getImplementation());
-    
+    // A pointer to a shared_ptr keeps the shared_ptr (and its deleter) alive
+    // behind the opaque C handle. Guard it with a unique_ptr so the error path
+    // cleans up automatically; ownership is transferred to *handle on success.
+    auto implPtr = std::make_unique<std::shared_ptr<OFIQ::Interface>>(
+        OFIQ::Interface::getImplementation());
+
     if (auto ret = (*implPtr)->initialize(
             std::string(configDir),
-            std::string(configFileName)); 
+            std::string(configFileName));
         ret.code != OFIQ::ReturnCode::Success)
     {
         std::stringstream sstr;
@@ -34,9 +38,9 @@ OFIQ_C_EXPORT ReturnStatus OFIQInitialize(
             << configDir << " and config file " << configFileName;
         return createReturnStatus(static_cast<ReturnStatus>(ret.code), sstr.str());
     }
-    
-    *handle = static_cast<OFIQHandle>(implPtr);
-    
+
+    *handle = static_cast<OFIQHandle>(implPtr.release());
+
     return createReturnStatus(ReturnCode::Success);
 }
 

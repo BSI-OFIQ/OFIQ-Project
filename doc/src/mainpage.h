@@ -67,6 +67,12 @@
      "model_path": "models/face_landmark_estimation/ADNet.onnx"
     }
    },
+   "threading": {
+    "opencv_threads": 0,
+    "ort_intra_threads": 0,
+    "ort_inter_threads": 0,
+    "ort_run_parallel": false,
+   },
    "measures": {
     "UnifiedQualityScore": {
      "model_path": "models/unified_quality_score/magface_iresnet50_norm.onnx"
@@ -90,6 +96,23 @@
  * <br/><br/>
  * Note that the model paths are specified as paths relative to the directory of the 
  * JAXN configuration file. We assume that the file above is stored in <OFIQ-SOURCE>/data.
+ *
+ * @subsection sec_runtime_threading Runtime threading configuration
+ * OFIQ allows runtime thread limits to be configured in the
+ * <code>"config.params.threading"</code> object of the JAXN file:
+ * <ul>
+ *  <li><code>opencv_threads</code>: maximum number of OpenCV threads</li>
+ *  <li><code>ort_intra_threads</code>: maximum number of ONNX Runtime intra-op threads</li>
+ *  <li><code>ort_inter_threads</code>: maximum number of ONNX Runtime inter-op threads</li>
+ *  <li><code>ort_run_parallel</code>: execution mode of ONNX Runtime
+ *      (<code>true</code> = parallel, <code>false</code> = sequential)</li>
+ * </ul>
+ * The three thread limits are optional non-negative integers. A value of
+ * <code>0</code> keeps the backend default behavior. <code>ort_run_parallel</code>
+ * is an optional boolean that defaults to <code>false</code> (sequential execution). 
+ * It must be set to <code>true</code> if <code>ort_inter_threads</code> is greater than <code>0</code>. 
+ * Otherwise the inter-op thread limit has no effect, because ONNX Runtime only uses inter-op
+ * parallelism in parallel execution mode.
  * 
  * @subsection sec_facedetect_cfg Configuration of the face detector
  * The face detector (SSD) must
@@ -250,8 +273,27 @@
  *  
  *  <tr>
  *  <td>-</td>
+ *  <td>Runtime threading</td>
+ *  <td>"config".<br/>"params".<br/>"threading"</td>
+ *  <td>-</td>
+ *  <td>
+ *   <code>opencv_threads</code>: OpenCV thread limit
+ *   <br/><br/>
+ *   <code>ort_intra_threads</code>: ONNX Runtime intra-op thread limit
+ *   <br/><br/>
+ *   <code>ort_inter_threads</code>: ONNX Runtime inter-op thread limit
+ *   <br/><br/>
+ *   <code>ort_run_parallel</code>: ONNX Runtime execution mode
+ *   <br/><br/>
+ *   Set any of the thread limit values to <code>0</code> to keep the corresponding backend default.
+ *  </td>
+ *  <td>-</td>
+ *  </tr>
+ *
+ *  <tr>
+ *  <td>-</td>
  *  <td>Face detector</td>
- *  <td>"config">"params".<br/>"detector"</td>
+ *  <td>"config".<br/>"params".<br/>"detector"</td>
  *  <td>-</td>
  *  <td>see @ref sec_facedetect_cfg "here"</td>
  *  <td>-</td>
@@ -260,7 +302,7 @@
  *  <tr>
  *  <td>-</td>
  *  <td>Face landmark estimator</td>
- *  <td>"config">"params".<br/>"landmarks"</td>
+ *  <td>"config".<br/>"params".<br/>"landmarks"</td>
  *  <td>-</td>
  *  <td>see @ref sec_facelandmark_cfg "here"</td>
  *  <td>-</td>
@@ -467,7 +509,7 @@
  *  <tr>
  *  <td>0x54</td>
  *  <td>Leftward crop of the face image</td>
- *  <td>"config">"params".<br/>"measures".<br/>"LeftwardCropOfTheFaceImage"</td>
+ *  <td>"config".<br/>"params".<br/>"measures".<br/>"LeftwardCropOfTheFaceImage"</td>
  *  <td>"config".<br/>"measures".<br/>"CropOfTheFaceImage"</td>
  *  <td>none</td>
  *  <td>yes</td>
@@ -476,7 +518,7 @@
  *  <tr>
  *  <td>0x55</td>
  *  <td>Rightward crop of the face image</td>
- *  <td>"config">"params".<br/>"measures".<br/>"RightwardCropOfTheFaceImage"</td>
+ *  <td>"config".<br/>"params".<br/>"measures".<br/>"RightwardCropOfTheFaceImage"</td>
  *  <td>"config".<br/>"measures".<br/>"CropOfTheFaceImage"</td>
  *  <td>none</td>
  *  <td>yes</td>
@@ -485,7 +527,7 @@
  *  <tr>
  *  <td>0x56</td>
  *  <td>Margin above of the face image</td>
- *  <td>"config">"params".<br/>"measures".<br/>"MarginAboveOfTheFaceImage"</td>
+ *  <td>"config".<br/>"params".<br/>"measures".<br/>"MarginAboveOfTheFaceImage"</td>
  *  <td>"config".<br/>"measures".<br/>"CropOfTheFaceImage"</td>
  *  <td>none</td>
  *  <td>yes</td>
@@ -494,7 +536,7 @@
  *  <tr>
  *  <td>0x57</td>
  *  <td>Margin below of the face image</td>
- *  <td>"config">"params".<br/>"measures".<br/>"MarginBelowOfTheFaceImage"</td>
+ *  <td>"config".<br/>"params".<br/>"measures".<br/>"MarginBelowOfTheFaceImage"</td>
  *  <td>"config".<br/>"measures".<br/>"CropOfTheFaceImage"</td>
  *  <td>none</td>
  *  <td>yes</td>
@@ -503,7 +545,7 @@
  *  <tr>
  *  <td>0x58</td>
  *  <td>Pose angle yaw frontal alignment</td>
- *  <td>"config">-</td>
+ *  <td>-</td>
  *  <td>"config".<br/>"measures".<br/>"HeadPose"</td>
  *  <td>none</td>
  *  <td>no</td>
@@ -530,7 +572,7 @@
  *  <tr>
  *  <td>0x5B</td>
  *  <td>Expression neutrality</td>
- *  <td>"config">"params".<br/>"measures".<br/>"ExpressionNeutrality"</td>
+ *  <td>"config".<br/>"params".<br/>"measures".<br/>"ExpressionNeutrality"</td>
  *  <td>"config".<br/>"measures".<br/>"ExpressionNeutrality"</td>
  *  <td>
  *   <code>cnn_model_path1</code>: Path to the CNN model <i>enet_b0_8_best_vgaf_embed_zeroed.onnx</i> derived from 
@@ -550,7 +592,7 @@
  *  <tr>
  *  <td>0x5C</td>
  *  <td>Abscence of head coverings</td>
- *  <td>"config">"params".<br/>"measures".<br/>"NoHeadCovering"</td>
+ *  <td>"config".<br/>"params".<br/>"measures".<br/>"NoHeadCovering"</td>
  *  <td>"config".<br/>"measures".<br/>"NoHeadCovering"</td>
  *  <td>
  *   <code>T0</code> - Proportion of pixels classified as head covering <= T0 will lead to a quality component value of 100 (best)<br/>
@@ -1026,7 +1068,7 @@
  * supported in the same way as they are supported by the linked OpenCV compilation.
  *
  * @section sec_release_notes Release notes
- * This is OFIQ v1.2.0. 
+ * This is OFIQ v1.2.1. 
  * The following table lists all measures and its implementation provided by this release of OFIQ. Details on the 
  * configuration and on requesting measures can be found
  * @ref sec_default_config "here". Note, the QAA identifiers listed in the table are defined in ISO/IEC 29794-5.

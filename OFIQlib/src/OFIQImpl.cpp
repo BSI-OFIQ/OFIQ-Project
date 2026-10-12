@@ -28,6 +28,7 @@
 #include "Executor.h"
 #include "FaceMeasures.h"
 #include "OFIQError.h"
+#include "RuntimeThreadSettings.h"
 #include "image_io.h"
 #include "image_utils.h"
 #include "ofiq_lib_impl.h"
@@ -49,6 +50,12 @@ ReturnStatus OFIQImpl::initialize(const std::string& configDir, const std::strin
     try
     {
         this->config = std::make_unique<Configuration>(configDir, configFilename);
+        // validate onnxruntime thread limit parameters
+        RuntimeThreadSettings::GetOrtIntraThreadCount(*this->config);
+        RuntimeThreadSettings::GetOrtInterThreadCount(*this->config);
+        // apply opencv thread limit
+        RuntimeThreadSettings::ApplyThreadLimit(*this->config);
+
         CreateNetworks();
         m_executorPtr = CreateExecutor();
     }
@@ -317,6 +324,48 @@ ReturnStatus OFIQImpl::vectorQualityWithPreprocessingResults(
     if (ReturnStatus retStatus = performAssessment(session); retStatus.code != ReturnCode::Success)
         return retStatus;
     return getPreprocessingResults(session, preprocessingResult, resultRequestsMask);
+}
+
+ReturnStatus OFIQImpl::vectorQualityWithVisualization(
+    const OFIQ::Image& image,
+    FaceImageQualityAssessment& assessments,
+    FaceImageQualityPreprocessingResult& preprocessingResult,
+    std::map<OFIQ::QualityMeasure, std::vector<uint32_t>>& visualizationResult,
+    uint32_t resultRequestsPreprocessingMask,
+    const std::set<OFIQ::QualityMeasure>& resultRequestsVisualizations)
+{
+    auto session = Session(image, assessments);
+    if (ReturnStatus retStatus = performAssessment(session); retStatus.code != ReturnCode::Success)
+        return retStatus;
+
+    // Produce a visualization for every requested measure that implements one.
+    for (const auto& measure : m_executorPtr->GetMeasures())
+    {
+        const OFIQ::QualityMeasure qualityMeasure = measure->GetQualityMeasure();
+        if (resultRequestsVisualizations.count(qualityMeasure) != 0 &&
+            measure->ImplementsVisualization())
+        {
+            std::vector<uint32_t> argbImage;
+            measure->Visualize(session, argbImage);
+            visualizationResult[qualityMeasure] = std::move(argbImage);
+        }
+    }
+
+    return getPreprocessingResults(session, preprocessingResult, resultRequestsPreprocessingMask);
+}
+
+bool OFIQImpl::ImplementsVisualization(const OFIQ::QualityMeasure& measure)
+{
+    if (!m_executorPtr)
+        return false;
+
+    for (const auto& activeMeasure : m_executorPtr->GetMeasures())
+    {
+        if (activeMeasure->GetQualityMeasure() == measure)
+            return activeMeasure->ImplementsVisualization();
+    }
+
+    return false;
 }
 
 ReturnStatus OFIQImpl::getPreprocessingResults(

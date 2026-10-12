@@ -26,6 +26,7 @@
 
 #include "adnet_landmarks.h"
 #include "OFIQError.h"
+#include "ONNXSessionOptions.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -65,13 +66,15 @@ namespace OFIQ_LIB::modules::landmarks
         }
 
         // init onnx session
-        void init_session(const std::vector<uint8_t>& i_model_data)
+        void init_session(
+            const std::vector<uint8_t>& i_model_data,
+            const OFIQ_LIB::Configuration& config)
         {
             m_ort_session = std::make_unique<Ort::Session>(
                 m_ortenv,
                 i_model_data.data(),
                 i_model_data.size(),
-                Ort::SessionOptions{nullptr});
+                OFIQ_LIB::CreateONNXSessionOptions(config));
 
 
             get_parameter_from_model(
@@ -240,7 +243,7 @@ namespace OFIQ_LIB::modules::landmarks
             DataStream instream(modelPath, std::ios::in | std::ios::binary);
             std::vector<uint8_t> modelData( (std::istreambuf_iterator<char>(instream)), std::istreambuf_iterator<char>());
 
-            landmarkExtractor_->init_session(modelData);
+            landmarkExtractor_->init_session(modelData, config);
         }
         catch (const std::exception&)
         {
